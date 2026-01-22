@@ -1,0 +1,142 @@
+/* Container */
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Loader */
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  font-size: 18px;
+  color: #64748b;
+  font-weight: 500;
+  gap: 10px;
+}
+
+/* Welcome Text */
+.welcomeText {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+/* --- Cards Grid System --- */
+.grid {
+  display: grid;
+  gap: 24px;
+  margin-bottom: 32px;
+  /* Default: 4 Columns for Desktop */
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Tablet: 2 Columns */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile: 1 Column */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Stat Card Styling */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.iconBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTitle {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+  margin: 0;
+}
+
+.cardValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 4px 0 0 0;
+}
+
+.cardNote {
+  font-size: 12px;
+  color: #9333ea;
+  background: #f3e8ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+/* --- Charts Section --- */
+.chartsSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 Columns for Charts */
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .chartsSection {
+    grid-template-columns: 1fr; /* Stack charts on smaller screens */
+  }
+}
+
+.chartCard {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.chartCard h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.noDataText {
+  text-align: center;
+  color: #94a3b8;
+  margin-top: 100px;
+  font-size: 14px;
+}

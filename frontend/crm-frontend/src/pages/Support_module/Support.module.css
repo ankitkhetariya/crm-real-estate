@@ -1,0 +1,118 @@
+/* Container Layout */
+.container {
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Header Section */
+.header {
+  margin-bottom: 50px;
+}
+
+.header h2 {
+  font-size: 32px;
+  color: #1e293b;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header p {
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* Grid System for Cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  justify-content: center;
+}
+
+/* Developer Card Design */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
+}
+
+/* Avatar Circle */
+.avatar {
+  width: 80px;
+  height: 80px;
+  background: #eff6ff;
+  color: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+/* Name & Role Typography */
+.name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.role {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Email Link Styling (Pill Style) */
+.emailLink {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: #f0f9ff; /* Light Blue Background */
+  border: 1px solid #dbeafe;
+  transition: all 0.3s ease;
+  word-break: break-all; /* Agar email lamba ho to layout na toote */
+}
+
+/* Hover Effect: Blue background, White Text */
+.emailLink:hover {
+  background-color: #2563eb;
+  color: white;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+/* Bottom Note */
+.note {
+  margin-top: 50px;
+  padding: 20px;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 14px;
+}

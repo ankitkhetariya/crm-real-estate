@@ -1,0 +1,11 @@
+# Dependecies (Bahut bhari folder)
+node_modules/
+
+# Security (Aapke passwords)
+.env
+.env.local
+.env.*
+
+# Logs
+*.log
+npm-debug.log*

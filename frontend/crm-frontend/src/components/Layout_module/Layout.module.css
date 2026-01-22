@@ -1,0 +1,238 @@
+/* =========================================
+   1. GLOBAL LAYOUT
+   ========================================= */
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f8fafc;
+  overflow: hidden;
+}
+
+/* =========================================
+   2. SIDEBAR (Brown Theme) 🟤
+   ========================================= */
+.sidebar {
+  width: 260px;
+  
+  /* ✅ Background: Deep Professional Brown */
+  background: #2C221F; 
+  
+  border-right: 1px solid #3E302B; /* Subtle dark border */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform 0.3s ease-in-out;
+  z-index: 1100;
+}
+
+/* Sidebar Header */
+.sidebarHeader {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #3E302B; /* Darker separator */
+}
+
+/* Logo Color - Light Brown/Goldish to pop on dark bg */
+.logoIcon {
+  color: #D7CCC8; 
+}
+
+/* Header Text - White */
+.sidebarHeader h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF; 
+  margin: 0;
+}
+
+/* Navigation Links */
+.nav {
+  flex: 1;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto;
+}
+
+/* Normal Link Style */
+.link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  
+  /* ✅ Text Color: Light Gray/Beige for readability */
+  color: #D7CCC8; 
+  
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+/* Hover Effect - Slightly lighter brown */
+.link:hover {
+  background-color: #3E302B;
+  color: #FFFFFF;
+}
+
+/* Active State - Distinct lighter brown */
+.active {
+  background-color: #4E3B34; /* Clay Brown */
+  color: #FFFFFF;
+  font-weight: 600;
+  border-left: 4px solid #A1887F; /* Accent line */
+}
+
+/* User Section (Bottom) */
+.userSection {
+  padding: 15px;
+  border-top: 1px solid #3E302B;
+  
+  /* ✅ Slightly darker brown for footer contrast */
+  background: #251D1A; 
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFFFFF; /* White Text */
+}
+
+/* Logout Button */
+.logoutBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #3E302B;
+  
+  /* Transparent/Dark bg for button */
+  background: #3E302B; 
+  color: #ffcccc; /* Soft Red */
+  
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background: #4E342E; /* Reddish Brown hover */
+  color: #ff9999;
+}
+
+/* =========================================
+   3. MAIN CONTENT
+   ========================================= */
+.mainContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+}
+
+/* =========================================
+   4. MOBILE HEADER (White & Black) ⚫⚪
+   ========================================= */
+/* (Ye waisa hi rakha hai jaisa aapne manga tha) */
+.mobileHeader {
+  display: none; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: #ffffff; 
+  color: #1e293b; 
+  border-bottom: 1px solid #e2e8f0;
+  z-index: 1000; 
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.mobileHeader h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b; 
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.menuBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #1e293b; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+/* Overlay */
+.overlay {
+  display: none;
+}
+
+/* =========================================
+   5. RESPONSIVE LOGIC
+   ========================================= */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .mobileHeader {
+    display: flex; 
+  }
+
+  .mainContent {
+    margin-top: 60px; 
+    padding: 15px;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  }
+
+  .showSidebar {
+    transform: translateX(0);
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050; 
+    backdrop-filter: blur(2px);
+  }
+}

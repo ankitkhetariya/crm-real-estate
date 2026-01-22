@@ -1,0 +1,128 @@
+/* Container */
+.container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.header {
+  margin-bottom: 25px;
+}
+
+.header h2 {
+  margin-top: 10px;
+  color: #1e293b;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.backBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-weight: 500;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.backBtn:hover {
+  color: #2563eb;
+}
+
+/* Form Card */
+.formCard {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 Columns */
+  gap: 20px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr; /* Mobile pe 1 Column */
+  }
+}
+
+/* Form Inputs */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.formGroup input, 
+.formGroup select, 
+.formGroup textarea {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  background: white;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.formGroup input:focus, 
+.formGroup select:focus, 
+.formGroup textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.formGroup textarea {
+  font-family: inherit;
+  resize: vertical;
+}
+
+/* Footer Button */
+.footer {
+  margin-top: 30px;
+}
+
+.submitBtn {
+  width: 100%;
+  background-color: #2563eb;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.submitBtn:hover {
+  background-color: #1d4ed8;
+}
+
+.submitBtn:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+}

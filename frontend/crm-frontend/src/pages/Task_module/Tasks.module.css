@@ -1,0 +1,134 @@
+.container {
+  padding: 20px;
+  width: 100%;
+  height: 90vh; /* Sidebar ke barabar height */
+  overflow-y: auto; /* Sirf ye hissa scroll karega */
+  background-color: #f8f9fa;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #2563eb;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.addBtn:hover {
+  background-color: #1d4ed8;
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.taskCard {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 5px solid #2563eb; /* Blue Default */
+}
+
+.taskCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+.completed {
+  background-color: #f0fdf4;
+  border-left-color: #16a34a; /* Green */
+  opacity: 0.8;
+}
+
+.taskInfo h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.metaTags {
+  display: flex;
+  gap: 15px;
+  font-size: 0.85rem;
+  color: #6b7280;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.priorityHigh { background: #fee2e2; color: #dc2626; }
+.priorityMedium { background: #fef3c7; color: #d97706; }
+.priorityLow { background: #e0f2fe; color: #0284c7; }
+
+.leadTag {
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBtn:hover {
+  background-color: #f3f4f6;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 50px;
+  color: #9ca3af;
+}

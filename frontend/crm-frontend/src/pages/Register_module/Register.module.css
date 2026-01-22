@@ -1,0 +1,58 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f5f9;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  width: 100%;
+  max-width: 450px; /* Thoda chauda (wide) kyunki fields zyada hain */
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.header { text-align: center; margin-bottom: 30px; }
+.header h2 { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
+.header p { color: #64748b; font-size: 14px; }
+
+.iconCircle {
+  width: 50px; height: 50px; background: #dbeafe; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 15px auto;
+}
+
+.form { display: flex; flex-direction: column; gap: 16px; }
+
+.inputGroup { display: flex; flex-direction: column; gap: 6px; }
+.inputGroup label { font-size: 13px; font-weight: 600; color: #334155; }
+
+.inputWrapper { position: relative; display: flex; align-items: center; }
+.inputIcon { position: absolute; left: 12px; color: #94a3b8; }
+
+.inputWrapper input {
+  width: 100%; padding: 10px 12px 10px 40px;
+  border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;
+  outline: none; transition: all 0.2s; background-color: #f8fafc;
+}
+.inputWrapper input:focus {
+  border-color: #2563eb; background-color: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.registerBtn {
+  background-color: #2563eb; color: white; border: none;
+  padding: 12px; border-radius: 8px; font-weight: 600; font-size: 15px;
+  cursor: pointer; transition: all 0.2s; margin-top: 10px;
+}
+.registerBtn:hover { background-color: #1d4ed8; transform: translateY(-1px); }
+.registerBtn:disabled { background-color: #94a3b8; cursor: not-allowed; }
+
+.footer { margin-top: 20px; text-align: center; font-size: 14px; color: #64748b; }
+.footer a { color: #2563eb; font-weight: 600; text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
