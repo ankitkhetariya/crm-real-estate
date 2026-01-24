@@ -3,7 +3,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import API from "../../api/axios"; 
 import toast from 'react-hot-toast'; 
-import { Save, ArrowLeft, User, Mail, Phone, MapPin, DollarSign, FileText } from "lucide-react"; 
+import { Save, ArrowLeft, User, Mail, Phone, MapPin, DollarSign, FileText, Briefcase } from "lucide-react"; 
 import styles from "./AddLead.module.css"; 
 
 const AddLead = () => {
@@ -15,6 +15,7 @@ const AddLead = () => {
     name: "",
     email: "",
     phone: "",
+    company: "",
     status: "New",
     source: "Website",
     budget: "",
@@ -23,18 +24,31 @@ const AddLead = () => {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+
+    // ✅ Validation: Budget negative nahi ho sakta
+    if (type === "number" && value < 0) {
+        toast.error("Budget cannot be negative!");
+        setFormData({ ...formData, [name]: 0 });
+        return;
+    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    
+    // ✅ Final Check
+    if (formData.budget < 0) {
+        toast.error("Invalid budget value");
+        return;
+    }
 
-    // ✅ FIX: Ab hum 'id' aur '_id' dono check karenge
+    setLoading(true);
     const userId = user?.id || user?._id;
 
     if (!user || !userId) {
-        toast.error("User not authenticated properly. Please Logout & Login.");
+        toast.error("User session expired. Please login again.");
         setLoading(false);
         return;
     }
@@ -42,19 +56,15 @@ const AddLead = () => {
     const payload = {
         ...formData,
         budget: formData.budget ? Number(formData.budget) : 0, 
-        assignedTo: userId // ✅ Ab sahi ID jayegi
+        assignedTo: userId 
     };
 
     try {
       await API.post("/leads", payload);
-      
       toast.success("New Lead Added Successfully! 🎉");
       navigate("/leads"); 
-
     } catch (err) {
-      console.error("API Error:", err.response?.data);
-      const message = err.response?.data?.message || "Failed to add lead";
-      toast.error(message);
+      toast.error(err.response?.data?.message || "Failed to add lead");
     } finally {
       setLoading(false);
     }
@@ -62,7 +72,6 @@ const AddLead = () => {
 
   return (
     <div className={styles.container}>
-      
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate("/leads")}>
           <ArrowLeft size={20} /> Back
@@ -72,8 +81,6 @@ const AddLead = () => {
 
       <form onSubmit={handleSubmit} className={styles.formCard}>
         <div className={styles.grid}>
-          
-          {/* Name */}
           <div className={styles.formGroup}>
             <label>Lead Name <span style={{color:"red"}}>*</span></label>
             <div className={styles.inputWrapper}>
@@ -82,7 +89,6 @@ const AddLead = () => {
             </div>
           </div>
 
-          {/* Email */}
           <div className={styles.formGroup}>
             <label>Email Address <span style={{color:"red"}}>*</span></label>
             <div className={styles.inputWrapper}>
@@ -91,7 +97,6 @@ const AddLead = () => {
             </div>
           </div>
 
-          {/* Phone */}
           <div className={styles.formGroup}>
             <label>Phone Number <span style={{color:"red"}}>*</span></label>
             <div className={styles.inputWrapper}>
@@ -100,16 +105,22 @@ const AddLead = () => {
             </div>
           </div>
 
-          {/* Budget */}
+          <div className={styles.formGroup}>
+            <label>Company</label>
+            <div className={styles.inputWrapper}>
+                <Briefcase size={16} className={styles.icon}/>
+                <input type="text" name="company" placeholder="Company Name" value={formData.company} onChange={handleChange} />
+            </div>
+          </div>
+
           <div className={styles.formGroup}>
             <label>Budget (₹)</label>
             <div className={styles.inputWrapper}>
                 <DollarSign size={16} className={styles.icon}/>
-                <input type="number" name="budget" placeholder="50000" value={formData.budget} onChange={handleChange} />
+                <input type="number" name="budget" min="0" placeholder="50000" value={formData.budget} onChange={handleChange} />
             </div>
           </div>
 
-          {/* Status */}
           <div className={styles.formGroup}>
             <label>Status</label>
             <select name="status" value={formData.status} onChange={handleChange}>
@@ -122,19 +133,19 @@ const AddLead = () => {
             </select>
           </div>
 
-          {/* Source */}
           <div className={styles.formGroup}>
             <label>Source</label>
             <select name="source" value={formData.source} onChange={handleChange}>
               <option value="Website">Website</option>
+              <option value="LinkedIn">LinkedIn</option>
               <option value="Referral">Referral</option>
               <option value="Social Media">Social Media</option>
               <option value="Cold Call">Cold Call</option>
               <option value="Ads">Ads</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
-          {/* Address */}
           <div className={styles.formGroup} style={{gridColumn: "1 / -1"}}>
             <label>Address</label>
             <div className={styles.inputWrapper}>
@@ -143,7 +154,6 @@ const AddLead = () => {
             </div>
           </div>
 
-          {/* Notes */}
           <div className={styles.formGroup} style={{gridColumn: "1 / -1"}}>
             <label>Notes</label>
             <div className={styles.inputWrapper} style={{alignItems:"flex-start"}}>
@@ -151,7 +161,6 @@ const AddLead = () => {
                 <textarea name="notes" rows="3" placeholder="Any special requirements..." value={formData.notes} onChange={handleChange} />
             </div>
           </div>
-
         </div>
 
         <div className={styles.footer}>

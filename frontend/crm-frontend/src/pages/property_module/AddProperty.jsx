@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../api/axios"; 
-import { Save, ArrowLeft, UploadCloud, X } from "lucide-react";
+import { Save, ArrowLeft, UploadCloud, X, Bed, Bath, Maximize } from "lucide-react";
 import Swal from 'sweetalert2'; 
+import toast from 'react-hot-toast';
 import styles from "./AddProperty.module.css"; 
 
 const AddProperty = () => {
@@ -10,7 +11,7 @@ const AddProperty = () => {
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null); 
 
-  // ✅ State setup (Backend fields ke hisab se)
+  // ✅ Updated State: Added bedrooms, bathrooms, and area
   const [formData, setFormData] = useState({
     title: "",
     type: "Apartment",
@@ -18,19 +19,29 @@ const AddProperty = () => {
     city: "",    
     address: "", 
     description: "",
+    bedrooms: "",
+    bathrooms: "",
+    area: "",
     status: "Available",
-    image: "" // Base64 string yahan store hogi
+    image: "" 
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+
+    // ✅ Validation Logic: Negative values ko allow nahi karega
+    if (type === "number" && value < 0) {
+      toast.error(`${name.charAt(0).toUpperCase() + name.slice(1)} cannot be negative!`);
+      setFormData({ ...formData, [name]: 0 });
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
-  // ✅ Image Handling Logic
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // 2MB Size Limit Check
       if (file.size > 2 * 1024 * 1024) {
         Swal.fire({ icon: 'error', title: 'File too large', text: 'Max 2MB allowed.' });
         return;
@@ -51,17 +62,17 @@ const AddProperty = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ Final Validation Check before API call
+    if (formData.price < 0 || formData.bedrooms < 0 || formData.bathrooms < 0 || formData.area < 0) {
+      toast.error("Please enter positive values only!");
+      return;
+    }
+
     setLoading(true);
 
-    // 🔴 FIX: Yahan galti thi. Hum 'images' array bhej rahe the.
-    // ✅ FIX: Ab hum direct 'image' string bhej rahe hain taaki database aur frontend match karein.
-    const payload = {
-      ...formData,
-      image: formData.image // Direct String (No Array)
-    };
-
     try {
-      await API.post("/properties", payload);
+      await API.post("/properties", formData);
       
       await Swal.fire({
         icon: 'success',
@@ -76,7 +87,7 @@ const AddProperty = () => {
       Swal.fire({
         icon: 'error',
         title: 'Submission Failed',
-        text: err.response?.data?.message || "City and Address are required!"
+        text: err.response?.data?.message || "Something went wrong!"
       });
     } finally {
       setLoading(false);
@@ -112,47 +123,64 @@ const AddProperty = () => {
 
           <div className={styles.formGroup}>
             <label>Price (₹)</label>
-            <input type="number" name="price" required value={formData.price} onChange={handleChange} placeholder="5000000" />
+            <input type="number" name="price" min="0" required value={formData.price} onChange={handleChange} placeholder="5000000" />
           </div>
 
           <div className={styles.formGroup}>
             <label>City</label>
-            <input 
-              type="text" name="city" required 
-              value={formData.city} onChange={handleChange} 
-              placeholder="e.g. Ahmedabad" 
-            />
+            <input type="text" name="city" required value={formData.city} onChange={handleChange} placeholder="e.g. Ahmedabad" />
+          </div>
+
+          {/* ✅ NEW: Bedrooms, Bathrooms, Area Fields */}
+          <div className={styles.formGroup}>
+            <label><Bed size={16} /> Bedrooms</label>
+            <input type="number" name="bedrooms" min="0" value={formData.bedrooms} onChange={handleChange} placeholder="e.g. 3" />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label><Bath size={16} /> Bathrooms</label>
+            <input type="number" name="bathrooms" min="0" value={formData.bathrooms} onChange={handleChange} placeholder="e.g. 2" />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label><Maximize size={16} /> Area (sqft)</label>
+            <input type="number" name="area" min="0" value={formData.area} onChange={handleChange} placeholder="e.g. 1500" />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Status</label>
+            <select name="status" value={formData.status} onChange={handleChange}>
+              <option value="Available">Available</option>
+              <option value="Sold">Sold</option>
+              <option value="Rented">Rented</option>
+            </select>
           </div>
 
           <div className={styles.formGroup} style={{gridColumn: "1 / -1"}}>
             <label>Full Address</label>
-            <input 
-              type="text" name="address" required 
-              value={formData.address} onChange={handleChange} 
-              placeholder="e.g. 101, Galaxy Tower, SG Highway" 
-            />
+            <input type="text" name="address" required value={formData.address} onChange={handleChange} placeholder="e.g. 101, Galaxy Tower, SG Highway" />
           </div>
 
           {/* Image Upload Section */}
           <div className={styles.formGroup} style={{gridColumn: "1 / -1"}}>
             <label>Property Image</label>
             {!preview ? (
-              <div style={{border: "2px dashed #cbd5e1", borderRadius: "8px", padding: "20px", textAlign: "center", cursor: "pointer", position: "relative", background: "#f8fafc"}}>
-                <input type="file" accept="image/*" onChange={handleImageChange} style={{position: "absolute", top: 0, left: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer"}} />
+              <div className={styles.uploadBox}>
+                <input type="file" accept="image/*" onChange={handleImageChange} className={styles.fileInput} />
                 <UploadCloud size={32} color="#2563eb"/>
-                <span style={{display:"block", fontSize:"14px", marginTop:"5px"}}>Click to Upload</span>
+                <span className={styles.uploadText}>Click to Upload Image</span>
               </div>
             ) : (
-              <div style={{position: "relative", height: "200px", borderRadius: "8px", overflow: "hidden", border: "1px solid #e2e8f0"}}>
-                <img src={preview} alt="Preview" style={{width: "100%", height: "100%", objectFit: "cover"}} />
-                <button type="button" onClick={removeImage} style={{position: "absolute", top: "10px", right: "10px", background: "red", color: "white", border: "none", borderRadius: "50%", padding: "5px", cursor: "pointer"}}><X size={16}/></button>
+              <div className={styles.previewContainer}>
+                <img src={preview} alt="Preview" className={styles.previewImg} />
+                <button type="button" onClick={removeImage} className={styles.removeBtn}><X size={16}/></button>
               </div>
             )}
           </div>
 
           <div className={styles.formGroup} style={{gridColumn: "1 / -1"}}>
             <label>Description</label>
-            <textarea name="description" rows="3" value={formData.description} onChange={handleChange} />
+            <textarea name="description" rows="3" value={formData.description} onChange={handleChange} placeholder="Describe the property features..." />
           </div>
 
         </div>
