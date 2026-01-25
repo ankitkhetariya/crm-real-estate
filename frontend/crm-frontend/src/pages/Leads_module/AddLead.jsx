@@ -26,7 +26,7 @@ const AddLead = () => {
   const handleChange = (e) => {
     const { name, value, type } = e.target;
 
-    // ✅ Validation: Budget negative nahi ho sakta
+    //  Validate budget to prevent negative values
     if (type === "number" && value < 0) {
         toast.error("Budget cannot be negative!");
         setFormData({ ...formData, [name]: 0 });
@@ -38,7 +38,7 @@ const AddLead = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // ✅ Final Check
+    // Final Check
     if (formData.budget < 0) {
         toast.error("Invalid budget value");
         return;

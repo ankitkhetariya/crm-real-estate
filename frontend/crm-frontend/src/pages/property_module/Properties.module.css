@@ -1,300 +1,461 @@
-.container {
-  padding: 2.5rem;
-  max-width: 1300px;
-  margin: 0 auto;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc;
-  min-height: 100vh;
+/* --- 1. Base Layout & Container --- */
+.container { 
+  padding: 2.5rem; 
+  max-width: 1200px; 
+  margin: 0 auto; 
+  font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+  background-color: #f8fafc; 
+  min-height: 100vh; 
 }
 
-/* --- Header Section --- */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
+.header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 2rem; 
 }
 
-.header h2 {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #0f172a;
+.header h2 { 
+  font-size: 1.8rem; 
+  font-weight: 800; 
+  color: #0f172a; 
   letter-spacing: -0.025em;
 }
 
-.headerActions {
-  display: flex;
-  gap: 1rem;
+.headerActions { 
+  display: flex; 
+  gap: 12px; 
 }
 
-.addBtn, .deleteBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  font-weight: 600;
+/* --- 2. Action Buttons (Header) --- */
+.addBtn, .deleteBtn { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  padding: 10px 20px; 
+  border-radius: 12px; 
+  font-weight: 700; 
+  border: none; 
+  cursor: pointer; 
+  transition: all 0.2s ease; 
+}
+
+.addBtn { 
+  background: #2563eb; 
+  color: white; 
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.addBtn:hover { 
+  background: #1d4ed8; 
+  transform: translateY(-2px); 
+}
+
+.deleteBtn { 
+  background: #fee2e2; 
+  color: #dc2626; 
+}
+
+.deleteBtn:hover { 
+  background: #fecaca; 
+}
+
+/* --- 3. Filter & Search Bar (Visible & Modern) --- */
+.filterBar { 
+  display: flex; 
+  gap: 1rem; 
+  margin-bottom: 2.5rem; 
+  background: white; 
+  padding: 1rem; 
+  border-radius: 16px; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+  border: 1px solid #e2e8f0; 
+  flex-wrap: wrap;
+}
+
+.searchWrapper { 
+  position: relative; 
+  flex: 3; 
+  min-width: 280px; 
+  display: flex; 
+  align-items: center; 
+}
+
+.searchIcon { 
+  position: absolute; 
+  left: 15px; 
+  color: #94a3b8; 
+}
+
+.searchInput { 
+  width: 100%; 
+  padding: 12px 12px 12px 45px !important; 
+  border: 1.5px solid #e2e8f0; 
+  border-radius: 10px; 
+  font-size: 0.95rem; 
+  outline: none; 
+  background: #f8fafc;
+  transition: 0.2s ease;
+  box-sizing: border-box;
+}
+
+.searchInput:focus { 
+  border-color: #2563eb; 
+  background: white;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); 
+}
+
+.filterWrapper { 
+  flex: 1; 
+  display: flex; 
+  align-items: center; 
+  background: #f1f5f9; 
+  border-radius: 10px; 
+  padding: 0 12px; 
+  min-width: 180px; 
+}
+
+.filterWrapper select { 
+  border: none; 
+  background: transparent; 
+  width: 100%; 
+  padding: 12px 0; 
+  font-weight: 600; 
+  color: #475569; 
+  outline: none; 
   cursor: pointer;
-  border: none;
+}
+
+/* --- 4. Property Cards Grid --- */
+.gridContainer { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+  gap: 2rem; 
+}
+
+.card { 
+  background: #ffffff; 
+  border-radius: 20px; 
+  overflow: hidden; 
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); 
+  border: 1px solid #f1f5f9; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+  display: flex; 
+  flex-direction: column; 
+}
+
+.card:hover { 
+  transform: translateY(-8px); 
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.1); 
+}
+
+.imageWrapper { 
+  position: relative; 
+  height: 210px; 
+}
+
+.cardImage { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
+
+.typeBadge { 
+  position: absolute; 
+  top: 12px; 
+  left: 12px; 
+  background: rgba(255,255,255,0.95); 
+  padding: 5px 12px; 
+  border-radius: 8px; 
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  color: #2563eb; 
+}
+
+.cardContent { 
+  padding: 1.5rem; 
+  flex-grow: 1; 
+}
+
+.cardHeader { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-start; 
+  margin-bottom: 8px; 
+}
+
+.title { 
+  font-size: 1.15rem; 
+  font-weight: 800; 
+  color: #1e293b; 
+  margin: 0; 
+}
+
+.price { 
+  color: #16a34a; 
+  font-weight: 800; 
+  font-size: 1.1rem; 
+}
+
+.location { 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+  color: #64748b; 
+  font-size: 0.85rem; 
+  margin-bottom: 12px; 
+}
+
+.propertySpecs { 
+  display: flex; 
+  justify-content: space-between; 
+  background: #f8fafc; 
+  padding: 12px; 
+  border-radius: 12px; 
+  margin: 15px 0; 
+  border: 1px solid #f1f5f9; 
+}
+
+.specItem { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  font-size: 0.85rem; 
+  font-weight: 700; 
+  color: #475569; 
+}
+
+/* --- 5. Professional Status Dropdown (In Card) --- */
+.statusWrapper { 
+  margin-top: 15px; 
+  width: fit-content; 
+}
+
+.statusSelect {
+  appearance: none;
+  padding: 8px 32px 8px 16px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
 }
 
-.addBtn {
-  background: #2563eb;
-  color: white;
+.statusSelect[data-status="Available"] { background-color: #f0fdf4; color: #166534; border-color: #dcfce7; }
+.statusSelect[data-status="Sold"] { background-color: #fef2f2; color: #991b1b; border-color: #fee2e2; }
+.statusSelect[data-status="Rented"] { background-color: #fffbeb; color: #92400e; border-color: #fef3c7; }
+
+/* --- 6. Card Footer Buttons --- */
+.cardFooter {
+  padding: 1rem 1.5rem;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
-.addBtn:hover {
-  background: #1d4ed8;
+.iconBtn {
+  width: 40px; 
+  height: 40px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  border-radius: 12px; 
+  border: 1px solid #e2e8f0; 
+  background: white; 
+  color: #64748b;
+  cursor: pointer; 
+  transition: all 0.2s ease;
+}
+
+.iconBtn:hover { 
+  background: #eff6ff; 
+  color: #2563eb; 
+  border-color: #bfdbfe; 
+  transform: translateY(-2px); 
+}
+
+.deleteIconBtn:hover { 
+  background: #fef2f2; 
+  color: #ef4444; 
+  border-color: #fecaca; 
+}
+
+/* --- 7. Edit Modal (Pixel-Perfect Grid) --- */
+.modalOverlay { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(15, 23, 42, 0.7); 
+  backdrop-filter: blur(8px); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 2000; 
+  padding: 20px; 
+}
+
+.modalContent { 
+  background: white; 
+  width: 100%; 
+  max-width: 750px; 
+  border-radius: 24px; 
+  padding: 2.5rem; 
+  max-height: 85vh; 
+  overflow-y: auto; 
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
+}
+
+.modalHeader { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 2rem; 
+  border-bottom: 2px solid #f1f5f9; 
+  padding-bottom: 1rem; 
+}
+
+.modalHeader h3 { 
+  font-size: 1.5rem; 
+  font-weight: 800; 
+  color: #0f172a; 
+  margin: 0; 
+}
+
+.editForm { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1.5rem; 
+}
+
+.formGrid { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 1.5rem; 
+  width: 100%;
+}
+
+.fullWidth { 
+  grid-column: span 2; 
+}
+
+.formGroup { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  width: 100%; 
+}
+
+.formGroup label { 
+  font-size: 0.85rem; 
+  font-weight: 700; 
+  color: #475569; 
+}
+
+.formGroup input, 
+.formGroup select, 
+.formGroup textarea { 
+  width: 100%; 
+  padding: 12px 16px; 
+  border: 1.5px solid #e2e8f0; 
+  border-radius: 12px; 
+  font-size: 1rem; 
+  background: #f8fafc;
+  box-sizing: border-box; /* ✅ Cart Fix */
+}
+
+.formGroup input:focus, 
+.formGroup select:focus, 
+.formGroup textarea:focus { 
+  border-color: #2563eb; 
+  background: white;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+/* Image Update UI */
+.imageUpdateSection { 
+  display: flex; 
+  align-items: center; 
+  gap: 20px; 
+  background: #f1f5f9; 
+  padding: 15px; 
+  border-radius: 16px; 
+}
+
+.previewContainer { 
+  position: relative; 
+  width: 80px; 
+  height: 80px; 
+  border-radius: 12px; 
+  overflow: hidden; 
+  border: 3px solid white; 
+}
+
+.previewContainer img { width: 100%; height: 100%; object-fit: cover; }
+
+.uploadTrigger { 
+  position: relative; 
+  flex: 1; 
+  border: 2px dashed #cbd5e1; 
+  border-radius: 12px; 
+  padding: 15px; 
+  text-align: center; 
+  cursor: pointer; 
+  background: white; 
+  font-weight: 600;
+  color: #475569;
+}
+
+.uploadTrigger input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+/* Modal Footer Actions */
+.modalActions { 
+  display: flex; 
+  gap: 1rem; 
+  margin-top: 1rem; 
+  justify-content: flex-end; 
+}
+
+.saveBtn { 
+  background: #2563eb; 
+  color: white; 
+  padding: 14px 28px; 
+  border-radius: 12px; 
+  font-weight: 700; 
+  border: none; 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  transition: 0.2s;
+}
+
+.saveBtn:hover { 
+  background: #1d4ed8; 
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
 }
 
-.deleteBtn {
-  background: #fee2e2;
-  color: #dc2626;
+.cancelBtn { 
+  background: #f1f5f9; 
+  color: #64748b; 
+  padding: 14px 28px; 
+  border-radius: 12px; 
+  font-weight: 700; 
+  border: none; 
+  cursor: pointer; 
 }
 
-.deleteBtn:hover {
-  background: #fecaca;
-  color: #991b1b;
-}
+.cancelBtn:hover { background: #e2e8f0; }
 
-/* --- Filter & Search Bar (Premium Look) --- */
-.filterBar {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-  background: white;
-  padding: 1.5rem;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border: 1px solid #e2e8f0;
-}
-
-.searchWrapper {
-  position: relative;
-  flex: 3;
-  display: flex;
-  align-items: center;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 18px;
-  color: #64748b;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 14px 14px 14px 50px !important;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 1rem;
-  outline: none;
-  background: #f8fafc;
-  transition: 0.3s;
-}
-
-.searchInput:focus {
-  background: white;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-}
-
-.filterWrapper {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 0 15px;
-}
-
-.filterWrapper select {
-  border: none;
-  background: transparent;
-  width: 100%;
-  padding: 14px 0;
-  font-weight: 600;
-  color: #475569;
-  outline: none;
-  cursor: pointer;
-}
-
-/* --- Property Grid & Cards --- */
-.gridContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 2rem;
-}
-
-.card {
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.imageWrapper {
-  position: relative;
-  height: 230px;
-}
-
-.cardImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.typeBadge {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(4px);
-  color: #2563eb;
-  padding: 6px 14px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.cardContent {
-  padding: 1.5rem;
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.price {
-  color: #10b981;
-  font-weight: 800;
-  font-size: 1.15rem;
-}
-
-.location {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #64748b;
-  font-size: 0.9rem;
-  margin-bottom: 1.2rem;
-}
-
-/* ✅ Property Specs Box */
-.propertySpecs {
-  display: flex;
-  justify-content: space-between;
-  background: #f1f5f9;
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 1.2rem;
-}
-
-.specItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #334155;
-}
-
-.cardDescription {
-  font-size: 0.95rem;
-  color: #64748b;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-  height: 45px;
-  overflow: hidden;
-}
-
-.statusSelect {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.statusSelect[data-status="Available"] { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-.statusSelect[data-status="Sold"] { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
-.statusSelect[data-status="Rented"] { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
-
-.cardFooter {
-  padding: 1.2rem 1.5rem;
-  background: #f8fafc;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  border-top: 1px solid #f1f5f9;
-}
-
-.iconBtn {
-  background: white;
-  border: 1px solid #e2e8f0;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  color: #64748b;
-  transition: all 0.2s ease;
-}
-
-.iconBtn:hover {
-  background: #2563eb;
-  color: white;
-  border-color: #2563eb;
-}
-
-.deleteIconBtn:hover {
-  background: #ef4444;
-  border-color: #ef4444;
-}
-
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #64748b;
-}
-
-.emptyState {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 4rem;
-  background: white;
-  border-radius: 20px;
-  border: 2px dashed #e2e8f0;
-  color: #94a3b8;
-  font-size: 1.1rem;
+/* --- 8. Responsive Design --- */
+@media (max-width: 650px) { 
+  .formGrid { grid-template-columns: 1fr; } 
+  .modalContent { padding: 1.5rem; width: 100%; height: 100%; max-height: 100vh; border-radius: 0; }
+  .header { flex-direction: column; gap: 15px; align-items: flex-start; }
 }

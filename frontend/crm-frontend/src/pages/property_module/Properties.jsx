@@ -33,11 +33,12 @@ const Properties = () => {
     fetchProperties();
   }, []);
 
+  // ✅ FIXED: Delete All Logic Wapas Aa Gaya
   const handleDeleteAll = async () => {
     if (properties.length === 0) return;
     const result = await Swal.fire({
       title: 'Delete All?',
-      text: "This will remove ALL your properties!",
+      text: "This will remove ALL your properties permanently!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
@@ -51,26 +52,6 @@ const Properties = () => {
         toast.success("All properties cleared");
       } catch (err) {
         toast.error("Failed to delete all");
-      }
-    }
-  };
-
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      confirmButtonText: 'Delete'
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await API.delete(`/properties/${id}`);
-        setProperties(properties.filter(p => p._id !== id));
-        toast.success("Deleted successfully");
-      } catch (err) {
-        toast.error("Failed to delete");
       }
     }
   };
@@ -107,7 +88,7 @@ const Properties = () => {
 
   const handleSaveChanges = async (e) => {
     e.preventDefault();
-    if (currentProp.price < 0 || (currentProp.bedrooms && currentProp.bedrooms < 0) || (currentProp.bathrooms && currentProp.bathrooms < 0) || (currentProp.area && currentProp.area < 0)) {
+    if (currentProp.price < 0 || currentProp.bedrooms < 0 || currentProp.bathrooms < 0 || currentProp.area < 0) {
       toast.error("Negative values are not allowed!");
       return;
     }
@@ -124,31 +105,45 @@ const Properties = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      confirmButtonText: 'Delete'
+    });
+    if (result.isConfirmed) {
+      try {
+        await API.delete(`/properties/${id}`);
+        setProperties(properties.filter(p => p._id !== id));
+        toast.success("Deleted successfully");
+      } catch (err) { toast.error("Failed to delete"); }
+    }
+  };
+
   const handleStatusChange = async (id, newStatus) => {
     try {
       await API.put(`/properties/${id}`, { status: newStatus });
       setProperties(properties.map(p => p._id === id ? { ...p, status: newStatus } : p));
       toast.success("Status Updated");
-    } catch(err) {
-      toast.error("Status Update failed");
-    }
+    } catch(err) { toast.error("Status Update failed"); }
   };
 
   const filteredProperties = properties.filter((p) => {
-    const matchesSearch = 
-      p.title.toLowerCase().includes(searchText.toLowerCase()) || 
-      p.city?.toLowerCase().includes(searchText.toLowerCase()); 
+    const matchesSearch = p.title.toLowerCase().includes(searchText.toLowerCase()) || p.city?.toLowerCase().includes(searchText.toLowerCase()); 
     const matchesStatus = statusFilter === "All" || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) return <div className={styles.loading}>Loading Properties...</div>;
+  if (loading) return <div className={styles.loading}>Loading...</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>My Properties</h2>
         <div className={styles.headerActions}>
+            {/* ✅ FIXED: Delete All Button logic added back */}
             {properties.length > 0 && (
                 <button onClick={handleDeleteAll} className={styles.deleteBtn}>
                     <Trash2 size={18} /> Delete All
@@ -160,20 +155,13 @@ const Properties = () => {
         </div>
       </div>
 
-      {/* ✅ Fixed Search Bar Structure */}
       <div className={styles.filterBar}>
         <div className={styles.searchWrapper}>
           <Search size={20} className={styles.searchIcon} />
-          <input 
-            type="text" 
-            placeholder="Search by title or city..." 
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className={styles.searchInput}
-          />
+          <input type="text" placeholder="Search title or city..." value={searchText} onChange={(e) => setSearchText(e.target.value)} className={styles.searchInput} />
         </div>
         <div className={styles.filterWrapper}>
-            <Filter size={18} className={styles.filterIcon} />
+            <Filter size={18} />
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="All">All Status</option>
               <option value="Available">Available</option>
@@ -184,102 +172,60 @@ const Properties = () => {
       </div>
 
       <div className={styles.gridContainer}>
-        {filteredProperties.length === 0 ? (
-            <div className={styles.emptyState}>No properties found.</div>
-        ) : (
-            filteredProperties.map((prop) => (
-                <div key={prop._id} className={styles.card}>
-                    <div className={styles.imageWrapper}>
-                        <img 
-                            src={prop.image || PLACEHOLDER_IMG} 
-                            alt={prop.title} 
-                            className={styles.cardImage}
-                            onError={(e) => {e.target.src = PLACEHOLDER_IMG}} 
-                        />
-                        <span className={styles.typeBadge}>{prop.type}</span>
-                    </div>
-
-                    <div className={styles.cardContent}>
-                        <div className={styles.cardHeader}>
-                            <h3 className={styles.title}>{prop.title}</h3>
-                            <span className={styles.price}>₹{Number(prop.price).toLocaleString('en-IN')}</span>
-                        </div>
-                        
-                        <div className={styles.location}>
-                            <MapPin size={14} /> {prop.city}
-                        </div>
-
-                        <div className={styles.propertySpecs}>
-                            <div className={styles.specItem}>
-                                <Bed size={16}/> <span>{prop.bedrooms || 0} BHK</span>
-                            </div>
-                            <div className={styles.specItem}>
-                                <Bath size={16}/> <span>{prop.bathrooms || 0} Bath</span>
-                            </div>
-                            <div className={styles.specItem}>
-                                <Maximize size={16}/> <span>{prop.area || 0} sqft</span>
-                            </div>
-                        </div>
-
-                        <p className={styles.cardDescription}>
-                            {prop.description ? 
-                                (prop.description.length > 50 ? prop.description.slice(0, 50) + "..." : prop.description) 
-                                : "No description available."
-                            }
-                        </p>
-
-                        <div className={styles.statusWrapper}>
-                            <select 
-                                value={prop.status}
-                                onChange={(e) => handleStatusChange(prop._id, e.target.value)}
-                                className={styles.statusSelect}
-                                data-status={prop.status}
-                            >
-                                <option value="Available">Available</option>
-                                <option value="Sold">Sold</option>
-                                <option value="Rented">Rented</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className={styles.cardFooter}>
-                        <button className={styles.iconBtn} onClick={() => openEditModal(prop)}>
-                            <Edit size={16} />
-                        </button>
-                        <button className={`${styles.iconBtn} ${styles.deleteIconBtn}`} onClick={() => handleDelete(prop._id)}>
-                            <Trash2 size={16} />
-                        </button>
-                    </div>
+        {filteredProperties.map((prop) => (
+          <div key={prop._id} className={styles.card}>
+            <div className={styles.imageWrapper}>
+                <img src={prop.image || PLACEHOLDER_IMG} alt={prop.title} className={styles.cardImage} />
+                <span className={styles.typeBadge}>{prop.type}</span>
+            </div>
+            <div className={styles.cardContent}>
+                <div className={styles.cardHeader}>
+                    <h3 className={styles.title}>{prop.title}</h3>
+                    <span className={styles.price}>₹{Number(prop.price).toLocaleString('en-IN')}</span>
                 </div>
-            ))
-        )}
+                <div className={styles.location}><MapPin size={14} /> {prop.city}</div>
+                <div className={styles.propertySpecs}>
+                    <div className={styles.specItem}><Bed size={16}/> <span>{prop.bedrooms || 0} BHK</span></div>
+                    <div className={styles.specItem}><Bath size={16}/> <span>{prop.bathrooms || 0} Bath</span></div>
+                    <div className={styles.specItem}><Maximize size={16}/> <span>{prop.area || 0} sqft</span></div>
+                </div>
+                <div className={styles.statusWrapper}>
+                    <select value={prop.status} onChange={(e) => handleStatusChange(prop._id, e.target.value)} className={styles.statusSelect} data-status={prop.status}>
+                        <option value="Available">Available</option>
+                        <option value="Sold">Sold</option>
+                        <option value="Rented">Rented</option>
+                    </select>
+                </div>
+            </div>
+            <div className={styles.cardFooter}>
+                <button className={styles.iconBtn} onClick={() => openEditModal(prop)}><Edit size={16} /></button>
+                <button className={`${styles.iconBtn} ${styles.deleteIconBtn}`} onClick={() => handleDelete(prop._id)}><Trash2 size={16} /></button>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* --- EDIT MODAL --- */}
       {isEditModalOpen && currentProp && (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
                 <div className={styles.modalHeader}>
                     <h3>Edit Property Details</h3>
-                    <button className={styles.closeBtn} onClick={() => setIsEditModalOpen(false)}>
-                        <X size={24} />
-                    </button>
+                    <button className={styles.closeBtn} onClick={() => setIsEditModalOpen(false)}><X size={24} /></button>
                 </div>
-
                 <form onSubmit={handleSaveChanges} className={styles.editForm}>
                     <div className={styles.formGrid}>
                         <div className={styles.formGroup}><label>Title</label><input name="title" value={currentProp.title} onChange={handleEditChange} required /></div>
                         <div className={styles.formGroup}><label>City</label><input name="city" value={currentProp.city} onChange={handleEditChange} required /></div>
-                        <div className={styles.formGroup}><label>Price (₹)</label><input type="number" name="price" min="0" value={currentProp.price} onChange={handleEditChange} required /></div>
+                        <div className={styles.formGroup}><label>Price (₹)</label><input type="number" name="price" value={currentProp.price} onChange={handleEditChange} required /></div>
                         <div className={styles.formGroup}>
                             <label>Type</label>
                             <select name="type" value={currentProp.type} onChange={handleEditChange}>
                                 <option value="Apartment">Apartment</option><option value="House">House</option><option value="Commercial">Commercial</option><option value="Land">Land</option>
                             </select>
                         </div>
-                        <div className={styles.formGroup}><label>Bedrooms</label><input type="number" name="bedrooms" min="0" value={currentProp.bedrooms || ""} onChange={handleEditChange} /></div>
-                        <div className={styles.formGroup}><label>Bathrooms</label><input type="number" name="bathrooms" min="0" value={currentProp.bathrooms || ""} onChange={handleEditChange} /></div>
-                        <div className={styles.formGroup}><label>Area (sqft)</label><input type="number" name="area" min="0" value={currentProp.area || ""} onChange={handleEditChange} /></div>
+                        <div className={styles.formGroup}><label>Bedrooms</label><input type="number" name="bedrooms" value={currentProp.bedrooms || ""} onChange={handleEditChange} /></div>
+                        <div className={styles.formGroup}><label>Bathrooms</label><input type="number" name="bathrooms" value={currentProp.bathrooms || ""} onChange={handleEditChange} /></div>
+                        <div className={styles.formGroup}><label>Area (sqft)</label><input type="number" name="area" value={currentProp.area || ""} onChange={handleEditChange} /></div>
                         <div className={styles.formGroup}>
                             <label>Status</label>
                             <select name="status" value={currentProp.status} onChange={handleEditChange}>
@@ -291,17 +237,22 @@ const Properties = () => {
                             <div className={styles.imageUpdateSection}>
                               {currentProp.image && (
                                 <div className={styles.previewContainer}>
-                                  <img src={currentProp.image} alt="Preview" /><button type="button" onClick={() => setCurrentProp({...currentProp, image: ""})}><X size={12}/></button>
+                                  <img src={currentProp.image} alt="Preview" />
+                                  <button type="button" onClick={() => setCurrentProp({...currentProp, image: ""})}><X size={12}/></button>
                                 </div>
                               )}
-                              <div className={styles.uploadTrigger}><UploadCloud size={20} /><span>Change Image</span><input type="file" accept="image/*" onChange={handleEditImageChange} /></div>
+                              <div className={styles.uploadTrigger}>
+                                <UploadCloud size={20} />
+                                <span>Change Image</span>
+                                <input type="file" accept="image/*" onChange={handleEditImageChange} />
+                              </div>
                             </div>
                         </div>
                         <div className={`${styles.formGroup} ${styles.fullWidth}`}><label>Description</label><textarea name="description" value={currentProp.description || ""} onChange={handleEditChange} rows="3" /></div>
                     </div>
                     <div className={styles.modalActions}>
                       <button type="button" className={styles.cancelBtn} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
-                      <button type="submit" className={styles.saveBtn} disabled={saveLoading}>{saveLoading ? "Updating..." : <><Save size={18} /> Update Property</>}</button>
+                      <button type="submit" className={styles.saveBtn} disabled={saveLoading}>{saveLoading ? "Saving..." : "Update Property"}</button>
                     </div>
                 </form>
             </div>

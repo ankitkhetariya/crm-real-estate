@@ -33,7 +33,6 @@ const Leads = () => {
     setIsEditModalOpen(true);
   };
 
-  // ✅ Validation Logic for Edit Modal
   const handleEditChange = (e) => {
     const { name, value, type } = e.target;
     if (type === "number" && value < 0) {
@@ -105,7 +104,6 @@ const Leads = () => {
         </button>
       </div>
 
-      {/* ✅ Premium Search Bar Section */}
       <div className={styles.filterBar}>
         <div className={styles.searchWrapper}>
           <Search size={20} className={styles.searchIcon} />
@@ -138,13 +136,14 @@ const Leads = () => {
                     <th>Lead Name & Company</th>
                     <th>Contact Details</th>
                     <th>Status</th>
+                    <th>Notes</th> {/* ✅ Naya Column yahan hai */}
                     <th>Budget & Source</th>
                     <th style={{textAlign: "center"}}>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {filteredLeads.length === 0 ? (
-                    <tr><td colSpan="5" className={styles.emptyState}>No leads found matching your search.</td></tr>
+                    <tr><td colSpan="6" className={styles.emptyState}>No leads found matching your search.</td></tr>
                 ) : (
                     filteredLeads.map((lead) => (
                         <tr key={lead._id}>
@@ -180,6 +179,12 @@ const Leads = () => {
                                     <option value="Lost">Lost</option>
                                 </select>
                             </td>
+                            {/* ✅ Table mein Notes dikhane ke liye naya cell */}
+                            <td data-label="Notes">
+                                <div className={styles.noteCell} title={lead.notes}>
+                                    {lead.notes ? (lead.notes.length > 30 ? lead.notes.substring(0, 30) + "..." : lead.notes) : <span className={styles.noNote}>-</span>}
+                                </div>
+                            </td>
                             <td data-label="Budget & Source">
                                 <div className={styles.budgetCell}>₹{Number(lead.budget).toLocaleString('en-IN')}</div>
                                 <div className={styles.sourceLabel}>{lead.source}</div>
@@ -197,7 +202,6 @@ const Leads = () => {
         </table>
       </div>
 
-      {/* ✅ Edit Modal Section */}
       {isEditModalOpen && currentLead && (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
