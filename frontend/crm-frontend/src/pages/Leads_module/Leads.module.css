@@ -1,6 +1,6 @@
-/* --- 1. Base Container & Header --- */
+/* Container Layout */
 .container { 
-  padding: 2rem; 
+  padding: 1.5rem; 
   max-width: 1200px; 
   margin: 0 auto; 
   font-family: 'Inter', system-ui, sans-serif; 
@@ -8,190 +8,356 @@
   min-height: 100vh; 
 }
 
+/* Header and Actions Styling */
 .header { 
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
   margin-bottom: 2rem; 
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .header h2 { 
   font-size: 1.8rem; 
   font-weight: 800; 
   color: #0f172a; 
+  margin: 0;
 }
 
-.addBtn {
-  background: #2563eb;
-  color: white;
-  padding: 0.8rem 1.5rem;
+.headerActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Primary Button Styles */
+.addBtn, .deleteAllBtn {
+  padding: 0.7rem 1.2rem;
   border-radius: 12px;
-  border: none;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   transition: 0.3s;
-  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  font-size: 0.9rem;
 }
 
-.addBtn:hover { transform: translateY(-2px); background: #1d4ed8; }
+.addBtn { 
+  background: #2563eb; 
+  color: white; 
+  border: none; 
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); 
+}
 
-/* --- 2. Search & Filter Bar (Visible Logic) --- */
+.addBtn:hover { 
+  transform: translateY(-2px); 
+  background: #1d4ed8; 
+}
+
+.deleteAllBtn { 
+  background: #fff; 
+  color: #ef4444; 
+  border: 1.5px solid #fecaca; 
+}
+
+.deleteAllBtn:hover { 
+  background: #fef2f2; 
+  border-color: #ef4444; 
+  transform: translateY(-2px); 
+}
+
+/* Filtering Controls */
 .filterBar {
   display: flex;
-  gap: 1.2rem;
-  margin-bottom: 2.5rem;
+  gap: 1rem;
+  margin-bottom: 2rem;
   background: white;
-  padding: 1.2rem;
+  padding: 1rem;
   border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
 }
 
-.searchWrapper { position: relative; flex: 3; display: flex; align-items: center; }
-.searchIcon { position: absolute; left: 15px; color: #94a3b8; }
+.searchWrapper { 
+  position: relative; 
+  flex: 2; 
+  min-width: 250px; 
+}
+
+.searchIcon { 
+  position: absolute; 
+  left: 15px; 
+  top: 50%; 
+  transform: translateY(-50%); 
+  color: #94a3b8; 
+}
 
 .searchInput {
   width: 100%;
-  padding: 12px 12px 12px 48px !important;
+  padding: 12px 12px 12px 45px !important;
   border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 1rem;
-  outline: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
   background: #f8fafc;
-  transition: 0.2s;
-  box-sizing: border-box; /* ✅ Layout protection */
+  outline: none;
+  box-sizing: border-box;
 }
 
-.searchInput:focus { background: white; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
-
-.filterWrapper {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 0 12px;
-  min-width: 180px;
+.filterWrapper { 
+  flex: 1; 
+  min-width: 150px; 
+  background: #f1f5f9; 
+  border-radius: 10px; 
+  padding: 0 10px; 
+  display: flex; 
+  align-items: center; 
 }
 
-.filterWrapper select { border: none; background: transparent; width: 100%; padding: 12px 0; font-weight: 600; color: #475569; outline: none; }
+.filterWrapper select { 
+  border: none; 
+  background: transparent; 
+  width: 100%; 
+  padding: 12px 0; 
+  font-weight: 600; 
+  outline: none; 
+}
 
-/* --- 3. Table Design --- */
+/* Data Table Styling */
 .tableCardContainer {
   background: white;
   border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
   border: 1px solid #e2e8f0;
+  overflow-x: auto;
 }
 
-.table { width: 100%; border-collapse: collapse; }
-.table th { background: #f8fafc; padding: 1.2rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; color: #64748b; font-weight: 700; border-bottom: 2px solid #f1f5f9; }
-.table td { padding: 1.2rem; border-top: 1px solid #f1f5f9; }
+.table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  min-width: 800px; 
+}
 
-.leadInfo { display: flex; align-items: center; gap: 12px; }
-.avatar { width: 40px; height: 40px; background: #e0e7ff; color: #4338ca; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; }
-.leadName { font-weight: 700; color: #1e293b; }
-.companyName { font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 4px; }
-
-/* --- 4. Status Dropdown (Same as Properties) --- */
-.statusSelect { 
-  padding: 8px 14px; 
-  border-radius: 20px; 
-  border: 1.5px solid transparent; 
-  font-size: 0.8rem; 
+.table th { 
+  background: #f8fafc; 
+  padding: 1rem; 
+  text-align: left; 
+  font-size: 0.75rem; 
+  text-transform: uppercase; 
+  color: #64748b; 
   font-weight: 700; 
-  cursor: pointer; 
-  width: 140px; 
-  text-align: center;
-  transition: 0.2s;
+}
+
+.table td { 
+  padding: 1.2rem 1rem; 
+  border-top: 1px solid #f1f5f9; 
+  vertical-align: middle; 
+}
+
+/* Contact Cell Typography */
+.contactCell { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; 
+}
+
+.contactCell span { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  font-size: 0.9rem; 
+  color: #475569; 
+  word-break: break-all; 
+}
+
+/* Status Selection Styling */
+.statusSelect { 
+  padding: 6px 12px; 
+  border-radius: 20px; 
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  border: 1.5px solid transparent;
+  width: 130px;
 }
 
 .statusSelect[data-status="New"] { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
-.statusSelect[data-status="Contacted"] { background: #f0f9ff; color: #0369a1; border-color: #e0f2fe; }
 .statusSelect[data-status="Converted"] { background: #f0fdf4; color: #15803d; border-color: #dcfce7; }
 .statusSelect[data-status="Lost"] { background: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
 
-/* --- 5. Action Buttons --- */
-.actions { display: flex; gap: 10px; justify-content: center; }
-.iconBtn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #64748b; cursor: pointer; transition: 0.2s; }
-.iconBtn:hover { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
-.deleteIconBtn:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
+/* In-table Action Buttons */
+.actions { 
+  display: flex; 
+  gap: 10px; 
+  justify-content: center; 
+}
 
-/* --- 6. 🚀 PREMIMUM RESPONSIVE MODAL (FIXED) --- */
+.editBtn, .deleteBtn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.editBtn { color: #2563eb; }
+.editBtn:hover { background: #eff6ff; border-color: #2563eb; transform: translateY(-2px); }
+
+.deleteBtn { color: #ef4444; }
+.deleteBtn:hover { background: #fef2f2; border-color: #ef4444; transform: translateY(-2px); }
+
+/* Premium Modal Styling */
 .modalOverlay { 
-  position: fixed; inset: 0; 
+  position: fixed; 
+  inset: 0; 
   background: rgba(15, 23, 42, 0.7); 
   backdrop-filter: blur(8px); 
-  display: flex; align-items: center; justify-content: center; 
-  z-index: 2000; padding: 20px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 2000; 
+  padding: 20px; 
 }
 
 .modalContent { 
-  background: white; width: 100%; max-width: 650px; 
-  border-radius: 24px; padding: 2.5rem; 
-  max-height: 85vh; overflow-y: auto; 
+  background: white; 
+  width: 95%; 
+  max-width: 650px; 
+  border-radius: 24px; 
+  padding: 2rem; 
+  max-height: 90vh; 
+  overflow-y: auto; 
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
 }
 
 .modalHeader { 
-  display: flex; justify-content: space-between; align-items: center; 
-  margin-bottom: 2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 2rem; 
+  border-bottom: 2px solid #f1f5f9; 
+  padding-bottom: 1rem; 
 }
 
-.editForm { display: flex; flex-direction: column; gap: 1.5rem; }
+.modalHeader h3 { 
+  margin: 0; 
+  font-size: 1.5rem; 
+  color: #0f172a; 
+}
 
-/* ✅ Responsive Grid: 2 columns on desktop, 1 on mobile */
+.editForm { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1.5rem; 
+}
+
 .formGrid { 
   display: grid; 
   grid-template-columns: repeat(2, 1fr); 
   gap: 1.5rem; 
-  width: 100%;
 }
 
-.formGroup { display: flex; flex-direction: column; gap: 8px; }
-.formGroup label { font-size: 0.85rem; font-weight: 700; color: #475569; }
+.formGroup { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+}
+
+.formGroup label { 
+  font-size: 0.85rem; 
+  font-weight: 700; 
+  color: #475569; 
+}
 
 .formGroup input, .formGroup select, .formGroup textarea { 
-  width: 100%; padding: 12px 16px; 
-  border: 1.5px solid #e2e8f0; border-radius: 12px; 
-  background: #f8fafc; font-size: 1rem;
-  box-sizing: border-box; /* ✅ Important: Width protection */
+  width: 100%; 
+  padding: 12px 16px; 
+  border: 1.5px solid #e2e8f0; 
+  border-radius: 12px; 
+  background: #f8fafc; 
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
-.fullWidth { grid-column: span 2; }
-
-.saveBtn { 
-  width: 100%; background: #2563eb; color: white; 
-  padding: 14px; border-radius: 12px; font-weight: 700; 
-  border: none; cursor: pointer; transition: 0.3s; 
+.fullWidth { 
+  grid-column: span 2; 
 }
 
-/* --- 📱 Media Queries (Responsive Fix) --- */
-@media (max-width: 900px) {
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1rem;
+}
+
+.cancelBtn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveBtn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* Mobile View Adjustments */
+@media (max-width: 950px) {
+  .table, .table thead, .table tbody, .table th, .table td, .table tr { 
+    display: block; 
+    width: 100%; 
+  }
+  
   .table thead { display: none; }
-  .table tr { display: block; border-bottom: 8px solid #f1f5f9; padding: 1rem 0; }
-  .table td { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1.2rem; }
-  .table td::before { content: attr(data-label); font-weight: 800; color: #64748b; font-size: 0.75rem; text-transform: uppercase; }
-  .filterBar { flex-direction: column; }
-}
+  
+  .table tr { 
+    margin-bottom: 1.5rem; 
+    border: 1.5px solid #e2e8f0; 
+    border-radius: 16px; 
+    background: #fff;
+    padding: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+  
+  .table td { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 0.8rem 0; 
+    border-top: none;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .table td:last-child { border-bottom: none; }
 
-@media (max-width: 650px) {
-  /* ✅ Grid becomes single column on mobile */
+  .table td::before { 
+    content: attr(data-label); 
+    font-weight: 800; 
+    color: #64748b; 
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    flex: 1;
+    text-align: left;
+  }
+
   .formGrid { grid-template-columns: 1fr; }
   .fullWidth { grid-column: span 1; }
-  .modalContent { padding: 1.5rem; }
+  .headerActions { width: 100%; flex-direction: column-reverse; }
+  .addBtn, .deleteAllBtn { width: 100%; justify-content: center; }
 }
-.noteCell {
-  font-size: 0.85rem;
-  color: #64748b;
-  font-style: italic;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.noNote { color: #cbd5e1; }

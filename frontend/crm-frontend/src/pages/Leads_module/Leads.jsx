@@ -15,6 +15,7 @@ const Leads = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentLead, setCurrentLead] = useState(null);
 
+  /* Fetching all leads from backend */
   const fetchLeads = async () => {
     try {
       const res = await API.get("/leads");
@@ -26,8 +27,11 @@ const Leads = () => {
     }
   };
 
-  useEffect(() => { fetchLeads(); }, []);
+  useEffect(() => { 
+    fetchLeads(); 
+  }, []);
 
+  /* Modal control for editing leads */
   const openEditModal = (lead) => {
     setCurrentLead({ ...lead });
     setIsEditModalOpen(true);
@@ -43,6 +47,7 @@ const Leads = () => {
     setCurrentLead({ ...currentLead, [name]: value });
   };
 
+  /* Save lead updates */
   const handleSaveChanges = async (e) => {
     e.preventDefault();
     if (currentLead.budget < 0) return toast.error("Invalid budget value");
@@ -50,26 +55,29 @@ const Leads = () => {
     try {
         const res = await API.put(`/leads/${currentLead._id}`, currentLead);
         setLeads(leads.map(l => l._id === currentLead._id ? res.data : l));
-        toast.success("Lead Updated Successfully! 🎉");
+        toast.success("Lead Updated Successfully!");
         setIsEditModalOpen(false);
     } catch (error) {
         toast.error("Update failed");
     }
   };
 
+  /* Quick status update from table */
   const handleStatusChange = async (id, newStatus) => {
     try {
         await API.put(`/leads/${id}`, { status: newStatus });
         setLeads(leads.map(l => l._id === id ? { ...l, status: newStatus } : l));
-        toast.success(`Status updated`);
+        toast.success(`Status updated to ${newStatus}`);
     } catch(err) {
         toast.error("Update failed");
     }
   };
 
+  /* Single lead deletion */
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: 'Delete this Lead?',
+      text: "You won't be able to revert this!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
@@ -79,11 +87,38 @@ const Leads = () => {
       try {
         await API.delete(`/leads/${id}`);
         setLeads(leads.filter((lead) => lead._id !== id));
-        toast.success("Lead removed");
+        toast.success("Lead removed successfully");
       } catch (err) { toast.error("Failed to delete"); }
     }
   };
 
+  /* Delete all leads functionality */
+  const handleDeleteAll = async () => {
+    const result = await Swal.fire({
+      title: 'Are you absolutely sure?',
+      text: "This will delete ALL leads. This action cannot be undone!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, delete everything!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        setLoading(true);
+        await API.delete("/leads/delete-all");
+        setLeads([]); 
+        toast.success("All Leads have been cleared!");
+      } catch (err) {
+        toast.error(err.response?.data?.message || "Failed to clear leads");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  /* Search and Filter logic */
   const filteredLeads = leads.filter((lead) => {
     const matchesSearch = 
         lead.name.toLowerCase().includes(searchText.toLowerCase()) || 
@@ -93,15 +128,20 @@ const Leads = () => {
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) return <div className={styles.loading}>Loading Leads Dashboard...</div>;
+  if (loading) return <div className={styles.loading}>Loading Dashboard...</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>Sales Leads</h2>
-        <button className={styles.addBtn} onClick={() => navigate("/add-lead")}>
-          <Plus size={18} /> New Lead
-        </button>
+        <div className={styles.headerActions}>
+            <button className={styles.deleteAllBtn} onClick={handleDeleteAll}>
+                <Trash2 size={18} /> Delete All
+            </button>
+            <button className={styles.addBtn} onClick={() => navigate("/add-lead")}>
+                <Plus size={18} /> New Lead
+            </button>
+        </div>
       </div>
 
       <div className={styles.filterBar}>
@@ -136,7 +176,7 @@ const Leads = () => {
                     <th>Lead Name & Company</th>
                     <th>Contact Details</th>
                     <th>Status</th>
-                    <th>Notes</th> {/* ✅ Naya Column yahan hai */}
+                    <th>Notes</th>
                     <th>Budget & Source</th>
                     <th style={{textAlign: "center"}}>Actions</th>
                 </tr>
@@ -147,7 +187,7 @@ const Leads = () => {
                 ) : (
                     filteredLeads.map((lead) => (
                         <tr key={lead._id}>
-                            <td data-label="Lead & Company">
+                            <td data-label="LEAD & COMPANY">
                                 <div className={styles.leadInfo}>
                                     <div className={styles.avatar}>{lead.name.charAt(0)}</div>
                                     <div>
@@ -158,13 +198,13 @@ const Leads = () => {
                                     </div>
                                 </div>
                             </td>
-                            <td data-label="Contact Details">
+                            <td data-label="CONTACT INFO">
                                 <div className={styles.contactCell}>
                                     <span><Mail size={14}/> {lead.email}</span>
                                     <span><Phone size={14}/> {lead.phone}</span>
                                 </div>
                             </td>
-                            <td data-label="Status">
+                            <td data-label="STATUS">
                                 <select 
                                     className={styles.statusSelect}
                                     value={lead.status}
@@ -179,20 +219,23 @@ const Leads = () => {
                                     <option value="Lost">Lost</option>
                                 </select>
                             </td>
-                            {/* ✅ Table mein Notes dikhane ke liye naya cell */}
-                            <td data-label="Notes">
+                            <td data-label="NOTES">
                                 <div className={styles.noteCell} title={lead.notes}>
                                     {lead.notes ? (lead.notes.length > 30 ? lead.notes.substring(0, 30) + "..." : lead.notes) : <span className={styles.noNote}>-</span>}
                                 </div>
                             </td>
-                            <td data-label="Budget & Source">
+                            <td data-label="BUDGET & SOURCE">
                                 <div className={styles.budgetCell}>₹{Number(lead.budget).toLocaleString('en-IN')}</div>
                                 <div className={styles.sourceLabel}>{lead.source}</div>
                             </td>
-                            <td data-label="Actions">
+                            <td data-label="ACTIONS">
                                 <div className={styles.actions}>
-                                    <button className={styles.iconBtn} onClick={() => openEditModal(lead)}><Edit size={16} /></button>
-                                    <button className={`${styles.iconBtn} ${styles.deleteIconBtn}`} onClick={() => handleDelete(lead._id)}><Trash2 size={16} /></button>
+                                    <button className={styles.editBtn} onClick={() => openEditModal(lead)} title="Edit Lead">
+                                      <Edit size={16} />
+                                    </button>
+                                    <button className={styles.deleteBtn} onClick={() => handleDelete(lead._id)} title="Delete Lead">
+                                      <Trash2 size={16} />
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -219,12 +262,21 @@ const Leads = () => {
                         <div className={styles.formGroup}>
                             <label>Source</label>
                             <select name="source" value={currentLead.source} onChange={handleEditChange}>
-                                <option value="Website">Website</option><option value="LinkedIn">LinkedIn</option><option value="Social Media">Social Media</option><option value="Ads">Ads</option><option value="Referral">Referral</option><option value="Cold Call">Cold Call</option><option value="Other">Other</option>
+                                <option value="Website">Website</option>
+                                <option value="LinkedIn">LinkedIn</option>
+                                <option value="Social Media">Social Media</option>
+                                <option value="Ads">Ads</option>
+                                <option value="Referral">Referral</option>
+                                <option value="Cold Call">Cold Call</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
                         <div className={`${styles.formGroup} ${styles.fullWidth}`}><label>Notes</label><textarea name="notes" value={currentLead.notes || ""} onChange={handleEditChange} rows="3" /></div>
                     </div>
-                    <button type="submit" className={styles.saveBtn}><Save size={18} /> Update Lead</button>
+                    <div className={styles.modalFooter}>
+                        <button type="button" className={styles.cancelBtn} onClick={() => setIsEditModalOpen(false)}>Cancel</button>
+                        <button type="submit" className={styles.saveBtn}><Save size={18} /> Update Lead</button>
+                    </div>
                 </form>
             </div>
         </div>

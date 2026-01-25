@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect for leads
 import { useNavigate } from "react-router-dom";
 import API from "../../api/axios"; 
-import { Save, ArrowLeft, UploadCloud, X, Bed, Bath, Maximize } from "lucide-react";
+import { Save, ArrowLeft, UploadCloud, X, Bed, Bath, Maximize, User } from "lucide-react";
 import Swal from 'sweetalert2'; 
 import toast from 'react-hot-toast';
 import styles from "./AddProperty.module.css"; 
@@ -10,8 +10,8 @@ const AddProperty = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null); 
+  const [leads, setLeads] = useState([]); // ✅ Added to store leads for linking
 
-  // ✅ Updated State: Added bedrooms, bathrooms, and area
   const [formData, setFormData] = useState({
     title: "",
     type: "Apartment",
@@ -23,19 +23,30 @@ const AddProperty = () => {
     bathrooms: "",
     area: "",
     status: "Available",
-    image: "" 
+    image: "",
+    owner: "" // ✅ Added owner field for Diagram validation
   });
+
+  // ✅ Fetching Leads to link with Property
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const res = await API.get("/leads");
+        setLeads(res.data);
+      } catch (err) {
+        console.error("Error fetching leads:", err);
+      }
+    };
+    fetchLeads();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-
-    // ✅ Validation Logic: Negative values ko allow nahi karega
     if (type === "number" && value < 0) {
       toast.error(`${name.charAt(0).toUpperCase() + name.slice(1)} cannot be negative!`);
       setFormData({ ...formData, [name]: 0 });
       return;
     }
-
     setFormData({ ...formData, [name]: value });
   };
 
@@ -62,33 +73,18 @@ const AddProperty = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // ✅ Final Validation Check before API call
     if (formData.price < 0 || formData.bedrooms < 0 || formData.bathrooms < 0 || formData.area < 0) {
       toast.error("Please enter positive values only!");
       return;
     }
 
     setLoading(true);
-
     try {
       await API.post("/properties", formData);
-      
-      await Swal.fire({
-        icon: 'success',
-        title: 'Property Added! 🏠',
-        timer: 2000,
-        showConfirmButton: false
-      });
-
+      await Swal.fire({ icon: 'success', title: 'Property Added! 🏠', timer: 2000, showConfirmButton: false });
       navigate("/properties"); 
     } catch (err) {
-      console.error(err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Submission Failed',
-        text: err.response?.data?.message || "Something went wrong!"
-      });
+      Swal.fire({ icon: 'error', title: 'Submission Failed', text: err.response?.data?.message || "Something went wrong!" });
     } finally {
       setLoading(false);
     }
@@ -105,7 +101,6 @@ const AddProperty = () => {
 
       <form onSubmit={handleSubmit} className={styles.formCard}>
         <div className={styles.grid}>
-          
           <div className={styles.formGroup}>
             <label>Property Title</label>
             <input type="text" name="title" required value={formData.title} onChange={handleChange} placeholder="e.g. Luxury Villa" />
@@ -131,7 +126,6 @@ const AddProperty = () => {
             <input type="text" name="city" required value={formData.city} onChange={handleChange} placeholder="e.g. Ahmedabad" />
           </div>
 
-          {/* ✅ NEW: Bedrooms, Bathrooms, Area Fields */}
           <div className={styles.formGroup}>
             <label><Bed size={16} /> Bedrooms</label>
             <input type="number" name="bedrooms" min="0" value={formData.bedrooms} onChange={handleChange} placeholder="e.g. 3" />
@@ -145,6 +139,17 @@ const AddProperty = () => {
           <div className={styles.formGroup}>
             <label><Maximize size={16} /> Area (sqft)</label>
             <input type="number" name="area" min="0" value={formData.area} onChange={handleChange} placeholder="e.g. 1500" />
+          </div>
+
+          {/* ✅ New Linked Lead (Owner) Dropdown for Diagram Validation */}
+          <div className={styles.formGroup}>
+            <label><User size={16} /> Assign to Lead (Optional)</label>
+            <select name="owner" value={formData.owner} onChange={handleChange}>
+              <option value="">-- No Owner/Lead --</option>
+              {leads.map((l) => (
+                <option key={l._id} value={l._id}>{l.name}</option>
+              ))}
+            </select>
           </div>
 
           <div className={styles.formGroup}>
@@ -161,7 +166,6 @@ const AddProperty = () => {
             <input type="text" name="address" required value={formData.address} onChange={handleChange} placeholder="e.g. 101, Galaxy Tower, SG Highway" />
           </div>
 
-          {/* Image Upload Section */}
           <div className={styles.formGroup} style={{gridColumn: "1 / -1"}}>
             <label>Property Image</label>
             {!preview ? (
@@ -182,7 +186,6 @@ const AddProperty = () => {
             <label>Description</label>
             <textarea name="description" rows="3" value={formData.description} onChange={handleChange} placeholder="Describe the property features..." />
           </div>
-
         </div>
 
         <div className={styles.footer}>

@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import API from "../../api/axios";
-import { Plus, Search, Filter, Trash2, Edit, MapPin, X, Save, UploadCloud, Bed, Bath, Maximize } from "lucide-react";
+import API from "../../api/axios"; 
+import { Plus, Search, Filter, Trash2, Edit, MapPin, X, Save, UploadCloud, Bed, Bath, Maximize, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'; 
 import styles from "./Properties.module.css"; 
 
 const Properties = () => {
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
+  const [leads, setLeads] = useState([]); // ✅ Added to fetch leads
   const [loading, setLoading] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -18,22 +19,26 @@ const Properties = () => {
 
   const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
 
-  const fetchProperties = async () => {
+  // ✅ Fetching Properties and Leads
+  const fetchData = async () => {
     try {
-      const res = await API.get("/properties");
-      setProperties(res.data);
+      const [propRes, leadRes] = await Promise.all([
+        API.get("/properties"),
+        API.get("/leads")
+      ]);
+      setProperties(propRes.data);
+      setLeads(leadRes.data);
     } catch (err) {
-      toast.error("Failed to load properties");
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProperties();
+    fetchData();
   }, []);
 
-  // ✅ FIXED: Delete All Logic Wapas Aa Gaya
   const handleDeleteAll = async () => {
     if (properties.length === 0) return;
     const result = await Swal.fire({
@@ -57,7 +62,8 @@ const Properties = () => {
   };
 
   const openEditModal = (prop) => {
-    setCurrentProp({ ...prop });
+    // Ensuring owner field is handled
+    setCurrentProp({ ...prop, owner: prop.owner?._id || prop.owner || "" });
     setIsEditModalOpen(true);
   };
 
@@ -88,13 +94,10 @@ const Properties = () => {
 
   const handleSaveChanges = async (e) => {
     e.preventDefault();
-    if (currentProp.price < 0 || currentProp.bedrooms < 0 || currentProp.bathrooms < 0 || currentProp.area < 0) {
-      toast.error("Negative values are not allowed!");
-      return;
-    }
     setSaveLoading(true);
     try {
       const res = await API.put(`/properties/${currentProp._id}`, currentProp);
+      // Refresh properties after edit to see updated owner
       setProperties(properties.map(p => p._id === currentProp._id ? res.data : p));
       toast.success("Updated Successfully!");
       setIsEditModalOpen(false);
@@ -136,14 +139,13 @@ const Properties = () => {
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) return <div className={styles.loading}>Loading...</div>;
+  if (loading) return <div className={styles.loading}>Loading Properties...</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>My Properties</h2>
         <div className={styles.headerActions}>
-            {/* ✅ FIXED: Delete All Button logic added back */}
             {properties.length > 0 && (
                 <button onClick={handleDeleteAll} className={styles.deleteBtn}>
                     <Trash2 size={18} /> Delete All
@@ -217,6 +219,18 @@ const Properties = () => {
                         <div className={styles.formGroup}><label>Title</label><input name="title" value={currentProp.title} onChange={handleEditChange} required /></div>
                         <div className={styles.formGroup}><label>City</label><input name="city" value={currentProp.city} onChange={handleEditChange} required /></div>
                         <div className={styles.formGroup}><label>Price (₹)</label><input type="number" name="price" value={currentProp.price} onChange={handleEditChange} required /></div>
+                        
+                        {/* ✅ Link to Lead/Owner Dropdown for 0..1 Validation */}
+                        <div className={styles.formGroup}>
+                            <label><User size={16} /> Assign to Lead (Owner)</label>
+                            <select name="owner" value={currentProp.owner} onChange={handleEditChange}>
+                                <option value="">-- No Owner/Lead --</option>
+                                {leads.map((l) => (
+                                    <option key={l._id} value={l._id}>{l.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
                         <div className={styles.formGroup}>
                             <label>Type</label>
                             <select name="type" value={currentProp.type} onChange={handleEditChange}>
