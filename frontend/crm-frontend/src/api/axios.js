@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API = axios.create({
   // 127.0.0.1 bilkul sahi hai Node v17+ ke liye
-  baseURL: "http://127.0.0.1:5000/api", 
+  baseURL: "https://crm-real-estate-k6cj.onrender.com/api", 
 });
 
 // 👇 YE PART BOOT ZAROORI HAI 👇

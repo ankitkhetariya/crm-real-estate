@@ -2,12 +2,16 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../../api/axios"; 
 import toast from 'react-hot-toast'; 
-import { UserPlus, User, Mail, Lock } from "lucide-react"; 
+import { UserPlus, User, Mail, Lock, ShieldAlert } from "lucide-react"; 
 import styles from "./Register.module.css"; 
 
 const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  
+  // ✅ Switch for Registration: Set to 'false' to enable registration back
+  const isRegistrationDisabled = true; 
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,28 +25,20 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Basic Validation
     if (formData.password !== formData.confirmPassword) {
       return toast.error("Passwords do not match!");
     }
 
     setLoading(true);
-
     try {
-      // Backend API Call
-      // Note: confirmPassword backend bhejne ki zaroorat nahi hoti usually
       const payload = {
         name: formData.name,
         email: formData.email,
         password: formData.password
       };
-
       await API.post("/auth/register", payload);
-      
       toast.success("Account created! Please log in.");
       navigate("/login");
-
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Registration Failed";
       toast.error(errorMsg);
@@ -51,11 +47,41 @@ const Register = () => {
     }
   };
 
+  // ✅ Show this view if registration is disabled
+  if (isRegistrationDisabled) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <div className={styles.header}>
+            <div className={`${styles.iconCircle} ${styles.disabledIcon}`}>
+              <ShieldAlert size={28} color="#ef4444" />
+            </div>
+            <h2>Registration Disabled</h2>
+            <p>To maintain demo data integrity, public registration is currently turned off.</p>
+          </div>
+          
+          <div className={styles.disabledBody}>
+            <p>Please use the existing demo credentials to explore the CRM dashboard.</p>
+            <button 
+              onClick={() => navigate("/login")} 
+              className={styles.registerBtn}
+            >
+              Go to Login Page
+            </button>
+          </div>
+
+          <div className={styles.footer}>
+            Need specialized access? <a href="mailto:admin@example.com">Contact Admin</a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Original Logic (Will only render if isRegistrationDisabled is false)
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        
-        {/* Header */}
         <div className={styles.header}>
           <div className={styles.iconCircle}>
             <UserPlus size={28} color="#2563eb" />
@@ -64,10 +90,7 @@ const Register = () => {
           <p>Join us and manage your leads effectively</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className={styles.form}>
-          
-          {/* Name */}
           <div className={styles.inputGroup}>
             <label>Full Name</label>
             <div className={styles.inputWrapper}>
@@ -79,7 +102,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Email */}
           <div className={styles.inputGroup}>
             <label>Email Address</label>
             <div className={styles.inputWrapper}>
@@ -91,7 +113,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Password */}
           <div className={styles.inputGroup}>
             <label>Password</label>
             <div className={styles.inputWrapper}>
@@ -103,7 +124,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Confirm Password */}
           <div className={styles.inputGroup}>
             <label>Confirm Password</label>
             <div className={styles.inputWrapper}>
@@ -118,10 +138,8 @@ const Register = () => {
           <button type="submit" className={styles.registerBtn} disabled={loading}>
             {loading ? "Creating Account..." : "Sign Up"}
           </button>
-
         </form>
 
-        {/* Footer */}
         <div className={styles.footer}>
           Already have an account? <Link to="/login">Sign In</Link>
         </div>
