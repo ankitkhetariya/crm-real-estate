@@ -1,34 +1,44 @@
-/* Container Layout */
-.container { 
-  padding: 1.5rem; 
-  max-width: 1200px; 
-  margin: 0 auto; 
-  font-family: 'Inter', system-ui, sans-serif; 
-  background-color: #f8fafc; 
-  min-height: 100vh; 
-}
+/* Leads.module.css – Final Merged Version */
 
-/* Header and Actions Styling */
-.header { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-bottom: 2rem; 
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.header h2 { 
-  font-size: 1.8rem; 
-  font-weight: 800; 
-  color: #0f172a; 
+/* ========================================= */
+/* 🖥️ GLOBAL SETTINGS */
+/* ========================================= */
+* {
+  box-sizing: border-box;
   margin: 0;
+  padding: 0;
+}
+
+.container {
+  padding: 2rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .headerActions {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 /* Primary Button Styles */
@@ -42,34 +52,28 @@
   cursor: pointer;
   transition: 0.3s;
   font-size: 0.9rem;
-  white-space: nowrap; /* Prevent button text wrapping */
+  white-space: nowrap;
 }
 
-.addBtn { 
-  background: #2563eb; 
-  color: white; 
-  border: none; 
-  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); 
+.addBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 }
+.addBtn:hover { transform: translateY(-2px); background: #1d4ed8; }
 
-.addBtn:hover { 
-  transform: translateY(-2px); 
-  background: #1d4ed8; 
+.deleteAllBtn {
+  background: #fff;
+  color: #ef4444;
+  border: 1.5px solid #fecaca;
 }
+.deleteAllBtn:hover { background: #fef2f2; border-color: #ef4444; transform: translateY(-2px); }
 
-.deleteAllBtn { 
-  background: #fff; 
-  color: #ef4444; 
-  border: 1.5px solid #fecaca; 
-}
 
-.deleteAllBtn:hover { 
-  background: #fef2f2; 
-  border-color: #ef4444; 
-  transform: translateY(-2px); 
-}
-
-/* Filtering Controls */
+/* ========================================= */
+/* 🔍 FILTER & SEARCH (AAPKA DESIGN) */
+/* ========================================= */
 .filterBar {
   display: flex;
   gap: 1rem;
@@ -81,18 +85,18 @@
   flex-wrap: wrap;
 }
 
-.searchWrapper { 
-  position: relative; 
-  flex: 2; 
-  min-width: 250px; 
+.searchWrapper {
+  position: relative;
+  flex: 2;
+  min-width: 250px;
 }
 
-.searchIcon { 
-  position: absolute; 
-  left: 15px; 
-  top: 50%; 
-  transform: translateY(-50%); 
-  color: #94a3b8; 
+.searchIcon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
 }
 
 .searchInput {
@@ -105,401 +109,237 @@
   outline: none;
   box-sizing: border-box;
 }
-
-.filterWrapper { 
-  flex: 1; 
-  min-width: 150px; 
-  background: #f1f5f9; 
-  border-radius: 10px; 
-  padding: 0 10px; 
-  display: flex; 
-  align-items: center; 
+.searchInput:focus {
+  border-color: #2563eb;
+  background: white;
 }
 
-.filterWrapper select { 
-  border: none; 
-  background: transparent; 
-  width: 100%; 
-  padding: 12px 0; 
-  font-weight: 600; 
-  outline: none; 
+.filterWrapper {
+  flex: 1;
+  min-width: 150px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
 }
 
-/* Data Table Styling */
+.filterWrapper select {
+  border: none;
+  background: transparent;
+  width: 100%;
+  padding: 12px 0;
+  font-weight: 600;
+  color: #475569;
+  outline: none;
+  cursor: pointer;
+}
+
+
+/* ========================================= */
+/* 📊 TABLE LAYOUT (DESKTOP) */
+/* ========================================= */
 .tableCardContainer {
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
-  overflow: hidden; /* Changed from auto to hidden for cleaner desktop view */
+  overflow: hidden;
 }
 
-.table { 
-  width: 100%; 
-  border-collapse: collapse; 
-  min-width: 800px; 
+.table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.table th { 
-  background: #f8fafc; 
-  padding: 1rem; 
-  text-align: left; 
-  font-size: 0.75rem; 
-  text-transform: uppercase; 
-  color: #64748b; 
-  font-weight: 700; 
-}
-
-.table td { 
-  padding: 1.2rem 1rem; 
-  border-top: 1px solid #f1f5f9; 
-  vertical-align: middle; 
-}
-
-/* Lead Info (Avatar + Name) */
-.leadInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  background: #dbeafe;
-  color: #2563eb;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.leadName {
+.table th {
+  background: #f8fafc;
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #0f172a;
-}
-
-.companyName {
-  font-size: 0.85rem;
   color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-/* Contact Cell Typography */
-.contactCell { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 8px; 
+.table td {
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
 }
 
-.contactCell span { 
-  display: flex; 
-  align-items: center; 
-  gap: 8px; 
-  font-size: 0.9rem; 
-  color: #475569; 
-  word-break: break-all; /* Ensures long emails don't overflow */
+/* Cell Styling */
+.leadInfo { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  width: 44px; height: 44px; background: #eff6ff; color: #2563eb;
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.1rem;
 }
+.leadName { font-weight: 600; color: #0f172a; }
+.companyName { font-size: 0.875rem; color: #64748b; margin-top: 3px; }
 
-/* Status Selection Styling */
-.statusSelect { 
-  padding: 6px 12px; 
-  border-radius: 20px; 
-  font-size: 0.75rem; 
-  font-weight: 700; 
+.contactCell { display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.95rem; color: #475569; }
+
+/* Status */
+.statusSelect {
+  min-width: 130px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
   border: 1.5px solid transparent;
-  width: 130px;
   cursor: pointer;
 }
-
-.statusSelect[data-status="New"] { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
+.statusSelect[data-status="New"]       { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
+.statusSelect[data-status="Contacted"] { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.statusSelect[data-status="Qualified"] { background: #dcfce7; color: #15803d; border-color: #dcfce7; }
 .statusSelect[data-status="Converted"] { background: #f0fdf4; color: #15803d; border-color: #dcfce7; }
-.statusSelect[data-status="Lost"] { background: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
-/* Add generic styles for other statuses so they are visible */
-.statusSelect:not([data-status="New"]):not([data-status="Converted"]):not([data-status="Lost"]) {
-  background: #f1f5f9; color: #475569; border-color: #e2e8f0;
+.statusSelect[data-status="Lost"]      { background: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
+
+/* Budget & Source */
+.budgetCell { font-size: 1.1rem; font-weight: 700; color: #059669; }
+.sourceLabel {
+  display: inline-block; margin-top: 0.5rem; background: #e0f2fe; color: #1e40af;
+  font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 999px;
 }
 
-/* In-table Action Buttons */
-.actions { 
-  display: flex; 
-  gap: 10px; 
-}
-
+/* Actions – Desktop */
+.actions { display: flex; gap: 10px; justify-content: center; }
 .editBtn, .deleteBtn {
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  cursor: pointer;
-  transition: 0.2s;
+  width: 38px; height: 38px; border-radius: 10px; border: 1px solid #e2e8f0;
+  background: white; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
 }
-
 .editBtn { color: #2563eb; }
 .editBtn:hover { background: #eff6ff; border-color: #2563eb; transform: translateY(-2px); }
-
 .deleteBtn { color: #ef4444; }
 .deleteBtn:hover { background: #fef2f2; border-color: #ef4444; transform: translateY(-2px); }
 
-/* Premium Modal Styling (No changes needed for logic, just layout) */
-.modalOverlay { 
-  position: fixed; 
-  inset: 0; 
-  background: rgba(15, 23, 42, 0.7); 
-  backdrop-filter: blur(8px); 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  z-index: 2000; 
-  padding: 20px; 
-}
-
-.modalContent { 
-  background: white; 
-  width: 100%; 
-  max-width: 650px; 
-  border-radius: 24px; 
-  padding: 2rem; 
-  max-height: 90vh; 
-  overflow-y: auto; 
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
-}
-
-.modalHeader { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-bottom: 2rem; 
-  border-bottom: 2px solid #f1f5f9; 
-  padding-bottom: 1rem; 
-}
-
-.modalHeader h3 { margin: 0; font-size: 1.5rem; color: #0f172a; }
-.closeBtn { background: none; border: none; cursor: pointer; color: #64748b; }
-
-.editForm { display: flex; flex-direction: column; gap: 1.5rem; }
-.formGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-.formGroup { display: flex; flex-direction: column; gap: 8px; }
-.formGroup label { font-size: 0.85rem; font-weight: 700; color: #475569; }
-.formGroup input, .formGroup select, .formGroup textarea { 
-  width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; 
-  border-radius: 12px; background: #f8fafc; font-size: 1rem; box-sizing: border-box; 
-}
+/* Modal Styles */
+.modalOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+.modalContent { background: white; width: 95%; max-width: 650px; padding: 2rem; border-radius: 24px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+.modalHeader { display: flex; justify-content: space-between; margin-bottom: 2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; align-items: center; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
 .fullWidth { grid-column: span 2; }
+.formGroup { display: flex; flex-direction: column; gap: 8px; }
+.formGroup input, .formGroup select, .formGroup textarea { padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 12px; background: #f8fafc; width: 100%; box-sizing: border-box; }
 .modalFooter { display: flex; justify-content: flex-end; gap: 12px; margin-top: 1rem; }
-.cancelBtn { padding: 12px 24px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; font-weight: 600; cursor: pointer; }
-.saveBtn { padding: 12px 24px; border-radius: 12px; background: #2563eb; color: white; border: none; font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.saveBtn { padding: 12px 24px; background: #2563eb; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+.cancelBtn { padding: 12px 24px; background: #fff; color: #64748b; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: 600; cursor: pointer; }
 
 
 /* ========================================= */
-/* 📱 MOBILE RESPONSIVE FIX (New & Strong) */
+/* 📱 MOBILE VIEW (RESPONSIVE FIX) */
 /* ========================================= */
-
 @media (max-width: 950px) {
   .container {
-    padding: 10px;
+    padding: 1rem 0.8rem;
+    overflow-x: hidden;
   }
 
-  /* 1. Table ko Card banayein */
-  .table, .table thead, .table tbody, .table th, .table td, .table tr { 
-    display: block; 
+  .header { flex-direction: column; align-items: stretch; }
+  .headerActions { width: 100%; flex-direction: column-reverse; }
+  .addBtn, .deleteAllBtn { width: 100%; justify-content: center; height: 46px; }
+
+  /* ✅ UPDATED MOBILE FILTER (Uses Your Design but Stacked) ✅ */
+  .filterBar {
+    flex-direction: column; 
+    gap: 12px; 
+    padding: 12px; 
+    /* Design same as Desktop code you provided */
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+  }
+
+  .searchWrapper, .filterWrapper { 
     width: 100%; 
-  }
-  
-  /* Header chupayein */
-  .table thead { display: none; }
-  
-  /* Card ka design */
-  .table tr { 
-    margin-bottom: 1.5rem; 
-    border: 1px solid #e2e8f0; 
-    border-radius: 12px; 
-    background: #ffffff;
-    padding: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.04);
-    position: relative;
-  }
-  
-  /* 2. Har Cell ki setting (Zaroori) */
-  .table td { 
-    display: flex;              /* Flexbox use karein */
-    flex-direction: column;     /* Label upar, Value niche (Fixes visibility) */
-    align-items: flex-start;    /* Left align */
-    justify-content: center;
-    padding: 10px 0; 
-    border-bottom: 1px solid #f1f5f9;
-    min-height: 40px;           /* Height fix taaki gayab na ho */
-  }
-  
-  .table td:last-child { 
-    border-bottom: none; 
+    height: 48px; /* Standard Height */
   }
 
-  /* 3. Label (Jo "data-label" se aata hai) */
-  .table td::before { 
-    content: attr(data-label); 
-    font-size: 0.7rem; 
-    font-weight: 800; 
-    color: #94a3b8;       /* Halka gray color */
-    text-transform: uppercase; 
-    margin-bottom: 5px;   /* Value se thoda gap */
+  /* Force Inputs to fill the full width container */
+  .searchInput { width: 100%; height: 100%; }
+  .filterWrapper { width: 100%; padding: 0 10px; }
+  .filterWrapper select { width: 100%; }
+
+  /* Cards (Amazon Style) */
+  .tableCardContainer { background: transparent; border: none; box-shadow: none; overflow: visible; }
+  .table thead { display: none; }
+
+  .table tr {
+    display: block;
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    border: 1.5px solid #e2e8f0;
+  }
+
+  .table td {
+    display: block; /* Stack content inside cell */
+    margin-bottom: 12px;
+    padding: 0;
+    border: none;
+    text-align: left; /* Reset alignment */
+  }
+  
+  /* Fix specific cells flex behavior */
+  .table td:has(.leadInfo), .table td:has(.statusSelect) {
+     display: block;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 6px;
     display: block;
   }
 
-  /* 4. Andar ka Content (Naam, Email, Status etc.) */
-  .leadInfo, .contactCell, .statusSelect, .noteCell, .budgetCell, .actions {
-    width: 100%;          /* Poori jagah le */
-    text-align: left;     /* Left mein rakhe */
-  }
+  .table td[data-label="LEAD & COMPANY"]::before,
+  .table td[data-label="ACTIONS"]::before { display: none; }
 
-  /* Specific Fixes */
-  .leadInfo {
-    flex-direction: row;  /* Avatar aur naam bagal mein */
-    justify-content: flex-start;
-  }
+  .leadInfo { border-bottom: 1px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 10px; }
+  .statusSelect { width: 100%; height: 40px; text-align: left; padding-left: 14px; border: 1px solid #d1d5db; }
+  .budgetCell { font-size: 1.3rem; }
 
-  .contactCell {
-    align-items: flex-start; /* Email/Phone left mein */
-  }
-
-  /* Actions button ko center mein karein */
+  /* ✅ BUTTONS (Side-by-Side 140px) ✅ */
   .actions {
-    flex-direction: row;
-    justify-content: flex-start;
-    margin-top: 5px;
-  }
-
-  /* Header Button fix */
-  .headerActions { 
-    width: 100%; 
-    flex-direction: row; 
-    gap: 10px;
-  }
-  
-  .addBtn, .deleteAllBtn { 
-    flex: 1; 
-    justify-content: center; 
-    font-size: 0.85rem;
-  }
-}
-/* ========================================= */
-/* 📱 MOBILE RESPONSIVE: COLORFUL LABELS */
-/* ========================================= */
-
-@media (max-width: 950px) {
-  .container {
-    padding: 10px;
-  }
-
-  /* 1. Table ko Card banayein */
-  .table, .table thead, .table tbody, .table th, .table td, .table tr { 
-    display: block; 
-    width: 100%; 
-  }
-  
-  /* Header chupayein */
-  .table thead { display: none; }
-  
-  /* Card ka design */
-  .table tr { 
-    margin-bottom: 1rem; 
-    border: 1px solid #e2e8f0; 
-    border-radius: 16px; 
-    background: #ffffff;
-    padding: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03); /* Soft shadow */
     display: flex;
-    flex-direction: column;
-    gap: 12px; /* Card ke andar gaps */
-  }
-  
-  /* 2. Cell Layout (Label Upar, Value Niche) */
-  .table td { 
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0;
-    border: none; /* Border hataya taaki clean dikhe */
-    width: 100%;
-  }
-
-  /* 3. ✨ COLORFUL LABELS (Jaise Converted Badge) ✨ */
-  .table td::before { 
-    content: attr(data-label); 
-    font-size: 0.7rem; 
-    font-weight: 800; 
-    color: #334155;          /* Dark Grey Text */
-    background: #f1f5f9;     /* Light Grey/Blue Background */
-    padding: 5px 10px;       /* Thoda space andar */
-    border-radius: 6px;      /* Gol kinare */
-    text-transform: uppercase; 
-    margin-bottom: 8px;      /* Value se gap */
-    display: inline-block;
-    letter-spacing: 0.5px;
-    border: 1px solid #e2e8f0; /* Halka border */
-  }
-
-  /* Specific Label Colors (Optional - Agar alag rang chahiye to) */
-  /* STATUS label ko thoda alag dikhate hain */
-  .table td[data-label="STATUS"]::before {
-    background: #eff6ff; /* Light Blue */
-    color: #2563eb;      /* Blue Text */
-    border-color: #dbeafe;
-  }
-
-  /* ACTIONS label ko chupate hain kyunki button khud clear hain */
-  .table td[data-label="ACTIONS"]::before {
-    display: none;
-  }
-
-  /* 4. Values (Andar ka content) */
-  .leadInfo, .contactCell, .statusSelect, .noteCell, .budgetCell {
-    width: 100%;
-    padding-left: 4px; /* Thoda right shift taaki label ke niche aaye */
-  }
-
-  /* Avatar fix */
-  .leadInfo {
     flex-direction: row;
-    align-items: center;
-    border-bottom: 1px solid #f8fafc; /* Naam ke niche line */
-    padding-bottom: 8px;
-    margin-bottom: 4px;
-  }
-
-  /* Actions Buttons ko full width aur bada karein */
-  .actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Do button barabar hisse mein */
-    gap: 10px;
-    width: 100%;
-    margin-top: 10px;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
     border-top: 1px solid #f1f5f9;
-    padding-top: 10px;
   }
 
   .editBtn, .deleteBtn {
-    width: 100%; /* Full width button */
-    height: 40px;
-    border-radius: 8px;
+    width: 140px;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Header Buttons Layout */
-  .headerActions { 
-    width: 100%; 
-    flex-direction: row; 
-    gap: 10px;
-  }
-  
-  .addBtn, .deleteAllBtn { 
-    flex: 1; 
-    justify-content: center; 
-  }
+  .editBtn { background: #e0f2fe; color: #1e40af; border: 1px solid #93c5fd; }
+  .editBtn:hover { background: #bae6fd; }
+
+  .deleteBtn { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+  .deleteBtn:hover { background: #fecaca; }
+
+  .editBtn::after { content: "Edit"; }
+  .deleteBtn::after { content: "Delete"; }
+  .editBtn svg, .deleteBtn svg { display: none; }
+
+  /* Modal Mobile */
+  .formGrid { grid-template-columns: 1fr; }
+  .fullWidth { grid-column: span 1; }
 }
