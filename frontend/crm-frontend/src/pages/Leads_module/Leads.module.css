@@ -42,6 +42,7 @@
   cursor: pointer;
   transition: 0.3s;
   font-size: 0.9rem;
+  white-space: nowrap; /* Prevent button text wrapping */
 }
 
 .addBtn { 
@@ -129,7 +130,7 @@
   background: white;
   border-radius: 16px;
   border: 1px solid #e2e8f0;
-  overflow-x: auto;
+  overflow: hidden; /* Changed from auto to hidden for cleaner desktop view */
 }
 
 .table { 
@@ -154,11 +155,44 @@
   vertical-align: middle; 
 }
 
+/* Lead Info (Avatar + Name) */
+.leadInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: #dbeafe;
+  color: #2563eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.leadName {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.companyName {
+  font-size: 0.85rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* Contact Cell Typography */
 .contactCell { 
   display: flex; 
   flex-direction: column; 
-  gap: 12px; 
+  gap: 8px; 
 }
 
 .contactCell span { 
@@ -167,7 +201,7 @@
   gap: 8px; 
   font-size: 0.9rem; 
   color: #475569; 
-  word-break: break-all; 
+  word-break: break-all; /* Ensures long emails don't overflow */
 }
 
 /* Status Selection Styling */
@@ -178,17 +212,21 @@
   font-weight: 700; 
   border: 1.5px solid transparent;
   width: 130px;
+  cursor: pointer;
 }
 
 .statusSelect[data-status="New"] { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; }
 .statusSelect[data-status="Converted"] { background: #f0fdf4; color: #15803d; border-color: #dcfce7; }
 .statusSelect[data-status="Lost"] { background: #fef2f2; color: #b91c1c; border-color: #fee2e2; }
+/* Add generic styles for other statuses so they are visible */
+.statusSelect:not([data-status="New"]):not([data-status="Converted"]):not([data-status="Lost"]) {
+  background: #f1f5f9; color: #475569; border-color: #e2e8f0;
+}
 
 /* In-table Action Buttons */
 .actions { 
   display: flex; 
   gap: 10px; 
-  justify-content: center; 
 }
 
 .editBtn, .deleteBtn {
@@ -210,7 +248,7 @@
 .deleteBtn { color: #ef4444; }
 .deleteBtn:hover { background: #fef2f2; border-color: #ef4444; transform: translateY(-2px); }
 
-/* Premium Modal Styling */
+/* Premium Modal Styling (No changes needed for logic, just layout) */
 .modalOverlay { 
   position: fixed; 
   inset: 0; 
@@ -225,7 +263,7 @@
 
 .modalContent { 
   background: white; 
-  width: 95%; 
+  width: 100%; 
   max-width: 650px; 
   border-radius: 24px; 
   padding: 2rem; 
@@ -243,121 +281,225 @@
   padding-bottom: 1rem; 
 }
 
-.modalHeader h3 { 
-  margin: 0; 
-  font-size: 1.5rem; 
-  color: #0f172a; 
-}
+.modalHeader h3 { margin: 0; font-size: 1.5rem; color: #0f172a; }
+.closeBtn { background: none; border: none; cursor: pointer; color: #64748b; }
 
-.editForm { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 1.5rem; 
-}
-
-.formGrid { 
-  display: grid; 
-  grid-template-columns: repeat(2, 1fr); 
-  gap: 1.5rem; 
-}
-
-.formGroup { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 8px; 
-}
-
-.formGroup label { 
-  font-size: 0.85rem; 
-  font-weight: 700; 
-  color: #475569; 
-}
-
+.editForm { display: flex; flex-direction: column; gap: 1.5rem; }
+.formGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.formGroup { display: flex; flex-direction: column; gap: 8px; }
+.formGroup label { font-size: 0.85rem; font-weight: 700; color: #475569; }
 .formGroup input, .formGroup select, .formGroup textarea { 
-  width: 100%; 
-  padding: 12px 16px; 
-  border: 1.5px solid #e2e8f0; 
-  border-radius: 12px; 
-  background: #f8fafc; 
-  font-size: 1rem;
-  box-sizing: border-box;
+  width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; 
+  border-radius: 12px; background: #f8fafc; font-size: 1rem; box-sizing: border-box; 
 }
+.fullWidth { grid-column: span 2; }
+.modalFooter { display: flex; justify-content: flex-end; gap: 12px; margin-top: 1rem; }
+.cancelBtn { padding: 12px 24px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; font-weight: 600; cursor: pointer; }
+.saveBtn { padding: 12px 24px; border-radius: 12px; background: #2563eb; color: white; border: none; font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
-.fullWidth { 
-  grid-column: span 2; 
-}
 
-.modalFooter {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 1rem;
-}
+/* ========================================= */
+/* 📱 MOBILE RESPONSIVE FIX (New & Strong) */
+/* ========================================= */
 
-.cancelBtn {
-  padding: 12px 24px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  color: #64748b;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.saveBtn {
-  padding: 12px 24px;
-  border-radius: 12px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-
-/* Mobile View Adjustments */
 @media (max-width: 950px) {
+  .container {
+    padding: 10px;
+  }
+
+  /* 1. Table ko Card banayein */
   .table, .table thead, .table tbody, .table th, .table td, .table tr { 
     display: block; 
     width: 100%; 
   }
   
+  /* Header chupayein */
   .table thead { display: none; }
   
+  /* Card ka design */
   .table tr { 
     margin-bottom: 1.5rem; 
-    border: 1.5px solid #e2e8f0; 
-    border-radius: 16px; 
-    background: #fff;
-    padding: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0; 
+    border-radius: 12px; 
+    background: #ffffff;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+    position: relative;
   }
   
+  /* 2. Har Cell ki setting (Zaroori) */
   .table td { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 0.8rem 0; 
-    border-top: none;
+    display: flex;              /* Flexbox use karein */
+    flex-direction: column;     /* Label upar, Value niche (Fixes visibility) */
+    align-items: flex-start;    /* Left align */
+    justify-content: center;
+    padding: 10px 0; 
     border-bottom: 1px solid #f1f5f9;
+    min-height: 40px;           /* Height fix taaki gayab na ho */
   }
   
-  .table td:last-child { border-bottom: none; }
+  .table td:last-child { 
+    border-bottom: none; 
+  }
 
+  /* 3. Label (Jo "data-label" se aata hai) */
   .table td::before { 
     content: attr(data-label); 
-    font-weight: 800; 
-    color: #64748b; 
     font-size: 0.7rem; 
+    font-weight: 800; 
+    color: #94a3b8;       /* Halka gray color */
     text-transform: uppercase; 
-    flex: 1;
-    text-align: left;
+    margin-bottom: 5px;   /* Value se thoda gap */
+    display: block;
   }
 
-  .formGrid { grid-template-columns: 1fr; }
-  .fullWidth { grid-column: span 1; }
-  .headerActions { width: 100%; flex-direction: column-reverse; }
-  .addBtn, .deleteAllBtn { width: 100%; justify-content: center; }
+  /* 4. Andar ka Content (Naam, Email, Status etc.) */
+  .leadInfo, .contactCell, .statusSelect, .noteCell, .budgetCell, .actions {
+    width: 100%;          /* Poori jagah le */
+    text-align: left;     /* Left mein rakhe */
+  }
+
+  /* Specific Fixes */
+  .leadInfo {
+    flex-direction: row;  /* Avatar aur naam bagal mein */
+    justify-content: flex-start;
+  }
+
+  .contactCell {
+    align-items: flex-start; /* Email/Phone left mein */
+  }
+
+  /* Actions button ko center mein karein */
+  .actions {
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-top: 5px;
+  }
+
+  /* Header Button fix */
+  .headerActions { 
+    width: 100%; 
+    flex-direction: row; 
+    gap: 10px;
+  }
+  
+  .addBtn, .deleteAllBtn { 
+    flex: 1; 
+    justify-content: center; 
+    font-size: 0.85rem;
+  }
+}
+/* ========================================= */
+/* 📱 MOBILE RESPONSIVE: COLORFUL LABELS */
+/* ========================================= */
+
+@media (max-width: 950px) {
+  .container {
+    padding: 10px;
+  }
+
+  /* 1. Table ko Card banayein */
+  .table, .table thead, .table tbody, .table th, .table td, .table tr { 
+    display: block; 
+    width: 100%; 
+  }
+  
+  /* Header chupayein */
+  .table thead { display: none; }
+  
+  /* Card ka design */
+  .table tr { 
+    margin-bottom: 1rem; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 16px; 
+    background: #ffffff;
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03); /* Soft shadow */
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Card ke andar gaps */
+  }
+  
+  /* 2. Cell Layout (Label Upar, Value Niche) */
+  .table td { 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    border: none; /* Border hataya taaki clean dikhe */
+    width: 100%;
+  }
+
+  /* 3. ✨ COLORFUL LABELS (Jaise Converted Badge) ✨ */
+  .table td::before { 
+    content: attr(data-label); 
+    font-size: 0.7rem; 
+    font-weight: 800; 
+    color: #334155;          /* Dark Grey Text */
+    background: #f1f5f9;     /* Light Grey/Blue Background */
+    padding: 5px 10px;       /* Thoda space andar */
+    border-radius: 6px;      /* Gol kinare */
+    text-transform: uppercase; 
+    margin-bottom: 8px;      /* Value se gap */
+    display: inline-block;
+    letter-spacing: 0.5px;
+    border: 1px solid #e2e8f0; /* Halka border */
+  }
+
+  /* Specific Label Colors (Optional - Agar alag rang chahiye to) */
+  /* STATUS label ko thoda alag dikhate hain */
+  .table td[data-label="STATUS"]::before {
+    background: #eff6ff; /* Light Blue */
+    color: #2563eb;      /* Blue Text */
+    border-color: #dbeafe;
+  }
+
+  /* ACTIONS label ko chupate hain kyunki button khud clear hain */
+  .table td[data-label="ACTIONS"]::before {
+    display: none;
+  }
+
+  /* 4. Values (Andar ka content) */
+  .leadInfo, .contactCell, .statusSelect, .noteCell, .budgetCell {
+    width: 100%;
+    padding-left: 4px; /* Thoda right shift taaki label ke niche aaye */
+  }
+
+  /* Avatar fix */
+  .leadInfo {
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid #f8fafc; /* Naam ke niche line */
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+  }
+
+  /* Actions Buttons ko full width aur bada karein */
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Do button barabar hisse mein */
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+  }
+
+  .editBtn, .deleteBtn {
+    width: 100%; /* Full width button */
+    height: 40px;
+    border-radius: 8px;
+  }
+
+  /* Header Buttons Layout */
+  .headerActions { 
+    width: 100%; 
+    flex-direction: row; 
+    gap: 10px;
+  }
+  
+  .addBtn, .deleteAllBtn { 
+    flex: 1; 
+    justify-content: center; 
+  }
 }
