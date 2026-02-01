@@ -1,9 +1,10 @@
 import { createContext, useState, useEffect } from "react";
+import { TOKEN_KEY } from "../api/axios"; // ✅ Dynamic key import karein
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // 1. Initialize User from LocalStorage (Keep this synchronous)
+  // 1. Initialize User from LocalStorage
   const [user, setUser] = useState(() => {
     try {
       const storedUser = localStorage.getItem("user");
@@ -14,20 +15,18 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  const [token, setToken] = useState(() => localStorage.getItem("token") || null);
+  // ✅ Token initialization uses the Environment-Aware KEY
+  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null);
 
-  // ✅ CRITICAL FIX: Start loading as TRUE
-  // This forces the "RoleRoute" to show a Spinner instead of redirecting immediately.
   const [loading, setLoading] = useState(true);
 
-  // 2. Use Effect to stop loading after the check is complete
   useEffect(() => {
-    // This ensures that the initial render is finished before we let the router decide where to go
     setLoading(false);
   }, []);
 
   const login = (userData, authToken) => {
-    localStorage.setItem("token", authToken);
+    // ✅ Save token using the dynamic TOKEN_KEY
+    localStorage.setItem(TOKEN_KEY, authToken);
     localStorage.setItem("user", JSON.stringify(userData));
     setToken(authToken);
     setUser(userData);
@@ -35,8 +34,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    // ✅ Clear the dynamic key on logout
+    localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem("user");
+    // Clear other helpers too just in case
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    
     setToken(null);
     setUser(null);
   };

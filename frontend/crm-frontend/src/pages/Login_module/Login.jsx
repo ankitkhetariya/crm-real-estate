@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../../api/axios"; 
+import API, { TOKEN_KEY } from "../../api/axios"; // ✅ Dynamic key imported
 import toast from 'react-hot-toast'; 
 import { LogIn, Mail, Lock } from "lucide-react"; 
 import styles from "./Login.module.css"; 
@@ -24,26 +24,27 @@ const Login = () => {
     try {
       const res = await API.post("/auth/login", formData);
       
-      // ✅ 1. Save Vital Info to LocalStorage
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);     // Important for protection
-      localStorage.setItem("userId", res.data._id);    // Important for queries
-      localStorage.setItem("userName", res.data.name); // For UI greeting
+      // ✅ 1. Save using Dynamic Environment Key (Fixes 401 Conflict)
+      localStorage.setItem(TOKEN_KEY, res.data.token);
+      
+      // Other vital info
+      localStorage.setItem("role", res.data.role); 
+      localStorage.setItem("userId", res.data._id); 
+      localStorage.setItem("userName", res.data.name);
 
       // ✅ 2. Update Context
       login(res.data, res.data.token);
       
       toast.success(`Welcome back, ${res.data.name}!`);
 
-      // ✅ 3. Role-Based Redirect (Updated for Manager)
-      const role = res.data.role; // Get role from response
-
+      // ✅ 3. Role-Based Redirect
+      const role = res.data.role;
       if (role === 'admin') {
-          navigate("/admin-dashboard");   // Redirect Admin
+          navigate("/admin-dashboard");
       } else if (role === 'manager') {
-          navigate("/manager-dashboard"); // Redirect Manager
+          navigate("/manager-dashboard");
       } else {
-          navigate("/dashboard");        // Redirect Agent (Default)
+          navigate("/dashboard");
       }
 
     } catch (err) {
@@ -57,8 +58,6 @@ const Login = () => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        
-        {/* Header */}
         <div className={styles.header}>
           <div className={styles.iconCircle}>
             <LogIn size={28} color="#2563eb" />
@@ -67,9 +66,7 @@ const Login = () => {
           <p>Please log in to your CRM account</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className={styles.form}>
-          
           <div className={styles.inputGroup}>
             <label>Email Address</label>
             <div className={styles.inputWrapper}>
@@ -106,10 +103,8 @@ const Login = () => {
           <button type="submit" className={styles.loginBtn} disabled={loading}>
             {loading ? "Signing In..." : "Sign In"}
           </button>
-
         </form>
 
-        {/* Footer */}
         <div className={styles.footer}>
           Don't have an account? <Link to="/register">Create Account</Link>
         </div>

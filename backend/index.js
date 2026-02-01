@@ -25,7 +25,8 @@ app.use(cors({
         "http://localhost:5173", 
         "https://crm-mohitrealestate.netlify.app"
     ],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"] 
 }));
 
 /**
