@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const API = axios.create({
-  // ✅ Switch between Live Backend and Local Backend automatically
+  // ✅ Switch between Local and the Correct Render Backend
   baseURL: window.location.hostname === "localhost" 
     ? "http://localhost:5000/api" 
-    : "https://crm-mohitrealestate-backend.onrender.com/api", // 👈 Replace with your actual LIVE BACKEND URL
+    : "https://crm-real-estate-k6cj.onrender.com/api", 
 });
 
 // Interceptor to attach the token to every request
