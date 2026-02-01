@@ -13,7 +13,7 @@
   justify-content: space-between; 
   align-items: center; 
   margin-bottom: 2rem; 
-  flex-wrap: wrap; /* Helps in smaller screens */
+  flex-wrap: wrap; 
   gap: 15px;
 }
 
@@ -41,7 +41,7 @@
   border: none; 
   cursor: pointer; 
   transition: all 0.2s ease; 
-  white-space: nowrap; /* Prevents text breaking */
+  white-space: nowrap; 
 }
 
 .addBtn { 
@@ -64,7 +64,7 @@
   background: #fecaca; 
 }
 
-/* --- 3. Filter & Search Bar (Visible & Modern) --- */
+/* --- 3. Filter & Search Bar --- */
 .filterBar { 
   display: flex; 
   gap: 1rem; 
@@ -133,7 +133,6 @@
 /* --- 4. Property Cards Grid --- */
 .gridContainer { 
   display: grid; 
-  /* Responsive grid: min 280px ensures it fits on small phones */
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
   gap: 1.5rem; 
 }
@@ -233,7 +232,7 @@
   color: #475569; 
 }
 
-/* --- 5. Professional Status Dropdown (In Card) --- */
+/* --- 5. Status Dropdown (In Card) --- */
 .statusWrapper { 
   margin-top: 15px; 
   width: 100%; 
@@ -241,7 +240,7 @@
 
 .statusSelect {
   appearance: none;
-  width: 100%; /* Full width on mobile looks better */
+  width: 100%; 
   padding: 8px 32px 8px 16px;
   border-radius: 12px;
   font-size: 0.85rem;
@@ -283,6 +282,15 @@
   transition: all 0.2s ease;
 }
 
+/* ✅ View (Eye) Button Style */
+.viewIconBtn:hover {
+  background: #f0fdf4; /* Light Green/Blueish mix */
+  color: #059669;       /* Dark Green */
+  border-color: #86efac;
+  transform: translateY(-2px);
+}
+
+/* Edit Button Hover */
 .iconBtn:hover { 
   background: #eff6ff; 
   color: #2563eb; 
@@ -290,13 +298,14 @@
   transform: translateY(-2px); 
 }
 
+/* Delete Button Hover */
 .deleteIconBtn:hover { 
   background: #fef2f2; 
   color: #ef4444; 
   border-color: #fecaca; 
 }
 
-/* --- 7. Edit Modal (Pixel-Perfect Grid) --- */
+/* --- 7. Edit Modal --- */
 .modalOverlay { 
   position: fixed; 
   inset: 0; 
@@ -306,7 +315,7 @@
   align-items: center; 
   justify-content: center; 
   z-index: 2000; 
-  padding: 10px; /* Reduced padding for mobile */
+  padding: 10px; 
 }
 
 .modalContent { 
@@ -386,6 +395,68 @@
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
+/* ✅ NEW DYNAMIC LIST STYLES (For Bedrooms/Bathrooms) */
+.dynamicLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.roomList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 4px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.roomRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.roomRow input {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  background: white;
+}
+
+.addMiniBtn {
+  background: #dbeafe;
+  color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.deleteMiniBtn {
+  background: #fee2e2;
+  color: #ef4444;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteMiniBtn:hover {
+  background: #fecaca;
+}
+
 /* Image Update UI */
 .imageUpdateSection { 
   display: flex; 
@@ -394,7 +465,7 @@
   background: #f1f5f9; 
   padding: 15px; 
   border-radius: 16px; 
-  flex-wrap: wrap; /* Allows stacking on mobile */
+  flex-wrap: wrap; 
 }
 
 .previewContainer { 
@@ -407,6 +478,22 @@
 }
 
 .previewContainer img { width: 100%; height: 100%; object-fit: cover; }
+
+.previewContainer button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .uploadTrigger { 
   position: relative; 
@@ -463,7 +550,7 @@
 
 .cancelBtn:hover { background: #e2e8f0; }
 
-/* --- 8. 📱 RESPONSIVE FIXES (Mobile & Tablet) --- */
+/* --- 8. Responsive Fixes --- */
 @media (max-width: 950px) {
   .container {
     padding: 1.5rem;
@@ -471,78 +558,40 @@
 }
 
 @media (max-width: 768px) { 
-  /* Reduce Padding for mobile */
-  .container {
-    padding: 1rem;
-  }
-
-  /* Header Stacking */
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .header h2 {
-    font-size: 1.5rem;
-  }
-
-  /* Header buttons full width */
-  .headerActions {
-    width: 100%;
-    justify-content: space-between;
-  }
+  .container { padding: 1rem; }
+  .header { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .headerActions { width: 100%; justify-content: space-between; }
+  .addBtn, .deleteBtn { flex: 1; justify-content: center; font-size: 0.9rem; }
+  .filterBar { flex-direction: column; gap: 12px; }
+  .searchWrapper, .filterWrapper { width: 100%; min-width: 100%; }
   
-  .addBtn, .deleteBtn {
-    flex: 1;
-    justify-content: center;
-    font-size: 0.9rem;
-  }
-
-  /* Filter Bar Stacking */
-  .filterBar {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .searchWrapper, .filterWrapper {
-    width: 100%;
-    min-width: 100%;
-  }
-
-  /* Modal Adjustments */
-  .formGrid { 
-    grid-template-columns: 1fr; 
-    gap: 1rem;
-  } 
-  
-  .fullWidth { 
-    grid-column: span 1; 
-  }
-  
-  .modalContent { 
-    padding: 1.5rem; 
-    width: 95%; 
-    max-height: 85vh; 
-  }
-
-  .modalHeader h3 {
-    font-size: 1.2rem;
-  }
-
-  .modalActions {
-    flex-direction: column-reverse; /* Save button on top for easier reach */
-  }
-
-  .saveBtn, .cancelBtn {
-    width: 100%;
-    justify-content: center;
-  }
+  .formGrid { grid-template-columns: 1fr; gap: 1rem; } 
+  .fullWidth { grid-column: span 1; }
+  .modalContent { padding: 1.5rem; width: 95%; max-height: 85vh; }
+  .modalActions { flex-direction: column-reverse; }
+  .saveBtn, .cancelBtn { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 480px) {
-  /* Grid becomes 1 column on small phones */
-  .gridContainer {
-    grid-template-columns: 1fr;
+  .gridContainer { grid-template-columns: 1fr; }
+}
+/* ... [KEEP ALL PREVIOUS CSS HERE] ... */
+
+/* (Add this at the very end of your CSS file) */
+
+/* ✅ SweetAlert Animation Custom Class */
+:global(.animated-popup) {
+  animation: popupFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 20px !important; /* Makes the popup rounded like cards */
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }

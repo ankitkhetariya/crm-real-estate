@@ -2,8 +2,11 @@ import { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
-/* Using LayoutGrid for a more professional 'CRM' feel */
-import { LayoutDashboard, Users, PlusCircle, LogOut, Building, Calendar, Menu, X, LayoutGrid, Settings, LifeBuoy } from "lucide-react"; 
+/* Icons */
+import { 
+  LayoutDashboard, Users, PlusCircle, LogOut, Building, 
+  Calendar, Menu, X, LayoutGrid, Settings, LifeBuoy 
+} from "lucide-react"; 
 import styles from "./Layout.module.css";
 
 const Layout = ({ children }) => {
@@ -20,34 +23,63 @@ const Layout = ({ children }) => {
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMenu = () => setIsMobileMenuOpen(false);
 
+  // Helper to check if the current path matches the link
   const isActive = (path) => location.pathname.startsWith(path);
+
+  // LOGIC FIX: Determine Dashboard Link based on Role
+  // We use .toLowerCase() to ensure 'Admin' and 'admin' both work
+  const getDashboardPath = () => {
+    const role = user?.role?.toLowerCase();
+    
+    if (role === 'admin') return "/admin-dashboard";
+    if (role === 'manager') return "/manager-dashboard";
+    
+    // Default fallback for agents
+    return "/dashboard";
+  };
+
+  // Helper to get the display text for the dashboard link
+  const getDashboardLabel = () => {
+    const role = user?.role?.toLowerCase();
+    if (role === 'admin') return 'Admin Dashboard';
+    if (role === 'manager') return 'Manager Dashboard';
+    return 'Dashboard';
+  };
 
   return (
     <div className={styles.container}>
       
-      {/* 📱 Mobile Header */}
+      {/* Mobile Header */}
       <div className={styles.mobileHeader}>
-        {/* Simple and Clean Branding: CRM */}
-        <h2><LayoutGrid size={24} fill="#D7CCC8" stroke="none" /> CRM</h2>
+        <h2><LayoutGrid size={24} fill="#1e293b" stroke="none" /> CRM</h2>
         <button onClick={toggleMenu} className={styles.menuBtn}>
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
-      {/* ⬅️ SIDEBAR */}
+      {/* SIDEBAR */}
       <aside className={`${styles.sidebar} ${isMobileMenuOpen ? styles.showSidebar : ""}`}>
         
-        {/* 🏢 Logo Header: CRM */}
+        {/* Sidebar Header */}
         <div className={styles.sidebarHeader}>
           <LayoutGrid size={32} fill="#D7CCC8" stroke="none" className={styles.logoIcon} />
           <h2>CRM</h2>
         </div>
 
         <nav className={styles.nav}>
-          <Link to="/dashboard" onClick={closeMenu} className={`${styles.link} ${isActive("/dashboard") ? styles.active : ""}`}>
-            <LayoutDashboard size={20} /> Dashboard
+          
+          {/* DYNAMIC DASHBOARD LINK */}
+          {/* This prevents the Admin from being sent to the Agent dashboard */}
+          <Link 
+            to={getDashboardPath()} 
+            onClick={closeMenu} 
+            className={`${styles.link} ${isActive(getDashboardPath()) ? styles.active : ""}`}
+          >
+            <LayoutDashboard size={20} /> 
+            {getDashboardLabel()}
           </Link>
 
+          {/* Common Links */}
           <Link to="/tasks" onClick={closeMenu} className={`${styles.link} ${isActive("/tasks") ? styles.active : ""}`}>
             <Calendar size={20} /> Tasks
           </Link>
@@ -64,23 +96,31 @@ const Layout = ({ children }) => {
              <PlusCircle size={20} /> Add Lead
           </Link>
 
-          <Link to="/support" onClick={closeMenu} className={`${styles.link} ${isActive("/support") ? styles.active : ""}`}>
-            <LifeBuoy size={20} /> Contact for Support
-          </Link>
+          <div style={{borderTop: '1px solid #3E302B', margin: '10px 0'}}></div>
 
           <Link to="/settings" onClick={closeMenu} className={`${styles.link} ${isActive("/settings") ? styles.active : ""}`}>
              <Settings size={20} /> Settings
           </Link>
 
+          <Link to="/support" onClick={closeMenu} className={`${styles.link} ${isActive("/support") ? styles.active : ""}`}>
+            <LifeBuoy size={20} /> Support
+          </Link>
+
         </nav>
 
+        {/* User Info Section */}
         <div className={styles.userSection}>
           <div className={styles.userInfo}>
-            {/* User Profile Avatar with Theme Border */}
-            <div style={{width:"35px", height:"35px", background:"#4E3B34", borderRadius:"50%", color:"white", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:"bold", border:"1px solid #D7CCC8"}}>
-                {user?.name?.charAt(0).toUpperCase() || "U"}
+            <div className={styles.userAvatar}>
+                {/* Shows the first letter of the name, or U if missing */}
+                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
             </div>
-            <p className={styles.userName}>{user?.name || "User"}</p>
+            <div>
+                {/* Shows the actual user name from Context */}
+                <p className={styles.userName}>{user?.name || "User"}</p>
+                {/* Shows the user role (e.g., Admin) */}
+                <p className={styles.userRole}>{user?.role || "Agent"}</p> 
+            </div>
           </div>
           <button onClick={handleLogout} className={styles.logoutBtn}>
             <LogOut size={16} /> Logout
@@ -88,11 +128,12 @@ const Layout = ({ children }) => {
         </div>
       </aside>
 
-      {/* 🖥️ MAIN CONTENT */}
+      {/* MAIN CONTENT */}
       <main className={styles.mainContent}>
         {children}
       </main>
 
+      {/* Mobile Overlay */}
       {isMobileMenuOpen && <div className={styles.overlay} onClick={closeMenu}></div>}
 
     </div>

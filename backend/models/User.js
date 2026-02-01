@@ -22,6 +22,13 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'agent', 'manager'],
         default: 'agent'
     },
+    // Reference to the Manager who supervises this Agent
+    // If the user is an Admin or Manager, this will be null
+    managedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now

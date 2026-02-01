@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+// ✅ 1. Sub-schema banayein (Room Sizes ke liye)
+const roomDetailSchema = new mongoose.Schema({
+    size: { 
+        type: String, 
+        required: true,
+        default: "Standard" 
+    }
+}, { _id: false }); // _id false rakhein taaki database bhare nahi
+
 const propertySchema = new mongoose.Schema({
     title: { 
         type: String, 
@@ -8,19 +17,19 @@ const propertySchema = new mongoose.Schema({
     description: String,
     type: { 
         type: String, 
-        enum: ['Apartment', 'House', 'Commercial', 'Land'], // Capitalized for better UI display
+        enum: ['Apartment', 'House', 'Commercial', 'Land'], 
         required: true 
     },
     address: { type: String, required: true },
     city: { type: String, required: true },
     price: { type: Number, required: true },
     
-    // Property specific details
-    bedrooms: Number,
-    bathrooms: Number,
-    area: Number, // Measured in square feet
+    // ✅ 2. Yahan Change Hai (Number hata kar Array lagayein)
+    bedrooms: [roomDetailSchema], 
+    bathrooms: [roomDetailSchema],
+    
+    area: Number, 
 
-    // Changed from array to single string to match frontend upload logic
     image: {
         type: String, 
         default: "" 
@@ -32,20 +41,19 @@ const propertySchema = new mongoose.Schema({
         default: 'Available' 
     },
 
-    // Reference to the user who assigned or created this property
     assignedTo: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User',
         required: true
     },
 
-    // Optional reference to a Lead if the property belongs to one
     owner: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Lead' 
+        ref: 'Lead',
+        default: null // Default null rakhein
     }
 }, { 
-    timestamps: true // Automatically manages createdAt and updatedAt fields
+    timestamps: true 
 });
 
 module.exports = mongoose.model('Property', propertySchema);

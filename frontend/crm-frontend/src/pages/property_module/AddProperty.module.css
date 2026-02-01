@@ -49,7 +49,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Do columns layout */
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
 }
 
@@ -85,6 +85,96 @@
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
+
+/* ----------------------------------------------------- */
+/* ✅ NEW STYLES: Dynamic Bedroom/Bathroom Lists */
+/* ----------------------------------------------------- */
+
+.dynamicLabel {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.roomList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 5px; /* space for scrollbar */
+}
+
+/* Custom Scrollbar for list */
+.roomList::-webkit-scrollbar {
+  width: 4px;
+}
+.roomList::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.roomRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.roomRow input {
+  flex: 1; /* Input takes available width */
+  padding: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.addMiniBtn {
+  background: #dbeafe;
+  color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: 0.2s;
+}
+
+.addMiniBtn:hover {
+  background: #bfdbfe;
+}
+
+.deleteMiniBtn {
+  background: #fee2e2;
+  color: #ef4444;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.deleteMiniBtn:hover {
+  background: #fecaca;
+}
+
+.emptyText {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------------------------------------------------- */
 
 /* Image Upload Styling */
 .uploadBox {
@@ -184,7 +274,7 @@
 /* Responsive Logic */
 @media (max-width: 640px) {
   .grid {
-    grid-template-columns: 1fr; /* Mobile par single column */
+    grid-template-columns: 1fr;
   }
   
   .container {

@@ -1,26 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const leadController = require('../controllers/leadController');
+const { 
+    createLead, 
+    getAllLeads, 
+    getDashboardStats, 
+    deleteAllLeads, 
+    getLeadById, 
+    updateLead, 
+    deleteLead 
+} = require('../controllers/leadController');
 const { protect } = require('../middleware/authMiddleware');
 
-// Sabhi routes ko protect middleware se guzaarna
 router.use(protect);
 
-// 1. Create New Lead
-router.post('/', leadController.createLead);
-
-// 2. Get All Leads
-router.get('/', leadController.getAllLeads);
-
-// 3. Dashboard Stats (Hamesha ID se upar)
-router.get('/stats', leadController.getDashboardStats); 
-
-// 4. DELETE ALL 
-router.delete('/delete-all', leadController.deleteAllLeads); 
-
-// 5. Single Lead Operations (Dynamic ID routes hamesha niche)
-router.get('/:id', leadController.getLeadById);
-router.put('/:id', leadController.updateLead);
-router.delete('/:id', leadController.deleteLead);
+// Ensure these functions are actually defined in the controller!
+router.post('/', createLead); 
+router.get('/', getAllLeads);
+router.get('/stats', getDashboardStats);
+router.delete('/delete-all', deleteAllLeads);
+router.get('/:id', getLeadById);
+router.put('/:id', updateLead);
+router.delete('/:id', deleteLead);
 
 module.exports = router;

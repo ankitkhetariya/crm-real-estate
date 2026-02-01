@@ -151,3 +151,42 @@
 }
 
 /* Force Update 1 */
+/* ... Purana code waisa hi rakhein, bas ye niche add karein ... */
+
+/* --- Dropdown Styling (For Register Page) --- */
+.selectWrapper {
+  position: relative;
+}
+
+.selectInput {
+  width: 100%;
+  padding: 12px 12px 12px 40px; /* Icon gap */
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  background-color: #f8fafc;
+  appearance: none; /* Hide default arrow */
+  cursor: pointer;
+  color: #334155;
+  font-family: inherit;
+}
+
+.selectInput:focus {
+  border-color: #2563eb;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Custom Arrow for Dropdown */
+.selectWrapper::after {
+  content: '▼';
+  font-size: 10px;
+  color: #94a3b8;
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}

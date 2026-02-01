@@ -1,0 +1,227 @@
+/* --- Container & Layout --- */
+.container {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: #f8fafc;
+    min-height: 100vh;
+  }
+  
+  .header {
+    margin-bottom: 32px;
+  }
+  
+  .welcomeText {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+  
+  .subtitle {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  
+  /* --- Loader --- */
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    gap: 12px;
+    color: #4f46e5;
+    font-weight: 600;
+  }
+  
+  /* --- Stat Cards Grid --- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  
+  .card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .iconBox {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .cardTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .cardValue {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 4px 0 0 0;
+  }
+  
+  /* --- Charts & Leaderboard Section --- */
+  .chartsSection {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2 parts Chart, 1 part Leaderboard */
+    gap: 24px;
+  }
+  
+  .chartCard, .sideList {
+    background: white;
+    padding: 24px;
+    border-radius: 20px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+  
+  .chartHeader, .listHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .chartHeader h3, .listHeader h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .badge {
+    background: #ecfdf5;
+    color: #059669;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  
+  /* --- Top Performers List --- */
+  .agentList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .agentItem {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f8fafc;
+    transition: background 0.2s;
+  }
+  
+  .agentItem:hover {
+    background: #f1f5f9;
+  }
+  
+  .agentRank {
+    width: 28px;
+    height: 28px;
+    background: white;
+    color: #4f46e5;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 800;
+    font-size: 12px;
+    margin-right: 12px;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .agentDetails {
+    flex: 1;
+  }
+  
+  .agentName {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .agentRev {
+    font-size: 13px;
+    color: #16a34a;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  /* --- Responsive Media Queries --- */
+  
+  /* Tablet View */
+  @media (max-width: 1100px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .chartsSection {
+      grid-template-columns: 1fr; /* Stack chart and list */
+    }
+  }
+  
+  /* Mobile View */
+  @media (max-width: 650px) {
+    .container {
+      padding: 16px;
+    }
+  
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .welcomeText {
+      font-size: 22px;
+    }
+  
+    .card {
+      padding: 16px;
+    }
+    
+    .chartCard {
+      padding: 16px;
+    }
+  }
+  
+  /* Animation for the spinner */
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }

@@ -6,7 +6,8 @@ const nodemailer = require('nodemailer');
 // --- 1. REGISTER USER ---
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    // ✅ Change 1: 'role' bhi accept karein
+    const { name, email, password, phone, role } = req.body;
     
     // Basic Validation
     if (!name || !email || !password) {
@@ -19,7 +20,16 @@ exports.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword, phone });
+
+    // ✅ Change 2: Role save karein (Agar nahi aaya toh default 'agent')
+    const newUser = new User({ 
+        name, 
+        email, 
+        password: hashedPassword, 
+        phone,
+        role: role || 'agent' 
+    });
+    
     await newUser.save();
 
     res.status(201).json({ message: 'User registered successfully' });
@@ -50,12 +60,16 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: user.role }, 
       process.env.JWT_SECRET, 
-      { expiresIn: "1d" }
+      { expiresIn: "30d" } // Thoda lamba time rakhein (1 month)
     );
 
+    // ✅ Change 3: Response Structure Frontend ke hisab se set kiya
     res.json({ 
-      token, 
-      user: { id: user._id, name: user.name, email: user.email, role: user.role } 
+      token,
+      _id: user._id,
+      name: user.name, 
+      email: user.email, 
+      role: user.role // <--- Ye line zaroori hai Frontend ke liye
     });
   } catch (err) {
     console.error("Login Error:", err);
@@ -66,7 +80,6 @@ exports.login = async (req, res) => {
 // --- 3. GET CURRENT USER ---
 exports.getCurrentUser = async (req, res) => {
   try {
-    // req.user.id middleware se aa raha hai
     const user = await User.findById(req.user.id).select('-password');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -78,7 +91,7 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
-// --- 4. FORGOT PASSWORD (EMAIL SENDING) ---
+// --- 4. FORGOT PASSWORD ---
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -88,7 +101,6 @@ exports.forgotPassword = async (req, res) => {
       return res.status(404).json({ error: "User not found with this email" });
     }
 
-    // Nodemailer Setup
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -97,7 +109,6 @@ exports.forgotPassword = async (req, res) => {
       }
     });
 
-    // Email Content
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -105,7 +116,6 @@ exports.forgotPassword = async (req, res) => {
       text: `Hello ${user.name},\n\nYou requested a password reset.\nClick here: http://localhost:5173/reset-password\n\n(This is an automated email)`
     };
 
-    // Send Email
     await transporter.sendMail(mailOptions);
     console.log(`✅ Email sent successfully to: ${email}`);
     
@@ -117,26 +127,22 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// --- 5. RESET PASSWORD (ACTUAL UPDATE) ---
+// --- 5. RESET PASSWORD ---
 exports.resetPassword = async (req, res) => {
   const { email, newPassword } = req.body;
 
   try {
-    // Validation
     if (!email || !newPassword) {
       return res.status(400).json({ error: "Email and New Password are required" });
     }
 
-    // 1. User dhundo
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // 2. Naya Password Hash karo
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // 3. Update karo
     user.password = hashedPassword;
     await user.save();
 
@@ -149,21 +155,17 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-// 👇👇👇 NEW SETTINGS MODULE FUNCTIONS 👇👇👇
-
-// --- 6. UPDATE PROFILE (Name/Email) ---
+// --- 6. UPDATE PROFILE ---
 exports.updateProfile = async (req, res) => {
     try {
         const { name, email } = req.body;
-        // User ID Middleware se lo (Support both .id and .userId just in case)
         const userId = req.user.id || req.user._id || req.user.userId;
 
-        // User update karo
         const user = await User.findByIdAndUpdate(
             userId, 
             { name, email }, 
-            { new: true, runValidators: true } // Return updated data
-        ).select("-password"); // Password return mat karna
+            { new: true, runValidators: true }
+        ).select("-password");
 
         res.status(200).json({ message: "Profile Updated", user });
 
@@ -173,7 +175,7 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-// --- 7. CHANGE PASSWORD (Logged In User) ---
+// --- 7. CHANGE PASSWORD ---
 exports.changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
@@ -181,13 +183,11 @@ exports.changePassword = async (req, res) => {
 
         const user = await User.findById(userId);
 
-        // 1. Purana Password Check
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Incorrect current password" }); // Use 'message' for frontend toast
+            return res.status(400).json({ message: "Incorrect current password" });
         }
 
-        // 2. Naya Password Hash & Save
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         

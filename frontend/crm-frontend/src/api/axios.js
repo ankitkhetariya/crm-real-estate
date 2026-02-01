@@ -1,16 +1,17 @@
 import axios from "axios";
 
 const API = axios.create({
-  // 127.0.0.1 bilkul sahi hai Node v17+ ke liye
-  baseURL: "https://crm-real-estate-k6cj.onrender.com/api", 
+  // ✅ Switch between Live Backend and Local Backend automatically
+  baseURL: window.location.hostname === "localhost" 
+    ? "http://localhost:5000/api" 
+    : "https://crm-mohitrealestate-backend.onrender.com/api", // 👈 Replace with your actual LIVE BACKEND URL
 });
 
-// 👇 YE PART BOOT ZAROORI HAI 👇
-// Iske bina backend ko pata nahi chalega ki kaun login hai
+// Interceptor to attach the token to every request
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token"); // Browser se token uthao
+  const token = localStorage.getItem("token"); 
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`; // Backend ko token bhejo
+    config.headers.Authorization = `Bearer ${token}`; 
   }
   return config;
 });

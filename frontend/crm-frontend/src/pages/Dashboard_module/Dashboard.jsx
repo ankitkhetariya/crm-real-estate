@@ -5,8 +5,10 @@ import { Users, TrendingUp, ClipboardList, Loader, IndianRupee } from "lucide-re
 import styles from "./Dashboard.module.css";
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, Legend 
-} from 'recharts';
+  PieChart, Pie, Cell, Legend, CartesianGrid 
+} from 'recharts'; // 👈 Add CartesianGrid here
+// Dashboard.jsx
+const res = await API.get("/leads/stats"); // This must match app.use('/api/leads', ...) + router.get('/stats', ...)
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -23,30 +25,50 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchStats = async () => {
       try {
+        setLoading(true);
         const res = await API.get("/leads/stats");
-        setStats(res.data);
+        if (isMounted) {
+          // If response is empty or null, we keep the default 0 values
+          setStats(res.data || {
+            totalLeads: 0,
+            convertedLeads: 0,
+            totalRevenue: 0,
+            totalPipeline: 0,
+            conversionRate: 0,
+            statusCounts: [],
+            activeTasksCount: 0 
+          });
+        }
       } catch (err) {
-        console.error("Stats Error:", err);
+        console.error("Dashboard Stats Sync Error:", err);
       } finally {
-        setLoading(false);
+        // This ensures Loading turns off even if the API fails or is empty
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
+
     fetchStats();
+    return () => { isMounted = false; };
   }, []);
 
+  // Data Formatting for Charts
   const financialData = [
     { name: 'Revenue', amount: stats.totalRevenue || 0 },
     { name: 'Pipeline', amount: stats.totalPipeline || 0 }
   ];
 
   const pieData = stats.statusCounts?.map(item => ({
-    name: item._id,
-    value: item.count
+    name: item._id || "Unknown",
+    value: item.count || 0
   })) || [];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#ff6b6b'];
+  const COLORS = ['#2563eb', '#16a34a', '#d97706', '#9333ea', '#ef4444', '#6366f1'];
 
   const statCards = [
     { 
@@ -77,14 +99,19 @@ const Dashboard = () => {
   ];
 
   if (loading) {
-      return <div className={styles.loaderContainer}><Loader className="animate-spin" /> Loading...</div>;
+      return (
+        <div className={styles.loaderContainer}>
+          <Loader className="animate-spin" /> 
+          <span>Syncing Dashboard...</span>
+        </div>
+      );
   }
 
   return (
     <div className={styles.container}>
       <h2 className={styles.welcomeText}>👋 Welcome back, {user?.name || "User"}</h2>
 
-      {/* Cards Grid */}
+      {/* --- Stat Cards Grid --- */}
       <div className={styles.grid}>
         {statCards.map((card, index) => (
           <div key={index} className={styles.card}>
@@ -100,14 +127,15 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Graphs Grid */}
+      {/* --- Charts Section --- */}
       <div className={styles.chartsSection}>
-        {/* Bar Chart */}
+        {/* Revenue Bar Chart */}
         <div className={styles.chartCard}>
             <h3>💰 Revenue vs Pipeline</h3>
             <div style={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer>
                     <BarChart data={financialData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip formatter={(value) => `₹${value.toLocaleString('en-IN')}`} />
@@ -117,7 +145,7 @@ const Dashboard = () => {
             </div>
         </div>
 
-        {/* Pie Chart */}
+        {/* Status Pie Chart */}
         <div className={styles.chartCard}>
             <h3>📊 Leads Status</h3>
             {pieData.length > 0 ? (
@@ -125,9 +153,12 @@ const Dashboard = () => {
                     <ResponsiveContainer>
                         <PieChart>
                             <Pie
-                                data={pieData} cx="50%" cy="50%"
-                                innerRadius={60} outerRadius={80}
-                                paddingAngle={5} dataKey="value"
+                                data={pieData} 
+                                cx="50%" cy="50%"
+                                innerRadius={60} 
+                                outerRadius={80}
+                                paddingAngle={5} 
+                                dataKey="value"
                             >
                                 {pieData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -139,7 +170,7 @@ const Dashboard = () => {
                     </ResponsiveContainer>
                 </div>
             ) : (
-                <p className={styles.noDataText}>No data available</p>
+                <div className={styles.noDataText}>No lead data tracked yet</div>
             )}
         </div>
       </div>

@@ -1,11 +1,9 @@
-/* Container */
 .container {
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* Loader */
 .loaderContainer {
   display: flex;
   justify-content: center;
@@ -17,7 +15,6 @@
   gap: 10px;
 }
 
-/* Welcome Text */
 .welcomeText {
   font-size: 24px;
   font-weight: 700;
@@ -25,30 +22,23 @@
   margin-bottom: 24px;
 }
 
-/* --- Cards Grid System --- */
+/* Cards Grid */
 .grid {
   display: grid;
   gap: 24px;
   margin-bottom: 32px;
-  /* Default: 4 Columns for Desktop */
   grid-template-columns: repeat(4, 1fr);
 }
 
-/* Tablet: 2 Columns */
 @media (max-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* Mobile: 1 Column */
 @media (max-width: 600px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+  .grid { grid-template-columns: 1fr; }
 }
 
-/* Stat Card Styling */
+/* Stat Card */
 .card {
   background: white;
   border-radius: 12px;
@@ -58,7 +48,7 @@
   gap: 16px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .card:hover {
@@ -74,11 +64,6 @@
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
-}
-
-.cardInfo {
-  display: flex;
-  flex-direction: column;
 }
 
 .cardTitle {
@@ -103,20 +88,17 @@
   border-radius: 4px;
   margin-top: 4px;
   display: inline-block;
-  width: fit-content;
 }
 
-/* --- Charts Section --- */
+/* Charts Section */
 .chartsSection {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 Columns for Charts */
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
 @media (max-width: 900px) {
-  .chartsSection {
-    grid-template-columns: 1fr; /* Stack charts on smaller screens */
-  }
+  .chartsSection { grid-template-columns: 1fr; }
 }
 
 .chartCard {
@@ -137,6 +119,6 @@
 .noDataText {
   text-align: center;
   color: #94a3b8;
-  margin-top: 100px;
+  padding: 100px 0;
   font-size: 14px;
 }

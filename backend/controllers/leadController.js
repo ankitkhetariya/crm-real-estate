@@ -1,163 +1,135 @@
 const Lead = require('../models/Lead');
-const Task = require('../models/Task'); 
+const User = require('../models/User');
 
-// 1. Create Lead
-exports.createLead = async (req, res) => {
+// ✅ 1. Stats logic (UPDATED FOR MANAGER HIERARCHY & PIPELINE)
+exports.getDashboardStats = async (req, res) => {
     try {
-        const { name, email, phone, company, source, status, budget, notes } = req.body;
+        const userId = req.user._id || req.user.id;
+        const role = req.user.role;
+        let query = {};
 
-        if (!req.user) {
-            return res.status(401).json({ message: "User not authenticated" });
+        // --- HIERARCHY LOGIC ---
+        if (role === 'admin') {
+            query = {}; // Admin sees everything
+        } else if (role === 'manager') {
+            // Find all agents managed by this manager
+            const teamAgents = await User.find({ managedBy: userId }).distinct('_id');
+            // Manager sees their own leads + their team's leads
+            query = { assignedTo: { $in: [userId, ...teamAgents] } };
+        } else {
+            query = { assignedTo: userId }; // Agent sees only theirs
         }
 
-        const newLead = new Lead({
-            name,
-            email,
-            phone,
-            company,
-            source,
-            status,
-            budget,
-            notes,
-            assignedTo: req.user._id || req.user.userId
+        const [totalLeads, aggregation] = await Promise.all([
+            Lead.countDocuments(query),
+            Lead.aggregate([
+                { $match: query },
+                { 
+                    $group: { 
+                        _id: "$status", 
+                        count: { $sum: 1 },
+                        // ✅ Revenue: Sum budget only if status is "Converted"
+                        revenue: { 
+                            $sum: { 
+                                $cond: [{ $eq: ["$status", "Converted"] }, { $toDouble: { $ifNull: ["$budget", 0] } }, 0] 
+                            } 
+                        },
+                        // ✅ Pipeline: Sum budget for all other active statuses
+                        pipeline: { 
+                            $sum: { 
+                                $cond: [{ $ne: ["$status", "Converted"] }, { $toDouble: { $ifNull: ["$budget", 0] } }, 0] 
+                            } 
+                        }
+                    } 
+                }
+            ])
+        ]);
+
+        // Extract totals from the aggregation array
+        const totalRevenue = aggregation.reduce((acc, curr) => acc + (curr.revenue || 0), 0);
+        const totalPipeline = aggregation.reduce((acc, curr) => acc + (curr.pipeline || 0), 0);
+        const convertedCount = aggregation.find(a => a._id === "Converted")?.count || 0;
+        
+        const conversionRate = totalLeads > 0 
+            ? ((convertedCount / totalLeads) * 100).toFixed(1) 
+            : 0;
+
+        res.status(200).json({ 
+            totalLeads, 
+            totalRevenue,
+            totalPipeline,
+            conversionRate: Number(conversionRate),
+            statusCounts: aggregation,
+            activeTasksCount: 0 // Placeholder
         });
-
-        const savedLead = await newLead.save();
-        res.status(201).json(savedLead);
-
-    } catch (error) {
-        console.error("Error creating lead:", error.message);
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: error.message });
-        }
-        res.status(500).json({ message: 'Server Error' });
+    } catch (error) { 
+        console.error("Stats Error:", error);
+        res.status(500).json({ message: 'Error' }); 
     }
 };
 
-// 2. Get All Leads
+// ✅ 2. Get All (UPDATED FOR MANAGER HIERARCHY)
 exports.getAllLeads = async (req, res) => {
     try {
-        const userId = req.user._id || req.user.userId;
-        const leads = await Lead.find({ assignedTo: userId }).sort({ createdAt: -1 });
+        const userId = req.user._id || req.user.id;
+        const role = req.user.role;
+        let query = {};
+
+        if (role === 'admin') {
+            query = {};
+        } else if (role === 'manager') {
+            const teamAgents = await User.find({ managedBy: userId }).distinct('_id');
+            query = { assignedTo: { $in: [userId, ...teamAgents] } };
+        } else {
+            query = { assignedTo: userId };
+        }
+
+        const leads = await Lead.find(query)
+            .populate('assignedTo', 'name email')
+            .sort({ createdAt: -1 })
+            .lean();
+            
         res.status(200).json(leads);
-    } catch (error) {
-        console.error("Error fetching leads:", error.message);
-        res.status(500).json({ message: 'Server Error' });
-    }
+    } catch (error) { res.status(500).json({ message: 'Error' }); }
 };
 
-// 3. Get Single Lead
+// ✅ 3. Create
+exports.createLead = async (req, res) => {
+    try {
+        const newLead = new Lead({ ...req.body, assignedTo: req.user.id });
+        await newLead.save();
+        res.status(201).json(newLead);
+    } catch (error) { res.status(500).json({ message: 'Error creating lead' }); }
+};
+
+// ✅ 4. Get By ID
 exports.getLeadById = async (req, res) => {
     try {
         const lead = await Lead.findById(req.params.id);
-        
-        if (!lead) return res.status(404).json({ message: 'Lead not found' });
-        
-        if (lead.assignedTo.toString() !== (req.user._id || req.user.userId).toString()) {
-            return res.status(401).json({ message: 'Not authorized' });
-        }
-
         res.status(200).json(lead);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
-    }
+    } catch (error) { res.status(500).json({ message: 'Error' }); }
 };
 
-// 4. Update Lead
+// ✅ 5. Update
 exports.updateLead = async (req, res) => {
     try {
-        let lead = await Lead.findById(req.params.id);
-        if (!lead) return res.status(404).json({ message: 'Lead not found' });
-
-        if (lead.assignedTo.toString() !== (req.user._id || req.user.userId).toString()) {
-            return res.status(401).json({ message: 'Not authorized' });
-        }
-
-        lead = await Lead.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        res.status(200).json(lead);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
-    }
+        const updated = await Lead.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.status(200).json(updated);
+    } catch (error) { res.status(500).json({ message: 'Error' }); }
 };
 
-// 5. Delete Lead
+// ✅ 6. Delete
 exports.deleteLead = async (req, res) => {
     try {
-        const lead = await Lead.findById(req.params.id);
-        if (!lead) return res.status(404).json({ message: 'Lead not found' });
-
-        if (lead.assignedTo.toString() !== (req.user._id || req.user.userId).toString()) {
-            return res.status(401).json({ message: 'Not authorized' });
-        }
- 
-        await lead.deleteOne();
-        res.status(200).json({ message: 'Lead removed' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
-    }
+        await Lead.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Deleted' });
+    } catch (error) { res.status(500).json({ message: 'Error' }); }
 };
 
-// 📊 6. Get Dashboard Stats
-exports.getDashboardStats = async (req, res) => {
-    try {
-        const userId = req.user._id || req.user.userId;
-
-        const totalLeads = await Lead.countDocuments({ assignedTo: userId });
-        const convertedLeads = await Lead.countDocuments({ assignedTo: userId, status: "Converted" });
-        
-        const revenueData = await Lead.aggregate([
-            { $match: { assignedTo: userId, status: "Converted" } }, 
-            { $group: { _id: null, totalRevenue: { $sum: "$budget" } } }
-        ]);
-        const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
-
-        const pipelineData = await Lead.aggregate([
-            { $match: { assignedTo: userId, status: { $ne: "Converted" } } }, 
-            { $group: { _id: null, totalPipeline: { $sum: "$budget" } } }
-        ]);
-        const totalPipeline = pipelineData.length > 0 ? pipelineData[0].totalPipeline : 0;
-
-        const conversionRate = totalLeads > 0 
-            ? ((convertedLeads / totalLeads) * 100).toFixed(1)
-            : 0;
-
-        const statusCounts = await Lead.aggregate([
-            { $match: { assignedTo: userId } },
-            { $group: { _id: "$status", count: { $sum: 1 } } }
-        ]);
-
-        const activeTasksCount = await Task.countDocuments({ 
-            assignedTo: userId, 
-            status: { $ne: "completed" } 
-        });
-
-        res.status(200).json({
-            totalLeads,
-            convertedLeads,
-            totalRevenue,
-            totalPipeline,
-            conversionRate,
-            statusCounts,
-            activeTasksCount
-        });
-
-    } catch (error) {
-        console.error("Stats Error:", error.message);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
-
-// 🗑️ 7. DELETE ALL LEADS (New Function)
+// ✅ 7. Delete All
 exports.deleteAllLeads = async (req, res) => {
     try {
-        const userId = req.user._id || req.user.userId;
-        
-        // Sirf login user ka data delete hoga
-        await Lead.deleteMany({ assignedTo: userId });
-
-        res.status(200).json({ message: "All leads deleted successfully" });
-    } catch (error) {
-        console.error("Delete All Error:", error.message);
-        res.status(500).json({ message: 'Server Error' });
-    }
+        await Lead.deleteMany({ assignedTo: req.user.id });
+        res.status(200).json({ message: 'All deleted' });
+    } catch (error) { res.status(500).json({ message: 'Error' }); }
 };

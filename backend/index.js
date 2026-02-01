@@ -3,42 +3,71 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
-// Routes Import
+// Import Route Modules
 const authRoutes = require('./routes/authRoutes');
-const leadRoutes = require('./routes/leadRoutes'); 
+const leadRoutes = require('./routes/leadRoutes');
 const propertyRoutes = require('./routes/propertyRoutes');
-const taskRoutes = require('./routes/taskRoutes'); 
+const taskRoutes = require('./routes/taskRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const managerRoutes = require('./routes/managerRoutes');
 
+// Load environment variables from .env file
 dotenv.config();
-const app = express(); 
 
-// Middleware - Yahan logic wahi hai, bas live URL add kiya hai
+const app = express();
+
+/**
+ * CORS Configuration
+ * 'origin' includes local development and production frontend URL
+ */
 app.use(cors({
     origin: [
         "http://localhost:5173", 
-        "https://crm-mohitrealestate.netlify.app" // Aapka live frontend address
+        "https://crm-mohitrealestate.netlify.app"
     ],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"]
+    credentials: true
 }));
 
-// ✅ Body Parser Limit (Images ke liye)
-app.use(express.json({ limit: "10mb" })); 
-app.use(express.urlencoded({ limit: "10mb", extended: true }));
+/**
+ * Body Parser Middleware
+ * Parses incoming requests with JSON payloads
+ */
+app.use(express.json());
 
-// ✅ Routes Connect Karein
-app.use('/api/auth', authRoutes);
-app.use('/api/leads', leadRoutes); 
-app.use('/api/properties', propertyRoutes);
-app.use('/api/tasks', taskRoutes); 
+/**
+ * API Route Definitions
+ * Hierarchy and module-based route mounting
+ */
+app.use('/api/auth', authRoutes);         // Authentication (Login/Register)
+app.use('/api/leads', leadRoutes);       // Lead Management & Stats
+app.use('/api/properties', propertyRoutes); // Real Estate Inventory
+app.use('/api/tasks', taskRoutes);       // Task Tracking
+app.use('/api/admin', adminRoutes);       // Admin Master Control
+app.use('/api/manager', managerRoutes);   // Manager Team Oversight
 
-// Database Connection - Name wahi rakha hai (MONGO_URL)
+/**
+ * Database Connection
+ * Connecting to MongoDB Atlas using URL from environment variables
+ */
 mongoose.connect(process.env.MONGO_URL)
-    .then(() => console.log('✅ MongoDB Connected'))
-    .catch(err => console.log('❌ MongoDB Error:', err));
+    .then(() => console.log('✅ MongoDB Connected Successfully'))
+    .catch(err => {
+        console.error('❌ MongoDB Connection Error:', err.message);
+        process.exit(1); // Exit process with failure
+    });
 
-// Render ke liye PORT setup
+/**
+ * Health Check Route (Optional but recommended for live servers)
+ */
+app.get('/', (req, res) => {
+    res.send('CRM Backend API is running...');
+});
+
+/**
+ * Server Execution
+ * Listen on defined PORT or default to 5000
+ */
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, () => {
+    console.log(`🚀 Production Server is running on port ${PORT}`);
 });

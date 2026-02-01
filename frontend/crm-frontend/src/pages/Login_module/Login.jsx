@@ -2,8 +2,8 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../../api/axios"; 
-import toast from 'react-hot-toast'; // ✅ Toast Import
-import { LogIn, Mail, Lock } from "lucide-react"; // Icons for better look
+import toast from 'react-hot-toast'; 
+import { LogIn, Mail, Lock } from "lucide-react"; 
 import styles from "./Login.module.css"; 
 
 const Login = () => {
@@ -24,16 +24,30 @@ const Login = () => {
     try {
       const res = await API.post("/auth/login", formData);
       
-      // Context mein login update karein
-      login(res.data.user, res.data.token);
+      // ✅ 1. Save Vital Info to LocalStorage
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);     // Important for protection
+      localStorage.setItem("userId", res.data._id);    // Important for queries
+      localStorage.setItem("userName", res.data.name); // For UI greeting
+
+      // ✅ 2. Update Context
+      login(res.data, res.data.token);
       
-      // ✅ Success Toast
-      toast.success("Welcome back! Login Successful.");
-      navigate("/dashboard");
+      toast.success(`Welcome back, ${res.data.name}!`);
+
+      // ✅ 3. Role-Based Redirect (Updated for Manager)
+      const role = res.data.role; // Get role from response
+
+      if (role === 'admin') {
+          navigate("/admin-dashboard");   // Redirect Admin
+      } else if (role === 'manager') {
+          navigate("/manager-dashboard"); // Redirect Manager
+      } else {
+          navigate("/dashboard");        // Redirect Agent (Default)
+      }
 
     } catch (err) {
-      // ❌ Error Toast
-      const errorMsg = err.response?.data?.message || "Invalid Email or Password";
+      const errorMsg = err.response?.data?.error || "Invalid Email or Password"; 
       toast.error(errorMsg);
     } finally {
       setLoading(false);
@@ -105,4 +119,3 @@ const Login = () => {
 };
 
 export default Login;
-// Force Update 1
