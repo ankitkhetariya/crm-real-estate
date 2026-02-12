@@ -1,172 +1,390 @@
 /* =========================================
-   1. GLOBAL LAYOUT
+   1. GLOBAL LAYOUT (Desktop)
    ========================================= */
-   .container {
+.container {
     display: flex;
     height: 100vh;
     width: 100vw;
     background-color: #f8fafc;
-    overflow: hidden;
-  }
-  
-  /* =========================================
-     2. SIDEBAR (Brown Theme) 🟤
-     ========================================= */
-  .sidebar {
-    width: 260px;
-    background: #2C221F; 
-    border-right: 1px solid #3E302B;
+    overflow: hidden; /* Prevents body scroll */
+}
+
+/* =========================================
+   2. SIDEBAR (Brown Theme 🟤)
+   ========================================= */
+.sidebar {
+    width: 260px; /* Default Width */
+    background: #2c221f;
+    border-right: 1px solid #3e302b;
     height: 100%;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    transition: transform 0.3s ease-in-out;
-    /* ✅ Sidebar needs to be highest to slide over everything */
-    z-index: 1200; 
-  }
-  
-  .sidebarHeader {
-    padding: 20px;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1200;
+    position: relative;
+    white-space: nowrap;
+}
+
+/* ✅ COLLAPSED STATE (Minibar) */
+.sidebarCollapsed {
+    width: 80px;
+}
+
+/* --- Sidebar Header --- */
+.sidebarHeader {
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #3e302b;
+    background: #2c221f;
+}
+
+.logoContent {
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid #3E302B;
-  }
-  
-  .logoIcon { color: #D7CCC8; }
-  .sidebarHeader h2 { font-size: 20px; font-weight: 700; color: #FFFFFF; margin: 0; }
-  
-  .nav {
+}
+
+.logoLink {
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+}
+
+.logoIcon {
+    color: #d7ccc8;
+    flex-shrink: 0;
+}
+
+.sidebarHeader h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+
+/* ✅ TOGGLE BUTTON (Desktop Only) */
+.collapseBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #a1887f;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.collapseBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* --- Navigation --- */
+.nav {
     flex: 1;
     padding: 20px 10px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
     overflow-y: auto;
-  }
-  
-  .link {
+    overflow-x: hidden;
+}
+
+.link {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #d7ccc8;
+    font-weight: 500;
+    transition: all 0.2s;
+    position: relative;
+    height: 44px;
+}
+
+.link:hover {
+    background-color: #3e302b;
+    color: #ffffff;
+}
+
+.active {
+    background-color: #4e3b34;
+    color: #ffffff;
+    font-weight: 600;
+    border-left: 4px solid #a1887f;
+}
+
+.iconWrapper {
+    min-width: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.linkLabel {
+    margin-left: 12px;
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+
+/* Collapsed Styles */
+.collapsedLink {
+    justify-content: center;
+    padding: 12px 0;
+    border-left: none;
+}
+
+.hideLabel {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.divider {
+    height: 1px;
+    background: #3e302b;
+    margin: 10px 0;
+}
+
+/* Tooltip */
+.tooltip {
+    position: absolute;
+    left: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1e1e1e;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+    z-index: 1300;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.collapsedLink:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    left: 85px;
+}
+
+/* --- User Section --- */
+.userSection {
+    padding: 16px;
+    border-top: 1px solid #3e302b;
+    background: #251d1a;
+}
+
+.userInfo {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #D7CCC8; 
-    font-weight: 500;
-    transition: all 0.2s;
-  }
-  
-  .link:hover { background-color: #3E302B; color: #FFFFFF; }
-  
-  .active {
-    background-color: #4E3B34; 
-    color: #FFFFFF;
+    margin-bottom: 12px;
+    min-height: 40px;
+}
+
+.justifyCenter {
+    justify-content: center;
+}
+
+.userAvatar {
+    width: 36px;
+    height: 36px;
+    background: #4e3b34;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 1px solid #d7ccc8;
+    flex-shrink: 0;
+}
+
+.userDetails {
+    overflow: hidden;
+}
+
+.userName {
+    font-size: 14px;
     font-weight: 600;
-    border-left: 4px solid #A1887F; 
-  }
-  
-  /* User Section */
-  .userSection {
-    padding: 15px;
-    border-top: 1px solid #3E302B;
-    background: #251D1A; 
-  }
-  
-  .userInfo { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  
-  .userAvatar {
-    width: 35px; height: 35px; 
-    background: #4E3B34; 
-    border-radius: 50%; 
-    color: white; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-weight: bold; 
-    border: 1px solid #D7CCC8;
-  }
-  
-  .userName { font-size: 14px; font-weight: 600; color: #FFFFFF; margin: 0; }
-  .userRole { font-size: 11px; color: #A1887F; margin: 0; text-transform: capitalize; }
-  
-  .logoutBtn {
+    color: #ffffff;
+    margin: 0;
+    white-space: nowrap;
+}
+.userRole {
+    font-size: 11px;
+    color: #a1887f;
+    margin: 0;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.logoutBtn {
     width: 100%;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 8px;
-    border: 1px solid #3E302B;
-    background: #3E302B; 
-    color: #ffcccc; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #3e302b;
+    background: #3e302b;
+    color: #ffcccc;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 13px; font-weight: 600;
+    font-size: 13px;
+    font-weight: 600;
     transition: all 0.2s;
-  }
-  .logoutBtn:hover { background: #4E342E; color: #ff9999; }
-  
-  /* =========================================
-     3. MAIN CONTENT
-     ========================================= */
-  .mainContent {
+}
+
+.logoutBtn:hover {
+    background: #4e342e;
+    color: #ff9999;
+}
+
+.logoutCollapsed {
+    border: none;
+    background: transparent;
+    padding: 0;
+}
+
+/* =========================================
+   3. MAIN CONTENT AREA
+   ========================================= */
+.mainContent {
     flex: 1;
     overflow-y: auto;
     padding: 24px;
     position: relative;
-  }
-  
-  /* =========================================
-     4. MOBILE HEADER (Fixed Z-Index)
-     ========================================= */
-  .mobileHeader {
-    display: none; 
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    width: 100%; height: 60px;
-    box-sizing: border-box; 
-    background: #ffffff; 
-    color: #1e293b; 
-    border-bottom: 1px solid #e2e8f0;
-    
-    /* ✅ FIX: Must be higher than overlay (1050) but lower than sidebar (1200) */
-    z-index: 1100; 
-  
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  
-  .mobileHeader h2 { font-size: 18px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 10px; margin: 0; }
-  .menuBtn { background: transparent; border: none; cursor: pointer; color: #1e293b; padding: 8px; margin-right: -5px; }
-  
-  /* =========================================
-     5. RESPONSIVE
-     ========================================= */
-  @media (max-width: 768px) {
-    .container { flex-direction: column; }
-    .mobileHeader { display: flex; }
-    .mainContent { margin-top: 60px; padding: 15px; }
-  
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+/* =========================================
+   4. MOBILE RESPONSIVE TWEAKS
+   ========================================= */
+.mobileHeader {
+    display: none; /* Hidden on Desktop */
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    /* 1. Mobile Top Header (Always Visible) */
+    .mobileHeader {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        z-index: 2000; /* Highest layer */
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .mobileLogoLink {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .mobileHeader h2 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .menuBtn {
+        background: transparent;
+        border: none;
+        padding: 4px;
+        color: #1e293b;
+        cursor: pointer;
+    }
+
+    /* 2. Main Content Adjustment */
+    .mainContent {
+        margin-top: 60px; /* Push content down */
+        padding: 16px;
+        height: calc(100vh - 60px);
+    }
+
+    /* 3. Sidebar Drawer Logic */
     .sidebar {
-      position: fixed;
-      top: 60px; /* ✅ Starts below header so header stays visible */
-      left: 0;
-      height: calc(100% - 60px);
-      transform: translateX(-100%);
-      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+        position: fixed;
+        top: 60px; /* Start BELOW the header */
+        left: 0;
+        bottom: 0;
+        height: calc(100% - 60px);
+        width: 260px !important;
+        transform: translateX(-100%); /* Hidden */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-right: none;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1500; /* Below Header, Above Content */
     }
-  
-    .showSidebar { transform: translateX(0); }
-  
+
+    .showMobileSidebar {
+        transform: translateX(0); /* Slide in */
+    }
+
+    /* ✅ HIDE SIDEBAR HEADER ON MOBILE */
+    /* This removes the duplicate "CRM" logo inside the menu */
+    .sidebarHeader {
+        display: none !important;
+    }
+
+    /* Force show text labels in mobile menu (ignoring desktop collapse state) */
+    .hideLabel {
+        display: block !important;
+        opacity: 1 !important;
+    }
+    .sidebarCollapsed {
+        width: 260px !important;
+    }
+
+    /* Fix User Section Alignment */
+    .justifyCenter {
+        justify-content: flex-start !important;
+    }
+    .logoutCollapsed {
+        border: 1px solid #3e302b;
+        padding: 10px;
+    }
+
+    /* 4. Overlay Backdrop */
     .overlay {
-      display: block;
-      position: fixed;
-      top: 60px; /* ✅ Starts below header */
-      left: 0;
-      width: 100%;
-      height: calc(100% - 60px);
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1050; 
-      backdrop-filter: blur(2px);
+        display: block;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100vw;
+        height: calc(100vh - 60px);
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1400;
+        backdrop-filter: blur(2px);
     }
-  }
+}

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
-// Import Route Modules
+// Import route modules
 const authRoutes = require('./routes/authRoutes');
 const leadRoutes = require('./routes/leadRoutes');
 const propertyRoutes = require('./routes/propertyRoutes');
@@ -11,15 +11,12 @@ const taskRoutes = require('./routes/taskRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const managerRoutes = require('./routes/managerRoutes');
 
-// Load environment variables from .env file
+// Initialize environment variables
 dotenv.config();
 
 const app = express();
 
-/**
- * CORS Configuration
- * 'origin' includes local development and production frontend URL
- */
+// Configure CORS for local development and production environments
 app.use(cors({
     origin: [
         "http://localhost:5173", 
@@ -29,46 +26,33 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"] 
 }));
 
-/**
- * Body Parser Middleware
- * Parses incoming requests with JSON payloads
- */
-app.use(express.json());
+// Body parser middleware with increased limit to prevent 413 Payload Too Large errors
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-/**
- * API Route Definitions
- * Hierarchy and module-based route mounting
- */
-app.use('/api/auth', authRoutes);         // Authentication (Login/Register)
-app.use('/api/leads', leadRoutes);       // Lead Management & Stats
-app.use('/api/properties', propertyRoutes); // Real Estate Inventory
-app.use('/api/tasks', taskRoutes);       // Task Tracking
-app.use('/api/admin', adminRoutes);       // Admin Master Control
-app.use('/api/manager', managerRoutes);   // Manager Team Oversight
+// Define API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/leads', leadRoutes);
+app.use('/api/properties', propertyRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/manager', managerRoutes);
 
-/**
- * Database Connection
- * Connecting to MongoDB Atlas using URL from environment variables
- */
+// Establish connection to MongoDB
 mongoose.connect(process.env.MONGO_URL)
-    .then(() => console.log('✅ MongoDB Connected Successfully'))
+    .then(() => console.log('MongoDB connection established'))
     .catch(err => {
-        console.error('❌ MongoDB Connection Error:', err.message);
-        process.exit(1); // Exit process with failure
+        console.error('MongoDB connection error:', err.message);
+        process.exit(1);
     });
 
-/**
- * Health Check Route (Optional but recommended for live servers)
- */
+// Basic health check route
 app.get('/', (req, res) => {
-    res.send('CRM Backend API is running...');
+    res.send('CRM Backend API is operational');
 });
 
-/**
- * Server Execution
- * Listen on defined PORT or default to 5000
- */
+// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Production Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

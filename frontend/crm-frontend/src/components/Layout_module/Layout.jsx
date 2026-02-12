@@ -3,139 +3,191 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
 /* Icons */
-import { 
-  LayoutDashboard, Users, PlusCircle, LogOut, Building, 
-  Calendar, Menu, X, LayoutGrid, Settings, LifeBuoy 
-} from "lucide-react"; 
+import {
+  LayoutDashboard,
+  Users,
+  PlusCircle,
+  LogOut,
+  Building,
+  Calendar,
+  Menu,
+  X,
+  LayoutGrid,
+  Settings,
+  LifeBuoy,
+  ChevronLeft,
+  ChevronRight, // ✅ Added Toggle Icons
+} from "lucide-react";
 import styles from "./Layout.module.css";
 
 const Layout = ({ children }) => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // State for Mobile Drawer
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // ✅ State for Desktop Collapse (Minibar)
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const closeMenu = () => setIsMobileMenuOpen(false);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  // Helper to check if the current path matches the link
-  const isActive = (path) => location.pathname.startsWith(path);
+  // ✅ Toggle Desktop Sidebar
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
-  // LOGIC FIX: Determine Dashboard Link based on Role
-  // We use .toLowerCase() to ensure 'Admin' and 'admin' both work
+  const isActive = (path) => location.pathname === path;
+
   const getDashboardPath = () => {
     const role = user?.role?.toLowerCase();
-    
-    if (role === 'admin') return "/admin-dashboard";
-    if (role === 'manager') return "/manager-dashboard";
-    
-    // Default fallback for agents
+    if (role === "admin") return "/admin-dashboard";
+    if (role === "manager") return "/manager-dashboard";
     return "/dashboard";
   };
 
-  // Helper to get the display text for the dashboard link
   const getDashboardLabel = () => {
     const role = user?.role?.toLowerCase();
-    if (role === 'admin') return 'Admin Dashboard';
-    if (role === 'manager') return 'Manager Dashboard';
-    return 'Dashboard';
+    if (role === "admin") return "Admin Dashboard";
+    if (role === "manager") return "Manager Dashboard";
+    return "Dashboard";
   };
+
+  // Helper for Nav Items
+  const NavItem = ({ to, icon: Icon, label }) => (
+    <Link
+      to={to}
+      onClick={closeMobileMenu}
+      className={`
+        ${styles.link}
+        ${isActive(to) ? styles.active : ""}
+        ${isCollapsed ? styles.collapsedLink : ""}
+      `}
+    >
+      <div className={styles.iconWrapper}>
+        <Icon size={20} />
+      </div>
+
+      {/* Hide Label on Collapse */}
+      <span
+        className={`${styles.linkLabel} ${isCollapsed ? styles.hideLabel : ""}`}
+      >
+        {label}
+      </span>
+
+      {/* Hover Tooltip (Only visible when collapsed) */}
+      {isCollapsed && <span className={styles.tooltip}>{label}</span>}
+    </Link>
+  );
 
   return (
     <div className={styles.container}>
-      
-      {/* Mobile Header */}
+      {/* --- Mobile Header --- */}
       <div className={styles.mobileHeader}>
-        <h2><LayoutGrid size={24} fill="#1e293b" stroke="none" /> CRM</h2>
-        <button onClick={toggleMenu} className={styles.menuBtn}>
+        <Link to={getDashboardPath()} className={styles.mobileLogoLink}>
+          <h2>
+            <LayoutGrid size={24} fill="#1e293b" stroke="none" /> CRM
+          </h2>
+        </Link>
+        <button onClick={toggleMobileMenu} className={styles.menuBtn}>
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
-      {/* SIDEBAR */}
-      <aside className={`${styles.sidebar} ${isMobileMenuOpen ? styles.showSidebar : ""}`}>
-        
-        {/* Sidebar Header */}
+      {/* --- SIDEBAR --- */}
+      <aside
+        className={`
+        ${styles.sidebar}
+        ${isMobileMenuOpen ? styles.showMobileSidebar : ""}
+        ${isCollapsed ? styles.sidebarCollapsed : ""}
+      `}
+      >
+        {/* Header & Toggle */}
         <div className={styles.sidebarHeader}>
-          <LayoutGrid size={32} fill="#D7CCC8" stroke="none" className={styles.logoIcon} />
-          <h2>CRM</h2>
+          <Link
+            to={getDashboardPath()}
+            className={styles.logoLink}
+            onClick={closeMobileMenu}
+          >
+            <div className={styles.logoContent}>
+              <LayoutGrid
+                size={28}
+                fill="#D7CCC8"
+                stroke="none"
+                className={styles.logoIcon}
+              />
+              <h2 className={isCollapsed ? styles.hideLabel : ""}>CRM</h2>
+            </div>
+          </Link>
+
+          {/* ✅ Collapse Button (Desktop Only) */}
+          <button className={styles.collapseBtn} onClick={toggleCollapse}>
+            {isCollapsed ? (
+              <ChevronRight size={18} />
+            ) : (
+              <ChevronLeft size={18} />
+            )}
+          </button>
         </div>
 
+        {/* Navigation */}
         <nav className={styles.nav}>
-          
-          {/* DYNAMIC DASHBOARD LINK */}
-          {/* This prevents the Admin from being sent to the Agent dashboard */}
-          <Link 
-            to={getDashboardPath()} 
-            onClick={closeMenu} 
-            className={`${styles.link} ${isActive(getDashboardPath()) ? styles.active : ""}`}
-          >
-            <LayoutDashboard size={20} /> 
-            {getDashboardLabel()}
-          </Link>
+          <NavItem
+            to={getDashboardPath()}
+            icon={LayoutDashboard}
+            label={getDashboardLabel()}
+          />
+          <NavItem to="/tasks" icon={Calendar} label="Tasks" />
+          <NavItem to="/properties" icon={Building} label="Properties" />
+          <NavItem to="/leads" icon={Users} label="Leads" />
+          <NavItem to="/add-lead" icon={PlusCircle} label="Add Lead" />
 
-          {/* Common Links */}
-          <Link to="/tasks" onClick={closeMenu} className={`${styles.link} ${isActive("/tasks") ? styles.active : ""}`}>
-            <Calendar size={20} /> Tasks
-          </Link>
-          
-          <Link to="/properties" onClick={closeMenu} className={`${styles.link} ${isActive("/properties") ? styles.active : ""}`}>
-            <Building size={20} /> Properties
-          </Link>
+          <div className={styles.divider}></div>
 
-          <Link to="/leads" onClick={closeMenu} className={`${styles.link} ${isActive("/leads") ? styles.active : ""}`}>
-            <Users size={20} /> Leads
-          </Link>
-
-          <Link to="/add-lead" onClick={closeMenu} className={`${styles.link} ${isActive("/add-lead") ? styles.active : ""}`}>
-             <PlusCircle size={20} /> Add Lead
-          </Link>
-
-          <div style={{borderTop: '1px solid #3E302B', margin: '10px 0'}}></div>
-
-          <Link to="/settings" onClick={closeMenu} className={`${styles.link} ${isActive("/settings") ? styles.active : ""}`}>
-             <Settings size={20} /> Settings
-          </Link>
-
-          <Link to="/support" onClick={closeMenu} className={`${styles.link} ${isActive("/support") ? styles.active : ""}`}>
-            <LifeBuoy size={20} /> Support
-          </Link>
-
+          <NavItem to="/settings" icon={Settings} label="Settings" />
+          <NavItem to="/support" icon={LifeBuoy} label="Support" />
         </nav>
 
-        {/* User Info Section */}
+        {/* User Info */}
         <div className={styles.userSection}>
-          <div className={styles.userInfo}>
+          <div
+            className={`${styles.userInfo} ${isCollapsed ? styles.justifyCenter : ""}`}
+          >
             <div className={styles.userAvatar}>
-                {/* Shows the first letter of the name, or U if missing */}
-                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+              {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
             </div>
-            <div>
-                {/* Shows the actual user name from Context */}
-                <p className={styles.userName}>{user?.name || "User"}</p>
-                {/* Shows the user role (e.g., Admin) */}
-                <p className={styles.userRole}>{user?.role || "Agent"}</p> 
+
+            <div
+              className={`${styles.userDetails} ${isCollapsed ? styles.hideLabel : ""}`}
+            >
+              <p className={styles.userName}>{user?.name || "User"}</p>
+              <p className={styles.userRole}>{user?.role || "Agent"}</p>
             </div>
           </div>
-          <button onClick={handleLogout} className={styles.logoutBtn}>
-            <LogOut size={16} /> Logout
+
+          <button
+            onClick={handleLogout}
+            className={`${styles.logoutBtn} ${isCollapsed ? styles.logoutCollapsed : ""}`}
+            title="Logout"
+          >
+            <LogOut size={18} />
+            <span className={isCollapsed ? styles.hideLabel : ""}>Logout</span>
           </button>
         </div>
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main className={styles.mainContent}>
-        {children}
-      </main>
+      {/* --- MAIN CONTENT --- */}
+      <main className={styles.mainContent}>{children}</main>
 
       {/* Mobile Overlay */}
-      {isMobileMenuOpen && <div className={styles.overlay} onClick={closeMenu}></div>}
-
+      {isMobileMenuOpen && (
+        <div className={styles.overlay} onClick={closeMobileMenu}></div>
+      )}
     </div>
   );
 };

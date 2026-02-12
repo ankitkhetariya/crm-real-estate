@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { TOKEN_KEY } from "../api/axios"; // ✅ Dynamic key import karein
+import { TOKEN_KEY } from "../api/axios"; // ✅ Dynamic key import
 
 export const AuthContext = createContext();
 
@@ -16,7 +16,9 @@ export const AuthProvider = ({ children }) => {
   });
 
   // ✅ Token initialization uses the Environment-Aware KEY
-  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null);
+  const [token, setToken] = useState(
+    () => localStorage.getItem(TOKEN_KEY) || null,
+  );
 
   const [loading, setLoading] = useState(true);
 
@@ -41,13 +43,23 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("role");
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
-    
+
     setToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser, // 👈 ✅ ADDED THIS (Fixes the crash)
+        token,
+        setToken, // Added this too (good practice)
+        login,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

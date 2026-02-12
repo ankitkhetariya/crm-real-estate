@@ -18,7 +18,7 @@ API.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY); 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    console.log(`📡 [${window.location.hostname}] Requesting: ${config.url}`);
+    console.log(` [${window.location.hostname}] Requesting: ${config.url}`);
   }
   return config;
 }, (error) => Promise.reject(error));

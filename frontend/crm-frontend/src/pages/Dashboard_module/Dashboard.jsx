@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import API from "../../api/axios"; // 👈 Ensure this is your custom API instance
+import API from "../../api/axios"; //Ensure this is your custom API instance
 import { Users, TrendingUp, ClipboardList, Loader, IndianRupee } from "lucide-react";
 import styles from "./Dashboard.module.css";
 import { 
@@ -27,7 +27,7 @@ const Dashboard = () => {
     let isMounted = true;
 
     const fetchStats = async () => {
-      // ✅ GUARD: If Auth is still loading or token is missing, don't fetch yet
+      // GUARD: If Auth is still loading or token is missing, don't fetch yet
       if (authLoading || !token) {
         console.warn("Skipping fetch: Auth is loading or token is missing.");
         return;

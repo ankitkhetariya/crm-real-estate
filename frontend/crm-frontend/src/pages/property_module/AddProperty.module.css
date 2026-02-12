@@ -1,9 +1,10 @@
+/* Main Layout */
 .container {
   padding: 2rem;
   max-width: 900px;
   margin: 0 auto;
   font-family: 'Inter', sans-serif;
-  background-color: #f8fafc;
+  background-color: #3a88d5;
   min-height: 100vh;
 }
 
@@ -28,23 +29,30 @@
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  color: #64748b;
+  color: #475569; /* Darkened for better visibility */
   cursor: pointer;
   font-weight: 500;
   transition: 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .backBtn:hover {
   background: #f1f5f9;
   color: #2563eb;
+  border-color: #cbd5e1;
 }
 
+/* Card Styling with Layered Shadows */
 .formCard {
   background: white;
   padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
+  /* Multi-layered shadow for professional depth */
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.02),
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 4px 6px -2px rgba(0, 0, 0, 0.03);
 }
 
 .grid {
@@ -62,7 +70,7 @@
 .formGroup label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #475569;
+  color: #334155; /* Increased contrast from #475569 */
   display: flex;
   align-items: center;
   gap: 6px;
@@ -72,24 +80,22 @@
 .formGroup select, 
 .formGroup textarea {
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e1; /* Slightly darker border for visibility */
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .formGroup input:focus, 
 .formGroup select:focus, 
 .formGroup textarea:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  /* Soft blue glow instead of harsh outline */
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-/* ----------------------------------------------------- */
-/* ✅ NEW STYLES: Dynamic Bedroom/Bathroom Lists */
-/* ----------------------------------------------------- */
-
+/* Dynamic List Styles */
 .dynamicLabel {
   display: flex;
   justify-content: space-between;
@@ -102,13 +108,13 @@
   gap: 0.5rem;
   max-height: 150px;
   overflow-y: auto;
-  padding-right: 5px; /* space for scrollbar */
+  padding-right: 5px;
 }
 
-/* Custom Scrollbar for list */
 .roomList::-webkit-scrollbar {
   width: 4px;
 }
+
 .roomList::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
@@ -122,23 +128,24 @@
 }
 
 .roomRow input {
-  flex: 1; /* Input takes available width */
+  flex: 1;
   padding: 0.6rem;
   font-size: 0.9rem;
 }
 
 .addMiniBtn {
   background: #dbeafe;
-  color: #2563eb;
+  color: #1e40af; /* Darkened blue for visibility */
   border: none;
   border-radius: 6px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   font-size: 0.8rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
   transition: 0.2s;
+  font-weight: 600;
 }
 
 .addMiniBtn:hover {
@@ -147,7 +154,7 @@
 
 .deleteMiniBtn {
   background: #fee2e2;
-  color: #ef4444;
+  color: #b91c1c; /* Darkened red for visibility */
   border: none;
   border-radius: 6px;
   padding: 0.6rem;
@@ -164,19 +171,12 @@
 
 .emptyText {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: #64748b;
   font-style: italic;
   padding: 0.5rem 0;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ----------------------------------------------------- */
-
-/* Image Upload Styling */
+/* Upload Styling */
 .uploadBox {
   border: 2px dashed #cbd5e1;
   border-radius: 12px;
@@ -191,6 +191,7 @@
 .uploadBox:hover {
   border-color: #2563eb;
   background: #eff6ff;
+  box-shadow: inset 0 0 10px rgba(37, 99, 235, 0.05);
 }
 
 .fileInput {
@@ -207,7 +208,7 @@
   display: block;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #64748b;
+  color: #475569;
   margin-top: 0.5rem;
 }
 
@@ -217,6 +218,7 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .previewImg {
@@ -233,12 +235,21 @@
   color: white;
   border: none;
   border-radius: 50%;
-  padding: 6px;
+  padding: 8px;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  /* Shadow matching the button color */
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+  transition: all 0.2s;
+  display: flex;
 }
 
-/* Footer & Buttons */
+.removeBtn:hover {
+  transform: scale(1.1);
+  background: #dc2626;
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Footer & Primary Action */
 .footer {
   margin-top: 2.5rem;
   padding-top: 1.5rem;
@@ -252,26 +263,41 @@
   align-items: center;
   gap: 0.75rem;
   background: #2563eb;
-  color: white;
-  padding: 0.8rem 2rem;
+  color: #ffffff; /* Improved from previous red/brown */
+  padding: 0.8rem 2.5rem;
   border-radius: 8px;
   font-weight: 600;
   font-size: 1rem;
   border: none;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  /* Button specific depth */
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
 }
 
 .submitBtn:hover {
   background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
+}
+
+.submitBtn:active {
+  transform: translateY(0);
 }
 
 .submitBtn:disabled {
   background: #94a3b8;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
-/* Responsive Logic */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: 1fr;
@@ -283,5 +309,10 @@
   
   .formCard {
     padding: 1.2rem;
+  }
+  
+  .submitBtn {
+    width: 100%;
+    justify-content: center;
   }
 }
