@@ -16,7 +16,7 @@ import {
   Settings,
   LifeBuoy,
   ChevronLeft,
-  ChevronRight, // ✅ Added Toggle Icons
+  ChevronRight,
 } from "lucide-react";
 import styles from "./Layout.module.css";
 
@@ -25,10 +25,7 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // State for Mobile Drawer
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // ✅ State for Desktop Collapse (Minibar)
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleLogout = () => {
@@ -38,27 +35,60 @@ const Layout = ({ children }) => {
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
-  // ✅ Toggle Desktop Sidebar
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-
   const isActive = (path) => location.pathname === path;
 
+  // =========================================================
+  // 🚀 SUPER LOGIC: Asli Naam aur Role nikalne ka tareeka
+  // =========================================================
+
+  // 1. Pehle naam nikalte hain (Context se ya LocalStorage se)
+  let displayName = "User"; // Default
+  const storedName = localStorage.getItem("userName");
+
+  if (user && user.name) {
+    displayName = user.name; // Agar AuthContext mein data hai toh wahan se lo
+  } else if (
+    storedName &&
+    storedName !== "undefined" &&
+    storedName !== "null"
+  ) {
+    displayName = storedName; // Agar LocalStorage mein valid naam hai toh wahan se lo
+  }
+
+  // 2. Ab Role nikalte hain
+  let displayRole = "Agent"; // Default
+  const storedRole = localStorage.getItem("role");
+
+  if (user && user.role) {
+    displayRole = user.role;
+  } else if (
+    storedRole &&
+    storedRole !== "undefined" &&
+    storedRole !== "null"
+  ) {
+    displayRole = storedRole;
+  }
+
+  // 3. Avatar ke liye pehla letter nikal lo (e.g., "Ankit" ka "A")
+  const avatarLetter = displayName.charAt(0).toUpperCase();
+
+  // =========================================================
+
   const getDashboardPath = () => {
-    const role = user?.role?.toLowerCase();
+    const role = displayRole.toLowerCase();
     if (role === "admin") return "/admin-dashboard";
     if (role === "manager") return "/manager-dashboard";
     return "/dashboard";
   };
 
   const getDashboardLabel = () => {
-    const role = user?.role?.toLowerCase();
+    const role = displayRole.toLowerCase();
     if (role === "admin") return "Admin Dashboard";
     if (role === "manager") return "Manager Dashboard";
     return "Dashboard";
   };
 
-  // Helper for Nav Items
   const NavItem = ({ to, icon: Icon, label }) => (
     <Link
       to={to}
@@ -72,15 +102,11 @@ const Layout = ({ children }) => {
       <div className={styles.iconWrapper}>
         <Icon size={20} />
       </div>
-
-      {/* Hide Label on Collapse */}
       <span
         className={`${styles.linkLabel} ${isCollapsed ? styles.hideLabel : ""}`}
       >
         {label}
       </span>
-
-      {/* Hover Tooltip (Only visible when collapsed) */}
       {isCollapsed && <span className={styles.tooltip}>{label}</span>}
     </Link>
   );
@@ -107,7 +133,6 @@ const Layout = ({ children }) => {
         ${isCollapsed ? styles.sidebarCollapsed : ""}
       `}
       >
-        {/* Header & Toggle */}
         <div className={styles.sidebarHeader}>
           <Link
             to={getDashboardPath()}
@@ -125,7 +150,6 @@ const Layout = ({ children }) => {
             </div>
           </Link>
 
-          {/* ✅ Collapse Button (Desktop Only) */}
           <button className={styles.collapseBtn} onClick={toggleCollapse}>
             {isCollapsed ? (
               <ChevronRight size={18} />
@@ -135,7 +159,6 @@ const Layout = ({ children }) => {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className={styles.nav}>
           <NavItem
             to={getDashboardPath()}
@@ -153,20 +176,18 @@ const Layout = ({ children }) => {
           <NavItem to="/support" icon={LifeBuoy} label="Support" />
         </nav>
 
-        {/* User Info */}
+        {/* --- USER INFO SECTION --- */}
         <div className={styles.userSection}>
           <div
             className={`${styles.userInfo} ${isCollapsed ? styles.justifyCenter : ""}`}
           >
-            <div className={styles.userAvatar}>
-              {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-            </div>
+            <div className={styles.userAvatar}>{avatarLetter}</div>
 
             <div
               className={`${styles.userDetails} ${isCollapsed ? styles.hideLabel : ""}`}
             >
-              <p className={styles.userName}>{user?.name || "User"}</p>
-              <p className={styles.userRole}>{user?.role || "Agent"}</p>
+              <p className={styles.userName}>{displayName}</p>
+              <p className={styles.userRole}>{displayRole}</p>
             </div>
           </div>
 
@@ -184,7 +205,6 @@ const Layout = ({ children }) => {
       {/* --- MAIN CONTENT --- */}
       <main className={styles.mainContent}>{children}</main>
 
-      {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div className={styles.overlay} onClick={closeMobileMenu}></div>
       )}

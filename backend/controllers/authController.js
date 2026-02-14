@@ -14,7 +14,7 @@ const getTransporter = () => {
   });
 };
 
-// --- 1. REGISTER USER (Unchanged) ---
+// --- 1. REGISTER USER ---
 exports.register = async (req, res) => {
   try {
     const { name, email, password, phone, role } = req.body;
@@ -47,7 +47,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// --- 2. LOGIN USER (Unchanged) ---
+// --- 2. LOGIN USER (FIXED FOR ADMIN DASHBOARD) ---
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -72,12 +72,18 @@ exports.login = async (req, res) => {
       { expiresIn: "30d" },
     );
 
+    // ✅ FIX: Role ko top-level pe bheja taaki frontend pakad sake
     res.json({
       token,
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
+      role: user.role, // <--- YE line zaroori hai Admin Dashboard ke liye!
+
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+      },
     });
   } catch (err) {
     console.error("Login Error:", err);
@@ -85,7 +91,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// --- 3. GET CURRENT USER (Unchanged) ---
+// --- 3. GET CURRENT USER ---
 exports.getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -99,7 +105,7 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
-// --- 4. FORGOT PASSWORD (Unchanged) ---
+// --- 4. FORGOT PASSWORD ---
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -112,7 +118,7 @@ exports.forgotPassword = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     user.resetPasswordOtp = otp;
-    user.resetPasswordOtpExpires = Date.now() + 10 * 60 * 1000;
+    user.resetPasswordOtpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
     await user.save();
 
     const transporter = getTransporter();
@@ -134,7 +140,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// --- 5. RESET PASSWORD (Unchanged) ---
+// --- 5. RESET PASSWORD ---
 exports.resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
 
@@ -148,6 +154,7 @@ exports.resetPassword = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Check OTP match and Expiry
     if (!user.resetPasswordOtp || user.resetPasswordOtp !== otp) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
@@ -159,6 +166,7 @@ exports.resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
 
+    // Clear OTP fields
     user.resetPasswordOtp = null;
     user.resetPasswordOtpExpires = null;
 
@@ -173,10 +181,10 @@ exports.resetPassword = async (req, res) => {
 };
 
 // ==========================================================
-//  CHANGED LOGIC STARTS HERE (To separate Phone vs Email)
+//  PROFILE & EMAIL CHANGE LOGIC
 // ==========================================================
 
-// --- 6. UPDATE PROFILE (Only Name & Phone) ---
+// --- 6. UPDATE PROFILE (Name & Phone ONLY) ---
 exports.updateProfile = async (req, res) => {
   try {
     const { name, phone } = req.body;
@@ -187,7 +195,7 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ✅ Update Name and Phone IMMEDIATELY
+    // Update Name and Phone directly
     if (name) user.name = name;
     if (phone) user.phone = phone;
 
@@ -196,7 +204,7 @@ exports.updateProfile = async (req, res) => {
     const responseUser = {
       _id: user._id,
       name: user.name,
-      email: user.email, // Email remains unchanged here
+      email: user.email,
       phone: user.phone,
       role: user.role,
     };
@@ -211,7 +219,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// --- 7. NEW: REQUEST EMAIL CHANGE (Sends OTP) ---
+// --- 7. REQUEST EMAIL CHANGE (Sends OTP to NEW Email) ---
 exports.requestEmailChange = async (req, res) => {
   try {
     const { newEmail } = req.body;
@@ -221,6 +229,7 @@ exports.requestEmailChange = async (req, res) => {
       return res.status(400).json({ message: "New email is required" });
     }
 
+    // Check if new email is already taken
     const existingUser = await User.findOne({ email: newEmail });
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use." });
@@ -234,15 +243,15 @@ exports.requestEmailChange = async (req, res) => {
     // Save to temp fields
     user.tempEmail = newEmail;
     user.emailOtp = otp;
-    user.emailOtpExpires = Date.now() + 10 * 60 * 1000;
+    user.emailOtpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
 
     await user.save();
 
-    // Send OTP
+    // Send OTP to the NEW email
     const transporter = getTransporter();
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: newEmail, // Send to the NEW email
+      to: newEmail,
       subject: "Verify Email Change",
       text: `Your verification code is: ${otp}\n\nThis code expires in 10 minutes.`,
     });
@@ -280,6 +289,8 @@ exports.verifyEmailChange = async (req, res) => {
 
     // Success: Update the real email
     user.email = user.tempEmail;
+
+    // Clear temp fields
     user.tempEmail = null;
     user.emailOtp = null;
     user.emailOtpExpires = null;
@@ -296,7 +307,7 @@ exports.verifyEmailChange = async (req, res) => {
   }
 };
 
-// --- 9. CHANGE PASSWORD (Unchanged) ---
+// --- 9. CHANGE PASSWORD (Logged In User) ---
 exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;

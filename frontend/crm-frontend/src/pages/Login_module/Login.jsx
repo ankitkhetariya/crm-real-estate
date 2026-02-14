@@ -1,15 +1,15 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import API, { TOKEN_KEY } from "../../api/axios"; // ✅ Dynamic key imported
-import toast from 'react-hot-toast'; 
-import { LogIn, Mail, Lock } from "lucide-react"; 
-import styles from "./Login.module.css"; 
+import API, { TOKEN_KEY } from "../../api/axios"; // Dynamic key imported
+import toast from "react-hot-toast";
+import { LogIn, Mail, Lock } from "lucide-react";
+import styles from "./Login.module.css";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -23,32 +23,37 @@ const Login = () => {
 
     try {
       const res = await API.post("/auth/login", formData);
-      
-      // ✅ 1. Save using Dynamic Environment Key (Fixes 401 Conflict)
-      localStorage.setItem(TOKEN_KEY, res.data.token);
-      
+
+      // UNIVERSAL FIX: Backend chahe naya ho ya purana, ye data nikal lega
+      const token = res.data.token;
+      const role = res.data.role || res.data.user?.role || "Agent";
+      const name = res.data.name || res.data.user?.name || "User";
+      const userId = res.data._id || res.data.user?._id;
+
+      // 1. Save using Dynamic Environment Key (Fixes 401 Conflict)
+      localStorage.setItem(TOKEN_KEY, token);
+
       // Other vital info
-      localStorage.setItem("role", res.data.role); 
-      localStorage.setItem("userId", res.data._id); 
-      localStorage.setItem("userName", res.data.name);
+      localStorage.setItem("role", role);
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("userName", name);
 
-      // ✅ 2. Update Context
-      login(res.data, res.data.token);
-      
-      toast.success(`Welcome back, ${res.data.name}!`);
+      // 2. Update Context
+      const userData = res.data.user ? res.data.user : res.data;
+      login(userData, token);
 
-      // ✅ 3. Role-Based Redirect
-      const role = res.data.role;
-      if (role === 'admin') {
-          navigate("/admin-dashboard");
-      } else if (role === 'manager') {
-          navigate("/manager-dashboard");
+      toast.success(`Welcome back, ${name}!`);
+
+      // 3. Role-Based Redirect
+      if (role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (role === "manager") {
+        navigate("/manager-dashboard");
       } else {
-          navigate("/dashboard");
+        navigate("/dashboard");
       }
-
     } catch (err) {
-      const errorMsg = err.response?.data?.error || "Invalid Email or Password"; 
+      const errorMsg = err.response?.data?.error || "Invalid Email or Password";
       toast.error(errorMsg);
     } finally {
       setLoading(false);
@@ -71,31 +76,33 @@ const Login = () => {
             <label>Email Address</label>
             <div className={styles.inputWrapper}>
               <Mail size={18} className={styles.inputIcon} />
-              <input 
-                type="email" 
-                name="email" 
-                placeholder="name@company.com" 
-                required 
-                value={formData.email} 
-                onChange={handleChange} 
+              <input
+                type="email"
+                name="email"
+                placeholder="name@company.com"
+                required
+                value={formData.email}
+                onChange={handleChange}
               />
             </div>
           </div>
 
           <div className={styles.inputGroup}>
-            <div style={{display:"flex", justifyContent:"space-between"}}>
-                <label>Password</label>
-                <Link to="/forgot-password" className={styles.forgotLink}>Forgot Password?</Link>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <label>Password</label>
+              <Link to="/forgot-password" className={styles.forgotLink}>
+                Forgot Password?
+              </Link>
             </div>
             <div className={styles.inputWrapper}>
               <Lock size={18} className={styles.inputIcon} />
-              <input 
-                type="password" 
-                name="password" 
-                placeholder="••••••••" 
-                required 
-                value={formData.password} 
-                onChange={handleChange} 
+              <input
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                required
+                value={formData.password}
+                onChange={handleChange}
               />
             </div>
           </div>
