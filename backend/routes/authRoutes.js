@@ -3,19 +3,19 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 
-// 1. Register Route
-router.post("/register", authController.register);
+// 1. Register Route (🔒 PROTECTED: Only Logged-in Admins can access)
+router.post("/register", protect, authController.register);
 
-// 2. Login Route
+// 2. Login Route (Public)
 router.post("/login", authController.login);
 
 // 3. Current User Route (Protected)
 router.get("/me", protect, authController.getCurrentUser);
 
-// 4. Forgot Password Route
+// 4. Forgot Password Route (Public)
 router.post("/forgot-password", authController.forgotPassword);
 
-// 5. Reset Password Route
+// 5. Reset Password Route (Public)
 router.post("/reset-password", authController.resetPassword);
 
 // --- NEW SETTINGS ROUTES (Protected) ---

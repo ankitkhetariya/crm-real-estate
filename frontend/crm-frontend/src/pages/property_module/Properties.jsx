@@ -85,7 +85,6 @@ const Properties = () => {
     }
   };
 
-  // ✅ PROFESSIONAL VIEW DETAILS POPUP (Your custom logic kept intact)
   const handleViewDetails = (prop) => {
     const bedroomsList =
       prop.bedrooms && prop.bedrooms.length > 0
@@ -305,14 +304,16 @@ const Properties = () => {
         </div>
       </div>
 
-      {/* ✅ 4. GLOBAL FILTER (For Admins AND Managers) */}
+      {/* ✅ 4. GLOBAL FILTER (Fixed Outer Wrapper to prevent bleed) */}
       {["admin", "manager"].includes(
         JSON.parse(localStorage.getItem("user") || "{}").role?.toLowerCase(),
       ) && (
-        <AdminViewFilter
-          currentViewId={viewTargetId}
-          onViewChange={setTarget}
-        />
+        <div className={styles.adminFilterWrapperOuter}>
+          <AdminViewFilter
+            currentViewId={viewTargetId}
+            onViewChange={setTarget}
+          />
+        </div>
       )}
 
       <div className={styles.filterBar}>

@@ -30,6 +30,14 @@
     font-size: 14px;
 }
 
+/* Header Actions Wrapper */
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
 /* Refresh Button */
 .refreshBtn {
     display: flex;
@@ -44,6 +52,7 @@
     cursor: pointer;
     transition: all 0.2s;
     font-size: 14px;
+    height: 42px;
 }
 
 .refreshBtn:hover {
@@ -52,11 +61,120 @@
 }
 
 /* =========================
-   2. STATS GRID (Financials)
+   2. DROPDOWN & MANAGE BUTTON
+   ========================= */
+.dropdownContainer {
+    position: relative;
+    display: inline-block;
+}
+
+.manageProfileBtn {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 4px 14px 4px 5px;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 10px;
+    height: 42px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.manageProfileBtn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.profileIconWrapper {
+    background: #1e3a8a;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profileText {
+    color: #1e3a8a;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
+
+.separator {
+    width: 1px;
+    height: 18px;
+    background: #cbd5e1;
+    margin: 0 2px;
+}
+
+.chevronIcon {
+    color: #1e3a8a;
+}
+
+/* Dropdown Menu Style */
+.dropdownMenu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+    animation: fadeInDown 0.2s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownMenu button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: none;
+    background: white;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: all 0.2s;
+}
+
+.dropdownMenu button:hover {
+    background: #f8fafc;
+    color: #1e3a8a;
+    padding-left: 20px;
+}
+
+.dropdownMenu button:not(:last-child) {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* =========================
+   3. STATS GRID & CHARTS
    ========================= */
 .grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 Columns on Desktop */
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     margin-bottom: 24px;
 }
@@ -72,7 +190,6 @@
     justify-content: center;
 }
 
-/* Premium Card (First one) */
 .premiumCard {
     background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
     color: white;
@@ -100,7 +217,6 @@
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Typography inside Stats */
 .cardTitle {
     font-size: 13px;
     font-weight: 600;
@@ -123,12 +239,9 @@
     display: block;
 }
 
-/* =========================
-   3. CHARTS SECTION
-   ========================= */
 .chartsSection {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* 2:1 Ratio */
+    grid-template-columns: 2fr 1fr;
     gap: 20px;
     margin-bottom: 24px;
 }
@@ -151,7 +264,6 @@
     gap: 8px;
 }
 
-/* Leaderboard List */
 .leaderboard {
     display: flex;
     flex-direction: column;
@@ -235,10 +347,9 @@
     gap: 6px;
 }
 
-/* Table Layout */
 .tableContainer {
     width: 100%;
-    overflow-x: auto; /* Scroll horizontally if needed on tablet */
+    overflow-x: auto;
 }
 
 .table {
@@ -263,7 +374,6 @@
     vertical-align: top;
 }
 
-/* Manager Cell */
 .mgrNameCell {
     display: flex;
     flex-direction: column;
@@ -275,7 +385,6 @@
     margin-top: 2px;
 }
 
-/* Badge count */
 .badge {
     background: #f1f5f9;
     padding: 4px 10px;
@@ -285,15 +394,13 @@
     color: #475569;
 }
 
-/* Agent Tag Cloud */
 .agentSelector {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    max-width: 600px; /* Prevent it from stretching too wide */
+    max-width: 600px;
 }
 
-/* Base Tag Style */
 .tag {
     display: inline-flex;
     align-items: center;
@@ -306,7 +413,6 @@
     user-select: none;
 }
 
-/* Tag Name Area */
 .tagName {
     padding: 6px 10px;
     font-size: 12px;
@@ -323,26 +429,22 @@
     color: #334155;
 }
 
-/* Active State (Selected) */
 .activeTag {
     border-color: #3b82f6;
     background: #eff6ff;
 }
-
 .activeTag .tagName {
     color: #2563eb;
     font-weight: 600;
     background: #eff6ff;
 }
 
-/* Disabled State (Assigned to others) */
 .disabledTag {
     opacity: 0.5;
     background: #f1f5f9;
     border-color: #e2e8f0;
     cursor: not-allowed;
 }
-
 .busyLabel {
     font-size: 10px;
     background: #e2e8f0;
@@ -351,12 +453,10 @@
     color: #64748b;
 }
 
-/* Check Icon */
 .checkIcon {
     color: #2563eb;
 }
 
-/* Save Button */
 .saveBtn {
     background: #0f172a;
     color: white;
@@ -376,7 +476,6 @@
     background: #1e293b;
 }
 
-/* Loading State */
 .loaderBox {
     display: flex;
     flex-direction: column;
@@ -389,51 +488,200 @@
 }
 
 /* =========================
-   5. RESPONSIVE DESIGN
+   5. MODAL STYLES (Manage Employees)
    ========================= */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
 
-/* Tablet & Mobile */
-@media (max-width: 1024px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr); /* 2x2 Grid */
+.modalContent {
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-
-    .chartsSection {
-        grid-template-columns: 1fr; /* Stack Charts */
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* Mobile Only */
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.modalHeader h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeBtn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.modalBody {
+    padding: 20px 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modalTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+.modalTable th {
+    text-align: left;
+    padding-bottom: 12px;
+    font-size: 13px;
+    color: #64748b;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e2e8f0;
+}
+.modalTable td {
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.empInfo {
+    display: flex;
+    flex-direction: column;
+}
+.empInfo strong {
+    font-size: 14px;
+    color: #1e293b;
+}
+.empInfo span {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.roleSelect {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #334155;
+    background: white;
+    cursor: pointer;
+    font-weight: 500;
+    outline: none;
+}
+.roleSelect:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.fireBtn {
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.fireBtn:hover {
+    background: #fecaca;
+    color: #dc2626;
+}
+
+/* =========================
+   6. RESPONSIVE DESIGN
+   ========================= */
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .chartsSection {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 12px;
     }
-
     .header {
         flex-direction: column;
         align-items: flex-start;
     }
-
-    .refreshBtn {
+    .headerActions {
         width: 100%;
-        justify-content: center;
-    }
-
-    .grid {
-        grid-template-columns: 1fr; /* 1 Column Stats */
+        flex-direction: column;
+        align-items: stretch;
         gap: 12px;
     }
-
+    .refreshBtn,
+    .dropdownContainer,
+    .manageProfileBtn {
+        width: 100%;
+    }
+    .manageProfileBtn {
+        justify-content: center;
+    }
+    .dropdownMenu {
+        width: 100%;
+        right: auto;
+        left: 0;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
     .infoBadge {
         width: 100%;
         justify-content: center;
     }
 
-    /* --- Mobile Table (Card View) --- */
+    /* Mobile Table (Card View) */
     .table thead {
-        display: none; /* Hide standard headers */
+        display: none;
     }
-
     .table tbody tr {
         display: flex;
         flex-direction: column;
@@ -444,7 +692,6 @@
         padding: 16px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
     }
-
     .table td {
         display: block;
         width: 100%;
@@ -452,13 +699,11 @@
         border: none;
         border-bottom: 1px solid #f8fafc;
     }
-
     .table td:last-child {
         border-bottom: none;
         padding-top: 16px;
     }
 
-    /* Add Pseudo Labels for Context */
     .table td:nth-of-type(1)::before {
         content: "Manager";
         font-size: 11px;
@@ -487,16 +732,13 @@
         margin-bottom: 8px;
     }
 
-    /* Make Agent Selector Wrappable & Touch Friendly */
     .agentSelector {
         gap: 8px;
     }
-
     .tag {
-        flex: 1 1 auto; /* Grow tags to fill space */
+        flex: 1 1 auto;
         justify-content: center;
     }
-
     .saveBtn {
         width: 100%;
         justify-content: center;

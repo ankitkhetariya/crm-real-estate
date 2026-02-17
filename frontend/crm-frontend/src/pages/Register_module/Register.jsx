@@ -1,18 +1,27 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../../api/axios"; 
-import toast from 'react-hot-toast'; 
-import { UserPlus, User, Mail, Lock, ShieldAlert, Briefcase, Phone } from "lucide-react"; 
-import styles from "./Register.module.css"; 
+import API from "../../api/axios";
+import toast from "react-hot-toast";
+import {
+  UserPlus,
+  User,
+  Mail,
+  Lock,
+  ShieldAlert,
+  Briefcase,
+  Phone,
+  ArrowLeft,
+} from "lucide-react";
+import styles from "./Register.module.css";
 
 const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  
-  //  SECURITY SWITCH: 
-  // Set 'true' to LOCK registration (Public cannot access)
-  // Set 'false' to OPEN registration (When you want to add staff)
-  const isRegistrationDisabled = true; 
+
+  // SMART SECURITY CHECK:
+  // LocalStorage se role nikalenge. Agar "admin" hai, toh hi form khulega.
+  const currentUserRole = localStorage.getItem("role");
+  const isAdmin = currentUserRole === "admin";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -20,7 +29,7 @@ const Register = () => {
     phone: "",
     role: "agent",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const handleChange = (e) => {
@@ -40,12 +49,16 @@ const Register = () => {
         email: formData.email,
         phone: formData.phone,
         role: formData.role,
-        password: formData.password
+        password: formData.password,
       };
 
       await API.post("/auth/register", payload);
-      toast.success("Account created! Please log in.");
-      navigate("/login");
+
+      // Admin ke liye success message aur redirect
+      toast.success(
+        `${formData.role.toUpperCase()} account created successfully!`,
+      );
+      navigate("/admin-dashboard");
     } catch (err) {
       const errorMsg = err.response?.data?.error || "Registration Failed";
       toast.error(errorMsg);
@@ -54,8 +67,8 @@ const Register = () => {
     }
   };
 
-  // 🚫 DISABLED VIEW (Security Mode)
-  if (isRegistrationDisabled) {
+  // DISABLED VIEW (Agar koi non-admin ya public aane ki koshish kare)
+  if (!isAdmin) {
     return (
       <div className={styles.container}>
         <div className={styles.card}>
@@ -64,13 +77,17 @@ const Register = () => {
               <ShieldAlert size={28} color="#ef4444" />
             </div>
             <h2>Registration Closed</h2>
-            <p>Public registration is currently disabled for security reasons.</p>
+            <p>
+              Public registration is currently disabled for security reasons.
+            </p>
           </div>
-          
+
           <div className={styles.disabledBody}>
-            <p>Please contact the Administrator to get your account credentials.</p>
-            <button 
-              onClick={() => navigate("/login")} 
+            <p>
+              Please contact the Administrator to get your account credentials.
+            </p>
+            <button
+              onClick={() => navigate("/login")}
               className={styles.registerBtn}
             >
               Go to Login Page
@@ -85,7 +102,7 @@ const Register = () => {
     );
   }
 
-  // ✅ ACTIVE FORM VIEW (Only visible if isRegistrationDisabled = false)
+  // ACTIVE FORM VIEW (Sirf Admin ko dikhega)
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -93,18 +110,23 @@ const Register = () => {
           <div className={styles.iconCircle}>
             <UserPlus size={28} color="#2563eb" />
           </div>
-          <h2>Create Account</h2>
-          <p>Join us and manage your leads effectively</p>
+          <h2>Add New Employee</h2>
+          <p>Create credentials for your team members</p>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          
           {/* Name */}
           <div className={styles.inputGroup}>
             <div className={styles.inputWrapper}>
               <User size={18} className={styles.inputIcon} />
-              <input type="text" name="name" placeholder="Full Name" required 
-                value={formData.name} onChange={handleChange} />
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
@@ -112,8 +134,14 @@ const Register = () => {
           <div className={styles.inputGroup}>
             <div className={styles.inputWrapper}>
               <Mail size={18} className={styles.inputIcon} />
-              <input type="email" name="email" placeholder="Email Address" required 
-                value={formData.email} onChange={handleChange} />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                required
+                value={formData.email}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
@@ -121,20 +149,33 @@ const Register = () => {
           <div className={styles.inputGroup}>
             <div className={styles.inputWrapper}>
               <Phone size={18} className={styles.inputIcon} />
-              <input type="text" name="phone" placeholder="Phone Number" 
-                value={formData.phone} onChange={handleChange} />
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
           {/* Role Dropdown */}
           <div className={styles.inputGroup}>
-            <label style={{marginBottom:'2px'}}>Select Role</label>
+            <label
+              style={{
+                marginBottom: "2px",
+                fontSize: "13px",
+                color: "#64748b",
+              }}
+            >
+              Select Role
+            </label>
             <div className={`${styles.inputWrapper} ${styles.selectWrapper}`}>
               <Briefcase size={18} className={styles.inputIcon} />
-              <select 
-                name="role" 
-                className={styles.selectInput} 
-                value={formData.role} 
+              <select
+                name="role"
+                className={styles.selectInput}
+                value={formData.role}
                 onChange={handleChange}
               >
                 <option value="agent">Agent (Sales)</option>
@@ -148,8 +189,14 @@ const Register = () => {
           <div className={styles.inputGroup}>
             <div className={styles.inputWrapper}>
               <Lock size={18} className={styles.inputIcon} />
-              <input type="password" name="password" placeholder="Create a password" required 
-                value={formData.password} onChange={handleChange} />
+              <input
+                type="password"
+                name="password"
+                placeholder="Create a temporary password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
@@ -157,18 +204,46 @@ const Register = () => {
           <div className={styles.inputGroup}>
             <div className={styles.inputWrapper}>
               <Lock size={18} className={styles.inputIcon} />
-              <input type="password" name="confirmPassword" placeholder="Confirm password" required 
-                value={formData.confirmPassword} onChange={handleChange} />
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm password"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
-          <button type="submit" className={styles.registerBtn} disabled={loading}>
-            {loading ? "Creating Account..." : "Sign Up"}
+          <button
+            type="submit"
+            className={styles.registerBtn}
+            disabled={loading}
+          >
+            {loading ? "Creating Account..." : "Register Employee"}
           </button>
         </form>
 
-        <div className={styles.footer}>
-          Already have an account? <Link to="/login">Sign In</Link>
+        <div
+          className={styles.footer}
+          style={{ display: "flex", justifyContent: "center", gap: "8px" }}
+        >
+          <button
+            onClick={() => navigate("/admin-dashboard")}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#64748b",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "500",
+            }}
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </button>
         </div>
       </div>
     </div>
