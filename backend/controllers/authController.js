@@ -4,19 +4,33 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
 // --- HELPER: Create Transporter ---
+// --- HELPER: Create Transporter ---
 const getTransporter = () => {
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587, // Use 587 (NOT 25)
+    secure: false, // Must be false for 587
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      pass: process.env.EMAIL_PASS, // Gmail App Password
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 10000, // 10 seconds timeout
   });
 };
 
-// --- 1. REGISTER USER ---
+// --- 1. REGISTER USER ( LOCKED: ADMIN ONLY) ---
 exports.register = async (req, res) => {
   try {
+    //  NEW SECURITY LOCK: Check if the user making the request is an Admin
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({
+        error: "Access denied. Only Admins can register new employees.",
+      });
+    }
+
     const { name, email, password, phone, role } = req.body;
 
     if (!name || !email || !password) {
@@ -72,10 +86,10 @@ exports.login = async (req, res) => {
       { expiresIn: "30d" },
     );
 
-    // ✅ FIX: Role ko top-level pe bheja taaki frontend pakad sake
+    //  FIX: Role ko top-level pe bheja taaki frontend pakad sake
     res.json({
       token,
-      role: user.role, // <--- YE line zaroori hai Admin Dashboard ke liye!
+      role: user.role, // <--- this is imp for Admin Dashboard!
 
       user: {
         _id: user._id,

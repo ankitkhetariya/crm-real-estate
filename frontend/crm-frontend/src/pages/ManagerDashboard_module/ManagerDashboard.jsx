@@ -7,8 +7,8 @@ import {
   Loader,
   ArrowRight,
   IndianRupee,
-  BarChart3, // ✅ Replaced 📊 emoji
-  Award, // ✅ Replaced 🏆 emoji
+  BarChart3, //  Replaced  emoji
+  Award, //  Replaced  emoji
 } from "lucide-react";
 import {
   BarChart,
@@ -73,7 +73,7 @@ const ManagerDashboard = () => {
     fetchManagerData();
   }, []);
 
-  // ✅ Smart Y-Axis formatting (1L, 1Cr, 10k)
+  //  Smart Y-Axis formatting (1L, 1Cr, 10k)
   const formatYAxis = (tickItem) => {
     if (tickItem >= 10000000) return `₹${(tickItem / 10000000).toFixed(2)}Cr`;
     if (tickItem >= 100000) return `₹${(tickItem / 100000).toFixed(1)}L`;
@@ -168,7 +168,7 @@ const ManagerDashboard = () => {
               marginBottom: "16px",
             }}
           >
-            {/* ✅ Replaced Emoji with BarChart3 Icon */}
+            {/*  Replaced Emoji with BarChart3 Icon */}
             <h3
               style={{
                 display: "flex",
@@ -196,7 +196,7 @@ const ManagerDashboard = () => {
           </div>
 
           <div style={{ width: "100%", height: 350 }}>
-            {/* ✅ Added width="100%" height="100%" to fix console error */}
+            {/*  Added width="100%" height="100%" to fix console error */}
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={performanceData}>
                 <CartesianGrid
@@ -213,7 +213,7 @@ const ManagerDashboard = () => {
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={formatYAxis} // ✅ Fixed Indian Y-Axis Format
+                  tickFormatter={formatYAxis} //  Fixed Indian Y-Axis Format
                   tick={{ fill: "#64748b", fontSize: 13 }}
                 />
                 <Tooltip
@@ -226,9 +226,9 @@ const ManagerDashboard = () => {
                     borderRadius: "8px",
                     border: "1px solid #e2e8f0",
                     boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
-                  }} // ✅ Professional tooltip UI
+                  }} //  Professional tooltip UI
                 />
-                {/* ✅ Added minPointSize={5} to prevent invisible bars */}
+                {/* Added minPointSize={5} to prevent invisible bars */}
                 <Bar
                   dataKey="revenue"
                   fill="#4f46e5"
@@ -243,7 +243,7 @@ const ManagerDashboard = () => {
 
         <div className={styles.sideList}>
           <div className={styles.listHeader} style={{ marginBottom: "16px" }}>
-            {/* ✅ Replaced Emoji with Award Icon */}
+            {/*  Replaced Emoji with Award Icon */}
             <h3
               style={{
                 display: "flex",

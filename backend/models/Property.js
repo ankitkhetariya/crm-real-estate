@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-// ✅ 1. Sub-schema banayein (Room Sizes ke liye)
+//  1. Sub-schema (Room Sizes)
 const roomDetailSchema = new mongoose.Schema(
   {
     size: {

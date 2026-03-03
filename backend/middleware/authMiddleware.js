@@ -24,7 +24,7 @@ exports.protect = async (req, res, next) => {
     req.user = await User.findById(userId).select("-password");
 
     if (!req.user) {
-      // ⚠️ Important for your conflict: check if DB is connected to right instance
+      //  Important for your conflict: check if DB is connected to right instance
       console.error(`Auth Error: User ID ${userId} not found in current DB.`);
       return res.status(401).json({ message: "User not found" });
     }
