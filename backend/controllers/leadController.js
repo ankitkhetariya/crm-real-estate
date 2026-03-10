@@ -82,7 +82,7 @@ exports.getDashboardStats = async (req, res) => {
   }
 };
 
-//  2. Get All (UPDATED FOR MANAGER HIERARCHY)
+//  2. Get All (with pagination and optional search/status/assignedTo filter)
 exports.getAllLeads = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
@@ -98,12 +98,39 @@ exports.getAllLeads = async (req, res) => {
       query = { assignedTo: userId };
     }
 
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 10));
+    const search = (req.query.search || "").trim();
+    const statusFilter = req.query.status;
+    const assignedToFilter = req.query.assignedTo;
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { company: { $regex: search, $options: "i" } },
+      ];
+    }
+    if (statusFilter && statusFilter !== "All") {
+      const valid = ["New", "Contacted", "Qualified", "Proposal Sent", "Lost", "Converted"];
+      if (valid.includes(statusFilter)) query.status = statusFilter;
+    }
+    if (assignedToFilter && (role === "admin" || role === "manager")) {
+      query.assignedTo = assignedToFilter;
+    }
+
+    const total = await Lead.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
     const leads = await Lead.find(query)
       .populate("assignedTo", "name email")
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
 
-    res.status(200).json(leads);
+    res.status(200).json({ data: leads, total, page, limit, totalPages });
   } catch (error) {
     res.status(500).json({ message: "Error" });
   }
@@ -170,7 +197,8 @@ exports.deleteLead = async (req, res) => {
 // 7. Delete All
 exports.deleteAllLeads = async (req, res) => {
   try {
-    await Lead.deleteMany({ assignedTo: req.user.id });
+    const userId = req.user._id || req.user.id;
+    await Lead.deleteMany({ assignedTo: userId });
     res.status(200).json({ message: "All deleted" });
   } catch (error) {
     res.status(500).json({ message: "Error" });

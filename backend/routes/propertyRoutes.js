@@ -6,23 +6,34 @@ const {
   getPropertyById,
   updateProperty,
   deleteProperty,
-  deleteAllProperties, // ✅ 1. Import New Function
+  deleteAllProperties,
+  uploadBrochure,
+  removeBrochure,
 } = require("../controllers/propertyController");
-
 const { protect } = require("../middleware/authMiddleware");
+const { uploadBrochure: uploadBrochureMulter } = require("../config/multer");
 
-// Saare routes password protected hain
 router.use(protect);
 
 router.post("/", createProperty);
 router.get("/", getAllProperties);
-
-// 🗑️ ✅ 2. DELETE ALL ROUTE (Isse /:id se PEHLE rakhna zaroori hai)
 router.delete("/delete-all", deleteAllProperties);
 
-// 👇 ID wale routes (Inke neeche rakhna)
 router.get("/:id", getPropertyById);
 router.put("/:id", updateProperty);
 router.delete("/:id", deleteProperty);
+router.post(
+  "/:id/brochure",
+  (req, res, next) => {
+    uploadBrochureMulter.single("brochure")(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message || "Invalid file. Only PDF allowed." });
+      }
+      next();
+    });
+  },
+  uploadBrochure
+);
+router.delete("/:id/brochure", removeBrochure);
 
 module.exports = router;

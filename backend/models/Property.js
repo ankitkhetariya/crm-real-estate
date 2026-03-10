@@ -39,6 +39,11 @@ const propertySchema = new mongoose.Schema(
       default: "",
     },
 
+    brochureUrl: {
+      type: String,
+      default: "",
+    },
+
     status: {
       type: String,
       enum: ["Available", "Sold", "Rented"],

@@ -1,0 +1,178 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--page-bg);
+    padding: 20px;
+}
+
+.card {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--card-border);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+.header p {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.iconCircle {
+    width: 50px;
+    height: 50px;
+    background: var(--input-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px auto;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Input Groups */
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.inputGroup label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.inputIcon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted);
+}
+
+.inputWrapper input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+.inputWrapper input:focus {
+    border-color: var(--link-color);
+    background-color: var(--card-bg);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ✅ NEW: Dropdown (Select) Styling to match Inputs */
+.selectWrapper {
+    position: relative;
+}
+
+.selectInput {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+    background-color: var(--input-bg);
+    appearance: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-family: inherit;
+}
+
+.selectInput:focus {
+    border-color: var(--link-color);
+    background-color: var(--card-bg);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.selectWrapper::after {
+    content: "▼";
+    font-size: 10px;
+    color: var(--text-muted);
+    position: absolute;
+    right: 15px;
+    pointer-events: none; /* Click goes through to select */
+}
+
+/* Buttons */
+.registerBtn {
+    background-color: var(--link-color);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+.registerBtn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+.registerBtn:disabled {
+    background-color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+.footer a {
+    color: var(--link-color);
+    font-weight: 600;
+    text-decoration: none;
+}
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Disabled State Styles */
+.disabledIcon {
+    background-color: #fef2f2 !important;
+    border: 1px solid #fee2e2;
+}
+.disabledBody {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+.disabledBody p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}

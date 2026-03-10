@@ -1,0 +1,51 @@
+/* Theme variables for light and dark mode. Applied on html via data-theme. */
+:root,
+html[data-theme="light"] {
+  --page-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --card-border: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --input-bg: #f8fafc;
+  --input-border: #e2e8f0;
+  --sidebar-bg: #2c221f;
+  --sidebar-border: #3e302b;
+  --sidebar-text: #d7ccc8;
+  --sidebar-text-active: #ffffff;
+  --header-bg: #ffffff;
+  --header-border: #e2e8f0;
+  --link-color: #2563eb;
+  --success-bg: #f0fdf4;
+  --success-text: #166534;
+  --danger-bg: #fef2f2;
+  --danger-text: #991b1b;
+  --overlay-bg: rgba(15, 23, 42, 0.6);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="dark"] {
+  --page-bg: #0f172a;
+  --card-bg: #1e293b;
+  --card-border: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --input-bg: #1e293b;
+  --input-border: #334155;
+  --sidebar-bg: #020617;
+  --sidebar-border: #1e293b;
+  --sidebar-text: #94a3b8;
+  --sidebar-text-active: #f1f5f9;
+  --header-bg: #1e293b;
+  --header-border: #334155;
+  --link-color: #60a5fa;
+  --success-bg: #14532d;
+  --success-text: #86efac;
+  --danger-bg: #450a0a;
+  --danger-text: #fca5a5;
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+}

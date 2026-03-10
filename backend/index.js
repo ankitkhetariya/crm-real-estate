@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -29,6 +30,9 @@ app.use(cors({
 // Body parser middleware with increased limit to prevent 413 Payload Too Large errors
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Serve uploaded brochures as static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Define API routes
 app.use('/api/auth', authRoutes);

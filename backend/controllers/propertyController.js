@@ -1,5 +1,19 @@
+const path = require("path");
+const fs = require("fs");
 const Property = require("../models/Property");
 const User = require("../models/User");
+
+function deleteBrochureFileIfExists(brochureUrl) {
+  if (!brochureUrl || typeof brochureUrl !== "string") return;
+  const filename = path.basename(brochureUrl);
+  if (!filename) return;
+  const filePath = path.join(__dirname, "..", "uploads", "brochures", filename);
+  try {
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  } catch (err) {
+    console.error("Brochure file delete failed:", err.message);
+  }
+}
 
 // 1. Create Property (UPDATED FOR MANAGER ASSIGNMENT)
 exports.createProperty = async (req, res) => {
@@ -35,7 +49,7 @@ exports.createProperty = async (req, res) => {
   }
 };
 
-// 2. Get All Properties (Manager Team Visibility Fix)
+// 2. Get All Properties (with pagination and optional search/status filter)
 exports.getAllProperties = async (req, res) => {
   try {
     const userId = req.user._id || req.user.userId;
@@ -51,11 +65,43 @@ exports.getAllProperties = async (req, res) => {
       query = { assignedTo: userId };
     }
 
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 10));
+    const search = (req.query.search || "").trim();
+    const statusFilter = req.query.status;
+    const assignedToFilter = req.query.assignedTo;
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { city: { $regex: search, $options: "i" } },
+      ];
+    }
+    if (statusFilter && statusFilter !== "All" && ["Available", "Sold", "Rented"].includes(statusFilter)) {
+      query.status = statusFilter;
+    }
+    if (assignedToFilter && (role === "admin" || role === "manager")) {
+      query.assignedTo = assignedToFilter;
+    }
+
+    const total = await Property.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
     const properties = await Property.find(query)
       .sort({ createdAt: -1 })
-      .populate("owner", "name email phone");
+      .skip(skip)
+      .limit(limit)
+      .populate("owner", "name email phone")
+      .populate("assignedTo", "name username");
 
-    res.status(200).json(properties);
+    res.status(200).json({
+      data: properties,
+      total,
+      page,
+      limit,
+      totalPages,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
   }
@@ -126,6 +172,7 @@ exports.deleteProperty = async (req, res) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
+    deleteBrochureFileIfExists(property.brochureUrl);
     await property.deleteOne();
     res.status(200).json({ message: "Property removed" });
   } catch (error) {
@@ -137,9 +184,87 @@ exports.deleteProperty = async (req, res) => {
 exports.deleteAllProperties = async (req, res) => {
   try {
     const userId = req.user._id || req.user.userId;
+    const toDelete = await Property.find({ assignedTo: userId }).select("brochureUrl").lean();
+    toDelete.forEach((p) => deleteBrochureFileIfExists(p.brochureUrl));
     await Property.deleteMany({ assignedTo: userId });
     res.status(200).json({ message: "All properties deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// 7. Upload brochure PDF for a property
+exports.uploadBrochure = async (req, res) => {
+  try {
+    if (!req.file || !req.file.filename) {
+      return res.status(400).json({ message: "No PDF file uploaded." });
+    }
+
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    const userId = req.user._id || req.user.userId;
+    const role = req.user.role;
+
+    if (role === "manager") {
+      const teamAgents = await User.find({ managedBy: userId }).distinct("_id");
+      const isTeamProp = teamAgents
+        .map((id) => id.toString())
+        .includes(property.assignedTo.toString());
+      if (property.assignedTo.toString() !== userId.toString() && !isTeamProp) {
+        return res.status(401).json({ message: "Not authorized" });
+      }
+    } else if (
+      role !== "admin" &&
+      property.assignedTo.toString() !== userId.toString()
+    ) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    const brochureUrl = "/uploads/brochures/" + req.file.filename;
+    property.brochureUrl = brochureUrl;
+    await property.save();
+
+    res.status(200).json(property);
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Server Error" });
+  }
+};
+
+// 8. Remove brochure (clear brochureUrl and delete file)
+exports.removeBrochure = async (req, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    const userId = req.user._id || req.user.userId;
+    const role = req.user.role;
+
+    if (role === "manager") {
+      const teamAgents = await User.find({ managedBy: userId }).distinct("_id");
+      const isTeamProp = teamAgents
+        .map((id) => id.toString())
+        .includes(property.assignedTo.toString());
+      if (property.assignedTo.toString() !== userId.toString() && !isTeamProp) {
+        return res.status(401).json({ message: "Not authorized" });
+      }
+    } else if (
+      role !== "admin" &&
+      property.assignedTo.toString() !== userId.toString()
+    ) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    deleteBrochureFileIfExists(property.brochureUrl);
+    property.brochureUrl = "";
+    await property.save();
+
+    res.status(200).json(property);
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 };

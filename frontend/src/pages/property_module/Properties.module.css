@@ -1,0 +1,584 @@
+/* --- Global Fix --- */
+.container,
+.container * {
+    box-sizing: border-box;
+}
+
+.loading {
+    padding: 3rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.container {
+    padding: clamp(1rem, 5vw, 2.5rem);
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: "Inter", sans-serif;
+    background-color: var(--page-bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- Header Section --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.header h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+}
+.headerActions {
+    display: flex;
+    gap: 10px;
+}
+
+.addBtn,
+.deleteBtn {
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.addBtn {
+    background: #2563eb;
+    color: white;
+}
+.deleteBtn {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* --- Admin Context Fix --- */
+.adminFilterWrapperOuter {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.adminFilterWrapperOuter > div {
+    max-width: 100% !important;
+    width: 100% !important;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* --- Search & Filter Bar --- */
+.filterBar {
+    display: flex;
+    gap: 1rem;
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.searchWrapper {
+    position: relative;
+    flex: 2;
+    display: flex;
+    align-items: center;
+    min-width: 250px;
+}
+.searchInput {
+    width: 100%;
+    padding: 12px 12px 12px 45px !important;
+    border: 1.5px solid var(--input-border);
+    border-radius: 12px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.filterWrapper {
+    flex: 1;
+    background: var(--input-bg);
+    border-radius: 12px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    min-width: 150px;
+}
+.filterWrapper select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 12px 0;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* --- 🏠 Property Cards --- */
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+}
+
+.imageWrapper {
+    position: relative;
+    height: 210px;
+}
+.cardImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.typeBadge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: white;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    color: #2563eb;
+    font-size: 0.75rem;
+}
+.pdfBadge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.cardContent {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+.title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+.price {
+    color: var(--success-text);
+    font-weight: 800;
+    font-size: 1.2rem;
+    display: block;
+    margin-bottom: 10px;
+}
+.location {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.propertySpecs {
+    display: flex;
+    justify-content: space-between;
+    background: var(--input-bg);
+    padding: 10px;
+    border-radius: 12px;
+    margin: 15px 0;
+    border: 1px solid var(--card-border);
+}
+.specItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.statusSelect {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: 1px solid transparent;
+}
+.statusSelect[data-status="Available"] {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+.statusSelect[data-status="Sold"] {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+
+.cardFooter {
+    padding: 1rem;
+    background: var(--input-bg);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.iconBtn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid var(--input-border);
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none;
+}
+.iconBtn:hover {
+    background: var(--link-color);
+    color: white;
+    border-color: var(--link-color);
+}
+.brochureIconBtn {
+    color: var(--link-color);
+}
+
+/* --- 📝 ✅ EDIT MODAL REFINED (UX FIXES) --- */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+}
+
+.modalContent {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 650px;
+    border-radius: 24px;
+    padding: clamp(1rem, 5vw, 2rem);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.fullWidth {
+    grid-column: span 2;
+}
+
+.formGroup label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    display: block;
+}
+
+.formGroup input,
+.formGroup select {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 10px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+/* ✅ UX FIX: Textarea only resizes vertically */
+.formGroup textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 10px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ✅ UX FIX: Compact Image Section */
+.imageUpdateSection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--input-bg);
+    padding: 10px;
+    border-radius: 12px;
+    margin-top: 5px;
+}
+
+.previewContainer {
+    width: 50px; /* Small mini-thumbnail */
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid white;
+}
+
+.previewContainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.uploadTrigger {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--link-color);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.brochureSection {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+    padding: 10px;
+    background: var(--input-bg);
+    border-radius: 12px;
+    border: 1px solid var(--input-border);
+}
+.brochureLink {
+    color: var(--link-color);
+    font-weight: 600;
+    text-decoration: none;
+}
+.brochureLink:hover {
+    text-decoration: underline;
+}
+.brochureNone {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+.removeBrochureBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.removeBrochureBtn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+.removeBrochureBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.brochureUploadLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--card-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--link-color);
+    cursor: pointer;
+}
+.brochureUploadLabel:has(input:disabled) {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+}
+.paginationBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--input-border);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.paginationBtn:hover:not(:disabled) {
+    background: var(--link-color);
+    color: white;
+    border-color: var(--link-color);
+}
+.paginationBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.paginationInfo {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.uploadTrigger input {
+    display: none;
+} /* Native input hidden */
+
+.roomList {
+    background: var(--input-bg);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1.5px solid var(--input-border);
+    margin-top: 5px;
+}
+.roomRow {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.addMiniBtn {
+    width: 100%;
+    padding: 10px;
+    background: #dbeafe;
+    color: #2563eb;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 5px;
+}
+.deleteMiniBtn {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 2rem;
+}
+.saveBtn {
+    background: #2563eb;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+}
+.cancelBtn {
+    background: var(--input-bg);
+    color: var(--text-muted);
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* --- 📱 MOBILE VIEW --- */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .headerActions {
+        width: 100%;
+    }
+    .addBtn,
+    .deleteBtn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .filterBar {
+        flex-direction: column;
+        padding: 12px;
+    }
+    .searchWrapper,
+    .filterWrapper {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .gridContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+    .fullWidth {
+        grid-column: span 1;
+    }
+
+    .modalActions {
+        flex-direction: column;
+    }
+    .saveBtn,
+    .cancelBtn {
+        width: 100%;
+    }
+
+    .adminFilterWrapperOuter > div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+}
