@@ -1,6 +1,11 @@
 /* =========================
-   1. MAIN CONTAINER
-   ========================= */
+      1. MAIN CONTAINER & BOX SIZING
+      ========================= */
+.container,
+.container * {
+    box-sizing: border-box; /* STRICT LAYOUT FIX */
+}
+
 .container {
     padding: 24px;
     max-width: 900px;
@@ -50,21 +55,24 @@
     border-radius: 16px;
     border: 1px solid var(--card-border);
     box-shadow: var(--shadow-md);
+    width: 100%;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 Columns by default */
+    grid-template-columns: repeat(2, 1fr);
     gap: 24px;
+    width: 100%;
 }
 
 /* =========================
-   4. FORM INPUTS & GROUPS
-   ========================= */
+      4. FORM INPUTS & GROUPS
+      ========================= */
 .formGroup {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    width: 100%;
 }
 
 .formGroup label {
@@ -83,9 +91,17 @@
     border: 1px solid var(--input-border);
     border-radius: 10px;
     padding: 0 14px;
-    height: 48px;
+    height: 48px; /* Fixed height for normal inputs */
     transition: all 0.2s ease;
     color: var(--text-muted);
+    width: 100%;
+}
+
+/* ✅ TEXTAREA FIX: Overrides the 48px fixed height */
+.textareaWrapper {
+    height: auto !important;
+    min-height: 100px;
+    align-items: flex-start; /* Aligns icon to top */
 }
 
 .inputWrapper:focus-within {
@@ -115,12 +131,14 @@
     font-size: 15px;
     color: var(--text-primary);
     padding: 12px 0;
-    resize: none;
+    resize: vertical; /* ✅ FIX: Allows only vertical resize, stops horizontal layout breaking */
     font-family: inherit;
+    min-height: 80px;
 }
 
 .formGroup select {
     appearance: none;
+    /* ✅ FIX: Dynamic SVG icon color for Dark/Light mode using currentColor workaround logic if needed, but standard grey is usually fine. I'll leave your SVG as is. */
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
@@ -135,6 +153,7 @@
     font-weight: 500;
     transition: all 0.2s ease;
     cursor: pointer;
+    width: 100%;
 }
 
 .formGroup select:focus {
@@ -148,8 +167,8 @@
 }
 
 /* =========================
-   5. FOOTER & BUTTONS
-   ========================= */
+      5. FOOTER & BUTTONS
+      ========================= */
 .footer {
     margin-top: 30px;
     padding-top: 20px;
@@ -160,7 +179,7 @@
 
 .submitBtn {
     background-color: var(--link-color);
-    color: white;
+    color: white; /* Button text should remain white */
     border: none;
     padding: 12px 24px;
     border-radius: 10px;
@@ -171,13 +190,13 @@
     align-items: center;
     gap: 8px;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* ✅ Softened shadow */
 }
 
 .submitBtn:hover {
-    background-color: #1d4ed8;
+    opacity: 0.9; /* ✅ FIX: Safer hover effect for dynamic colors than hardcoded #1d4ed8 */
     transform: translateY(-1px);
-    box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.2);
 }
 
 .submitBtn:disabled {
@@ -185,11 +204,12 @@
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+    opacity: 0.6;
 }
 
 /* =========================
-   6. RESPONSIVE (MOBILE)
-   ========================= */
+      6. RESPONSIVE (MOBILE)
+      ========================= */
 @media (max-width: 768px) {
     .container {
         padding: 16px;
@@ -207,7 +227,7 @@
 
     /* Ensure full-width elements stay full width */
     .formGroup[style*="grid-column: 1 / -1"] {
-        grid-column: 1 / -1 !important; /* Force override just in case */
+        grid-column: 1 / -1 !important;
     }
 
     .header {

@@ -1,30 +1,30 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
+
+require("dotenv").config(); //before file load it will get
+
+// SET SENDGRID API KEY
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // --- HELPER: Create Transporter ---
-// --- HELPER: Create Transporter ---
 const getTransporter = () => {
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587, // Use 587 (NOT 25)
-    secure: false, // Must be false for 587
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // Gmail App Password
+  return {
+    sendMail: async ({ from, to, subject, text }) => {
+      await sgMail.send({
+        to,
+        from,
+        subject,
+        text,
+      });
     },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 10000, // 10 seconds timeout
-  });
+  };
 };
 
 // --- 1. REGISTER USER ( LOCKED: ADMIN ONLY) ---
 exports.register = async (req, res) => {
   try {
-    //  NEW SECURITY LOCK: Check if the user making the request is an Admin
     if (!req.user || req.user.role !== "admin") {
       return res.status(403).json({
         error: "Access denied. Only Admins can register new employees.",
@@ -38,6 +38,7 @@ exports.register = async (req, res) => {
     }
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
@@ -61,7 +62,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// --- 2. LOGIN USER (FIXED FOR ADMIN DASHBOARD) ---
+// --- 2. LOGIN USER ---
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -71,11 +72,13 @@ exports.login = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
@@ -86,11 +89,9 @@ exports.login = async (req, res) => {
       { expiresIn: "30d" },
     );
 
-    //  FIX: Role ko top-level pe bheja taaki frontend pakad sake
     res.json({
       token,
-      role: user.role, // <--- this is imp for Admin Dashboard!
-
+      role: user.role,
       user: {
         _id: user._id,
         name: user.name,
@@ -109,9 +110,11 @@ exports.login = async (req, res) => {
 exports.getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+
     res.json(user);
   } catch (err) {
     console.error("Get User Error:", err);
@@ -125,6 +128,7 @@ exports.forgotPassword = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(404).json({ error: "User not found with this email" });
     }
@@ -132,25 +136,31 @@ exports.forgotPassword = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     user.resetPasswordOtp = otp;
-    user.resetPasswordOtpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
+    user.resetPasswordOtpExpires = Date.now() + 10 * 60 * 1000;
+
     await user.save();
 
     const transporter = getTransporter();
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: process.env.SENDGRID_FROM_EMAIL,
       to: email,
       subject: "Password Reset Code",
-      text: `Hello ${user.name},\n\nYour One-Time Password (OTP) for resetting your password is:\n\n${otp}\n\nThis code expires in 10 minutes. Do not share this with anyone.`,
+      text: `Hello ${user.name},
+
+Your One-Time Password (OTP) for resetting your password is:
+
+${otp}
+
+This code expires in 10 minutes. Do not share this with anyone.`,
     });
 
     console.log(`Password OTP sent to: ${email}`);
+
     res.status(200).json({ message: "OTP sent to your email" });
   } catch (err) {
     console.error("Email Error:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to send email. Check backend logs." });
+    res.status(500).json({ error: "Failed to send email." });
   }
 };
 
@@ -164,11 +174,11 @@ exports.resetPassword = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Check OTP match and Expiry
     if (!user.resetPasswordOtp || user.resetPasswordOtp !== otp) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
@@ -180,13 +190,11 @@ exports.resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
 
-    // Clear OTP fields
     user.resetPasswordOtp = null;
     user.resetPasswordOtpExpires = null;
 
     await user.save();
 
-    console.log(`Password updated successfully for: ${email}`);
     res.status(200).json({ message: "Password updated successfully" });
   } catch (err) {
     console.error("Reset Password Error:", err);
@@ -194,38 +202,26 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-// ==========================================================
-//  PROFILE & EMAIL CHANGE LOGIC
-// ==========================================================
-
-// --- 6. UPDATE PROFILE (Name & Phone ONLY) ---
+// --- 6. UPDATE PROFILE ---
 exports.updateProfile = async (req, res) => {
   try {
     const { name, phone } = req.body;
     const userId = req.user.id || req.user._id;
 
     const user = await User.findById(userId);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update Name and Phone directly
     if (name) user.name = name;
     if (phone) user.phone = phone;
 
     await user.save();
 
-    const responseUser = {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-    };
-
     res.status(200).json({
       message: "Profile details updated successfully",
-      user: responseUser,
+      user,
     });
   } catch (error) {
     console.error("Update Profile Error:", error);
@@ -233,7 +229,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// --- 7. REQUEST EMAIL CHANGE (Sends OTP to NEW Email) ---
+// --- 7. REQUEST EMAIL CHANGE ---
 exports.requestEmailChange = async (req, res) => {
   try {
     const { newEmail } = req.body;
@@ -243,31 +239,31 @@ exports.requestEmailChange = async (req, res) => {
       return res.status(400).json({ message: "New email is required" });
     }
 
-    // Check if new email is already taken
     const existingUser = await User.findOne({ email: newEmail });
+
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use." });
     }
 
     const user = await User.findById(userId);
 
-    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Save to temp fields
     user.tempEmail = newEmail;
     user.emailOtp = otp;
-    user.emailOtpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
+    user.emailOtpExpires = Date.now() + 10 * 60 * 1000;
 
     await user.save();
 
-    // Send OTP to the NEW email
     const transporter = getTransporter();
+
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: process.env.SENDGRID_FROM_EMAIL,
       to: newEmail,
       subject: "Verify Email Change",
-      text: `Your verification code is: ${otp}\n\nThis code expires in 10 minutes.`,
+      text: `Your verification code is: ${otp}
+
+This code expires in 10 minutes.`,
     });
 
     res.status(200).json({ message: "OTP sent to new email" });
@@ -277,7 +273,7 @@ exports.requestEmailChange = async (req, res) => {
   }
 };
 
-// --- 8. VERIFY EMAIL CHANGE (Finalize Update) ---
+// --- 8. VERIFY EMAIL CHANGE ---
 exports.verifyEmailChange = async (req, res) => {
   try {
     const { otp } = req.body;
@@ -286,9 +282,9 @@ exports.verifyEmailChange = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user.tempEmail || !user.emailOtp) {
-      return res
-        .status(400)
-        .json({ message: "No pending email change request found." });
+      return res.status(400).json({
+        message: "No pending email change request found.",
+      });
     }
 
     if (user.emailOtp !== otp) {
@@ -296,15 +292,13 @@ exports.verifyEmailChange = async (req, res) => {
     }
 
     if (user.emailOtpExpires < Date.now()) {
-      return res
-        .status(400)
-        .json({ message: "Verification code has expired." });
+      return res.status(400).json({
+        message: "Verification code has expired.",
+      });
     }
 
-    // Success: Update the real email
     user.email = user.tempEmail;
 
-    // Clear temp fields
     user.tempEmail = null;
     user.emailOtp = null;
     user.emailOtpExpires = null;
@@ -321,7 +315,7 @@ exports.verifyEmailChange = async (req, res) => {
   }
 };
 
-// --- 9. CHANGE PASSWORD (Logged In User) ---
+// --- 9. CHANGE PASSWORD ---
 exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -330,6 +324,7 @@ exports.changePassword = async (req, res) => {
     const user = await User.findById(userId);
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
+
     if (!isMatch) {
       return res.status(400).json({ message: "Incorrect current password" });
     }

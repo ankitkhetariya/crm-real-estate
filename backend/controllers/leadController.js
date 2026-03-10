@@ -1,10 +1,11 @@
 const Lead = require("../models/Lead");
 const User = require("../models/User");
+const Task = require("../models/Task");
 
 // 1. Stats logic (UPDATED FOR MANAGER HIERARCHY & PIPELINE)
 exports.getDashboardStats = async (req, res) => {
   try {
-    const userId = req.user._id || req.user.id;
+    const userId = req.user._id || req.user.userId || req.user.id;
     const role = req.user.role;
     let query = {};
 
@@ -20,7 +21,12 @@ exports.getDashboardStats = async (req, res) => {
       query = { assignedTo: userId }; // Agent sees only theirs
     }
 
-    const [totalLeads, aggregation] = await Promise.all([
+    const activeTasksQuery = {
+      ...query,
+      status: { $in: ["pending", "in-progress"] },
+    };
+
+    const [totalLeads, aggregation, activeTasksCount] = await Promise.all([
       Lead.countDocuments(query),
       Lead.aggregate([
         { $match: query },
@@ -51,6 +57,7 @@ exports.getDashboardStats = async (req, res) => {
           },
         },
       ]),
+      Task.countDocuments(activeTasksQuery),
     ]);
 
     // Extract totals from the aggregation array
@@ -74,7 +81,7 @@ exports.getDashboardStats = async (req, res) => {
       totalPipeline,
       conversionRate: Number(conversionRate),
       statusCounts: aggregation,
-      activeTasksCount: 0, // Placeholder
+      activeTasksCount: activeTasksCount,
     });
   } catch (error) {
     console.error("Stats Error:", error);
@@ -99,7 +106,10 @@ exports.getAllLeads = async (req, res) => {
     }
 
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 10));
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(req.query.limit, 10) || 10),
+    );
     const search = (req.query.search || "").trim();
     const statusFilter = req.query.status;
     const assignedToFilter = req.query.assignedTo;
@@ -112,7 +122,14 @@ exports.getAllLeads = async (req, res) => {
       ];
     }
     if (statusFilter && statusFilter !== "All") {
-      const valid = ["New", "Contacted", "Qualified", "Proposal Sent", "Lost", "Converted"];
+      const valid = [
+        "New",
+        "Contacted",
+        "Qualified",
+        "Proposal Sent",
+        "Lost",
+        "Converted",
+      ];
       if (valid.includes(statusFilter)) query.status = statusFilter;
     }
     if (assignedToFilter && (role === "admin" || role === "manager")) {

@@ -21,7 +21,7 @@ exports.createProperty = async (req, res) => {
     if (!req.user)
       return res.status(401).json({ message: "Not authenticated" });
 
-    // ✅ START CHANGE: Logic to determine assignee
+    //  START CHANGE: Logic to determine assignee
     let assignee = req.user._id || req.user.userId;
 
     // If User is Admin or Manager AND they selected someone in the dropdown, use that ID
@@ -33,7 +33,7 @@ exports.createProperty = async (req, res) => {
     }
 
     req.body.assignedTo = assignee;
-    // ✅ END CHANGE
+    //  END CHANGE
 
     if (!req.body.owner || req.body.owner === "" || req.body.owner === "null") {
       delete req.body.owner;
@@ -66,7 +66,10 @@ exports.getAllProperties = async (req, res) => {
     }
 
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 10));
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(req.query.limit, 10) || 10),
+    );
     const search = (req.query.search || "").trim();
     const statusFilter = req.query.status;
     const assignedToFilter = req.query.assignedTo;
@@ -77,7 +80,11 @@ exports.getAllProperties = async (req, res) => {
         { city: { $regex: search, $options: "i" } },
       ];
     }
-    if (statusFilter && statusFilter !== "All" && ["Available", "Sold", "Rented"].includes(statusFilter)) {
+    if (
+      statusFilter &&
+      statusFilter !== "All" &&
+      ["Available", "Sold", "Rented"].includes(statusFilter)
+    ) {
       query.status = statusFilter;
     }
     if (assignedToFilter && (role === "admin" || role === "manager")) {
@@ -184,7 +191,9 @@ exports.deleteProperty = async (req, res) => {
 exports.deleteAllProperties = async (req, res) => {
   try {
     const userId = req.user._id || req.user.userId;
-    const toDelete = await Property.find({ assignedTo: userId }).select("brochureUrl").lean();
+    const toDelete = await Property.find({ assignedTo: userId })
+      .select("brochureUrl")
+      .lean();
     toDelete.forEach((p) => deleteBrochureFileIfExists(p.brochureUrl));
     await Property.deleteMany({ assignedTo: userId });
     res.status(200).json({ message: "All properties deleted successfully" });

@@ -72,11 +72,22 @@ const AddLead = () => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
+
     if (type === "number" && value < 0) {
       toast.error("Budget cannot be negative!");
       setFormData((prev) => ({ ...prev, [name]: 0 }));
       return;
     }
+
+    // ✅ 15 WORDS LIMIT LOGIC
+    if (name === "notes") {
+      const words = value.trim().split(/\s+/).filter(Boolean);
+      if (words.length > 15) {
+        // Prevent typing more than 15 words
+        return;
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -99,11 +110,11 @@ const AddLead = () => {
     try {
       await API.post("/leads", payload);
 
-      let successMsg = "New Lead Added Successfully! 🎉";
+      let successMsg = "New Lead Added Successfully!";
       if (finalAssignee !== userId) {
         const assigneeName =
           assignableUsers.find((u) => u._id === finalAssignee)?.name || "Agent";
-        successMsg = `Lead assigned to ${assigneeName}! 🚀`;
+        successMsg = `Lead assigned to ${assigneeName}!`;
       }
 
       toast.success(successMsg);
@@ -114,6 +125,12 @@ const AddLead = () => {
       setLoading(false);
     }
   };
+
+  // ✅ Calculate current words for the UI
+  const currentWordCount = formData.notes
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
 
   return (
     <div className={styles.container}>
@@ -171,7 +188,6 @@ const AddLead = () => {
                   ))}
                 </select>
               </div>
-              {/* Visual Feedback */}
               {viewTargetId && formData.assignedTo === viewTargetId && (
                 <p
                   style={{
@@ -306,16 +322,35 @@ const AddLead = () => {
               />
             </div>
           </div>
+
           <div className={styles.formGroup} style={{ gridColumn: "1 / -1" }}>
-            <label>Notes</label>
-            <div
-              className={styles.inputWrapper}
-              style={{ alignItems: "flex-start" }}
+            {/* ✅ WORD LIMIT LABEL */}
+            <label
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
             >
+              <span>Notes</span>
+              <span
+                style={{
+                  fontSize: "12px",
+                  color: currentWordCount >= 15 ? "#ef4444" : "#64748b",
+                  textTransform: "none",
+                  letterSpacing: "normal",
+                }}
+              >
+                {currentWordCount}/15 words
+              </span>
+            </label>
+
+            {/* ✅ ADDED textareaWrapper CLASS HERE */}
+            <div className={`${styles.inputWrapper} ${styles.textareaWrapper}`}>
               <FileText
                 size={16}
                 className={styles.icon}
-                style={{ marginTop: "12px" }}
+                style={{ marginTop: "14px" }}
               />
               <textarea
                 name="notes"

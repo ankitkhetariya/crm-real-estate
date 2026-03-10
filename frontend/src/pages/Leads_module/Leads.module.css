@@ -1,7 +1,7 @@
 /* Container */
 .container,
 .container * {
-    box-sizing: border-box; /* 🛑 MASTER LOCK: Stop all overflows */
+    box-sizing: border-box; /* MASTER LOCK: Stop all overflows */
 }
 
 .container {
@@ -46,12 +46,12 @@
 }
 
 .addBtn {
-    background-color: #2563eb;
+    background-color: var(--link-color, #2563eb);
     color: white;
 }
 
 .addBtn:hover {
-    background-color: #1d4ed8;
+    opacity: 0.9;
 }
 
 .deleteAllBtn {
@@ -76,15 +76,16 @@
     max-width: 100% !important;
     min-width: 0 !important;
     width: auto !important;
-    background: white !important; /* Overrides any gradient */
-    border: 1px solid #e2e8f0 !important;
+    background: var(--card-bg) !important; /* ✅ Dark Mode Fix */
+    border: 1px solid var(--card-border) !important; /* ✅ Dark Mode Fix */
     border-radius: 12px !important;
     padding: 8px 16px !important;
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-    overflow: hidden !important; /* Prevents text overflow */
+    box-shadow: var(--shadow-sm) !important;
+    overflow: hidden !important;
+    color: var(--text-primary) !important;
 }
 
 /* Filter Bar */
@@ -105,10 +106,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #f8fafc;
+    background: var(--input-bg); /* ✅ Dark Mode Fix */
     padding: 10px 16px;
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--input-border); /* ✅ Dark Mode Fix */
 }
 
 .searchInput {
@@ -117,6 +118,7 @@
     width: 100%;
     outline: none;
     font-size: 14px;
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
 }
 
 .filterWrapper {
@@ -124,9 +126,9 @@
     align-items: center;
     gap: 10px;
     padding: 10px 16px;
-    background: #f8fafc;
+    background: var(--input-bg); /* ✅ Dark Mode Fix */
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--input-border); /* ✅ Dark Mode Fix */
 }
 
 .filterWrapper select {
@@ -134,17 +136,17 @@
     background: transparent;
     outline: none;
     font-size: 14px;
-    color: #475569;
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
     cursor: pointer;
 }
 
 /* Table Container */
 .tableCardContainer {
-    background: white;
+    background: var(--card-bg); /* ✅ Dark Mode Fix */
     border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--card-border); /* ✅ Dark Mode Fix */
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
 }
 
 .table {
@@ -154,19 +156,19 @@
 }
 
 .table th {
-    background-color: #f8fafc;
+    background-color: var(--input-bg); /* ✅ Dark Mode Fix */
     padding: 16px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-muted); /* ✅ Dark Mode Fix */
     font-size: 12px;
     text-transform: uppercase;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--card-border); /* ✅ Dark Mode Fix */
 }
 
 .table td {
     padding: 16px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #334155;
+    border-bottom: 1px solid var(--card-border); /* ✅ Dark Mode Fix */
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
     font-size: 14px;
     vertical-align: middle;
 }
@@ -185,8 +187,8 @@
 .avatar {
     width: 36px;
     height: 36px;
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--input-bg); /* ✅ Dark Mode Fix */
+    color: var(--link-color, #2563eb);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -194,17 +196,18 @@
     font-weight: 700;
     font-size: 14px;
     flex-shrink: 0;
+    border: 1px solid var(--input-border);
 }
 
 .leadName {
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
     font-size: 14px;
 }
 
 .companyName {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-muted); /* ✅ Dark Mode Fix */
     display: flex;
     align-items: center;
     gap: 4px;
@@ -223,18 +226,18 @@
     align-items: center;
     gap: 6px;
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-secondary); /* ✅ Dark Mode Fix */
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .contactLink:hover {
-    color: #2563eb;
+    color: var(--link-color, #2563eb);
     text-decoration: underline;
 }
 
 .phoneLink {
-    color: #0f766e;
+    color: var(--link-color, #0f766e); /* Made adaptive */
     font-weight: 500;
 }
 
@@ -244,10 +247,10 @@
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
-    border: 1px solid transparent;
+    border: 1px solid var(--input-border); /* ✅ Added border for contrast */
     outline: none;
     cursor: pointer;
-    background-color: #f1f5f9;
+    background-color: var(--input-bg);
     max-width: 100%;
 }
 
@@ -281,12 +284,12 @@
 }
 
 .noteIcon {
-    color: #94a3b8;
+    color: var(--text-muted); /* ✅ Dark Mode Fix */
     flex-shrink: 0;
 }
 
 .noteText {
-    color: #475569;
+    color: var(--text-secondary); /* ✅ Dark Mode Fix */
     font-size: 13px;
     white-space: nowrap;
     overflow: hidden;
@@ -298,20 +301,21 @@
 /* Budget & Source */
 .budgetCell {
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
     font-size: 13px;
 }
 
 .sourceLabel {
     font-size: 10px;
-    background: #f1f5f9;
+    background: var(--input-bg); /* ✅ Dark Mode Fix */
     padding: 2px 6px;
     border-radius: 4px;
     display: inline-block;
     margin-top: 4px;
-    color: #64748b;
+    color: var(--text-muted); /* ✅ Dark Mode Fix */
     text-transform: uppercase;
     font-weight: 700;
+    border: 1px solid var(--input-border);
 }
 
 /* Actions */
@@ -334,33 +338,33 @@
 
 .editBtn {
     color: #3b82f6;
-    background: #eff6ff;
+    background: rgba(59, 130, 246, 0.1); /* ✅ Adaptive background */
 }
 .editBtn:hover {
-    background: #dbeafe;
+    background: rgba(59, 130, 246, 0.2);
 }
 
 .deleteBtn {
     color: #ef4444;
-    background: #fee2e2;
+    background: rgba(239, 68, 68, 0.1); /* ✅ Adaptive background */
 }
 .deleteBtn:hover {
-    background: #fecaca;
+    background: rgba(239, 68, 68, 0.2);
 }
 
 .viewBtn {
-    background: #f0fdf4;
     color: #16a34a;
+    background: rgba(22, 163, 74, 0.1); /* ✅ Adaptive background */
 }
 .viewBtn:hover {
-    background: #dcfce7;
+    background: rgba(22, 163, 74, 0.2);
 }
 
 /* Modal Styles */
 .modalOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6); /* Slightly darker for better focus */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -369,12 +373,13 @@
 }
 
 .modalContent {
-    background: white;
+    background: var(--card-bg); /* ✅ Dark Mode Fix */
     width: 100%;
     max-width: 550px;
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--card-border);
     max-height: 90vh;
     overflow-y: auto;
 }
@@ -389,12 +394,13 @@
 .modalHeader h3 {
     margin: 0;
     font-size: 18px;
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
 }
 .closeBtn {
     background: none;
     border: none;
     cursor: pointer;
-    color: #64748b;
+    color: var(--text-muted); /* ✅ Dark Mode Fix */
 }
 
 .formGrid {
@@ -410,13 +416,15 @@
 .formGroup label {
     font-size: 13px;
     font-weight: 600;
-    color: #475569;
+    color: var(--text-secondary); /* ✅ Dark Mode Fix */
 }
 
 .formGroup input,
 .formGroup select {
     padding: 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--input-border); /* ✅ Dark Mode Fix */
+    background: var(--input-bg); /* ✅ Dark Mode Fix */
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
     border-radius: 6px;
     outline: none;
     font-size: 14px;
@@ -426,7 +434,9 @@
 
 .formGroup textarea {
     padding: 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--input-border); /* ✅ Dark Mode Fix */
+    background: var(--input-bg); /* ✅ Dark Mode Fix */
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
     border-radius: 6px;
     outline: none;
     font-size: 14px;
@@ -458,15 +468,16 @@
 }
 
 .saveBtn {
-    background: #2563eb;
+    background: var(--link-color, #2563eb);
     color: white;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 .cancelBtn {
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--input-bg); /* ✅ Dark Mode Fix */
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
+    border: 1px solid var(--input-border);
 }
 
 /* =========================================
@@ -507,6 +518,8 @@
     .adminFilterWrapperOuter select {
         width: 100% !important; /* Dropdown fills mobile width */
         margin-top: 5px !important;
+        background: var(--input-bg);
+        color: var(--text-primary);
     }
 
     .filterBar {
@@ -527,11 +540,11 @@
 
     .table tbody tr {
         display: block;
-        background: white;
+        background: var(--card-bg); /* ✅ Dark Mode Fix */
         margin-bottom: 16px;
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--card-border); /* ✅ Dark Mode Fix */
         padding: 16px;
     }
 
@@ -540,7 +553,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 8px 0;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--card-border); /* ✅ Dark Mode Fix */
         text-align: right;
     }
 
@@ -554,7 +567,7 @@
         content: attr(data-label);
         font-weight: 600;
         font-size: 11px;
-        color: #94a3b8;
+        color: var(--text-muted); /* ✅ Dark Mode Fix */
         text-transform: uppercase;
         text-align: left;
         margin-right: 12px;
@@ -592,9 +605,9 @@
     gap: 6px;
     padding: 10px 18px;
     border-radius: 10px;
-    border: 1px solid var(--input-border);
-    background: var(--card-bg);
-    color: var(--text-primary);
+    border: 1px solid var(--input-border); /* ✅ Dark Mode Fix */
+    background: var(--card-bg); /* ✅ Dark Mode Fix */
+    color: var(--text-primary); /* ✅ Dark Mode Fix */
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
@@ -610,6 +623,6 @@
 }
 .paginationInfo {
     font-size: 0.95rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary); /* ✅ Dark Mode Fix */
     font-weight: 500;
 }

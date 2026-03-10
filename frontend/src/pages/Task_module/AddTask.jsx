@@ -11,7 +11,7 @@ import {
   User,
   FileText,
 } from "lucide-react";
-import styles from "./AddTask.module.css"; // ✅ CSS Module Import
+import styles from "./AddTask.module.css";
 
 const AddTask = () => {
   const navigate = useNavigate();
@@ -31,7 +31,11 @@ const AddTask = () => {
     const fetchLeads = async () => {
       try {
         const res = await API.get("/leads");
-        setLeads(res.data);
+        //  FIX: Extract the actual array from res.data.data
+        const leadsArray = Array.isArray(res.data.data)
+          ? res.data.data
+          : res.data;
+        setLeads(leadsArray || []);
       } catch (err) {
         console.error(err);
       }
@@ -52,7 +56,7 @@ const AddTask = () => {
     }
     try {
       await API.post("/tasks", formData);
-      toast.success("Task Added Successfully! 📅");
+      toast.success("Task Added Successfully!"); // Emoji removed
       navigate("/tasks");
     } catch (err) {
       toast.error("Failed to add task.");
@@ -121,7 +125,7 @@ const AddTask = () => {
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
-                <option value="high">High 🔥</option>
+                <option value="high">High</option> {/* Emoji removed */}
               </select>
             </div>
           </div>

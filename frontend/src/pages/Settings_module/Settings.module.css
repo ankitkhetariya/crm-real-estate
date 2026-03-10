@@ -49,12 +49,12 @@
 }
 
 .dangerText {
-    color: #ef4444; /* Red color for Security Title */
+    color: var(--danger-text, #ef4444); /* ✅ Dark mode adaptive red */
 }
 
 .infoText {
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--text-muted); /* ✅ Removed hardcoded #94a3b8 */
     margin-bottom: 20px;
     margin-top: -15px;
 }
@@ -80,7 +80,7 @@
 .inputGroup label {
     font-size: 13px;
     font-weight: 600;
-    color: #475569;
+    color: var(--text-secondary); /* ✅ Removed hardcoded #475569 */
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -89,20 +89,20 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--input-bg); /* ✅ Removed hardcoded #f8fafc */
+    border: 1px solid var(--input-border); /* ✅ Removed hardcoded #e2e8f0 */
     border-radius: 10px;
     padding: 0 14px;
     height: 50px;
     transition: all 0.2s ease;
-    color: #64748b;
+    color: var(--text-muted); /* ✅ Removed hardcoded #64748b */
 }
 
 .inputWrapper:focus-within {
-    border-color: #2563eb;
-    background: white;
+    border-color: var(--link-color, #2563eb);
+    background: var(--card-bg); /* ✅ Removed hardcoded white */
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    color: #2563eb;
+    color: var(--link-color, #2563eb);
 }
 
 .inputWrapper input {
@@ -111,12 +111,12 @@
     background: transparent;
     outline: none;
     font-size: 15px;
-    color: #1e293b;
+    color: var(--text-primary); /* ✅ Removed hardcoded #1e293b */
     height: 100%;
 }
 
 .warningText {
-    color: #f59e0b;
+    color: var(--warning-text, #f59e0b); /* ✅ Dark mode adaptive orange */
     font-size: 12px;
     font-weight: 500;
     margin-top: 4px;
@@ -125,22 +125,22 @@
 /* Divider */
 .divider {
     height: 1px;
-    background: #f1f5f9;
+    background: var(--card-border); /* ✅ Removed hardcoded #f1f5f9 */
     width: 100%;
 }
 
 /* Footer Button */
 .formFooter {
-    background: #f8fafc;
+    background: var(--card-bg); /* ✅ Matches card bottom */
     padding: 20px 30px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--card-border); /* ✅ Removed hardcoded border */
     display: flex;
     justify-content: flex-end;
 }
 
 .saveBtn {
-    background: #2563eb;
-    color: white;
+    background: var(--link-color, #2563eb);
+    color: white; /* Text inside primary btn usually stays white */
     padding: 12px 24px;
     border-radius: 8px;
     font-size: 15px;
@@ -149,16 +149,17 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .saveBtn:hover {
-    background: #1d4ed8;
+    opacity: 0.9; /* ✅ Replaced hardcoded hover color for dynamic adaptability */
 }
 
 .saveBtn:disabled {
-    background: #94a3b8;
+    background: var(--text-muted); /* ✅ Removed hardcoded #94a3b8 */
     cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* --- OTP Modal --- */
@@ -174,13 +175,14 @@
 }
 
 .modalContent {
-    background: white;
+    background: var(--card-bg); /* ✅ Removed hardcoded white */
     padding: 30px;
     border-radius: 16px;
     width: 90%;
     max-width: 400px;
     text-align: center;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--card-border); /* ✅ Added border for dark mode clarity */
 }
 
 .modalHeader {
@@ -193,13 +195,14 @@
 .modalHeader h3 {
     margin: 0;
     font-size: 20px;
+    color: var(--text-primary); /* ✅ Ensure title is visible */
 }
 
 .closeBtn {
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #94a3b8;
+    color: var(--text-muted); /* ✅ Removed hardcoded #94a3b8 */
 }
 
 .otpInput {
@@ -208,7 +211,9 @@
     font-size: 24px;
     text-align: center;
     letter-spacing: 5px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--input-border); /* ✅ Removed hardcoded border */
+    background: var(--input-bg); /* ✅ Explicitly setting background */
+    color: var(--text-primary); /* ✅ Explicitly setting text color */
     border-radius: 10px;
     margin: 20px 0;
     outline: none;
@@ -216,18 +221,23 @@
 }
 
 .otpInput:focus {
-    border-color: #2563eb;
+    border-color: var(--link-color, #2563eb);
 }
 
 .verifyBtn {
     width: 100%;
     padding: 14px;
-    background: #2563eb;
+    background: var(--link-color, #2563eb);
     color: white;
     font-weight: bold;
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.verifyBtn:hover {
+    opacity: 0.9;
 }
 
 /* Mobile Responsive */

@@ -180,12 +180,16 @@ const Layout = ({ children }) => {
             type="button"
             onClick={toggleTheme}
             className={styles.themeToggle}
-            title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+            title={
+              theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+            }
           >
             <div className={styles.iconWrapper}>
               {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
             </div>
-            <span className={`${styles.linkLabel} ${isCollapsed ? styles.hideLabel : ""}`}>
+            <span
+              className={`${styles.linkLabel} ${isCollapsed ? styles.hideLabel : ""}`}
+            >
               {theme === "light" ? "Dark mode" : "Light mode"}
             </span>
           </button>
