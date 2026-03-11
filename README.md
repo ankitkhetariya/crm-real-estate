@@ -1,44 +1,70 @@
-🏡 Real Estate CRM Pro
-This is a modern CRM (Customer Relationship Management) tool designed for real estate agents to manage their leads, properties, and daily tasks in one organized place. We built this as our semester project to solve real-world property management challenges.
+# 🏢 Mohit Real Estate CRM
 
-🚀 Key Features
-Lead Management: Easily add and track potential clients.
+A full-stack, comprehensive Customer Relationship Management (CRM) system explicitly designed for real estate businesses. This application streamlines lead management, property listings, task tracking, and team hierarchy, ensuring smooth operations from initial contact to final conversion.
 
-Property Listings: Keep a digital record of all available properties.
+🟢 **Live Demo:** [Mohit Real Estate CRM](https://crm-mohitrealestate.netlify.app)
 
-Dynamic Dashboard: Get a quick overview of your total business at a glance.
+---
 
-Secure Authentication: Private login and signup for data protection.
+## 🌟 Key Features
 
-Developer Support: Built-in support page for direct contact.
+* **Role-Based Access Control (RBAC):** Distinct dashboards and permissions for Admins, Managers, and Agents.
+* **Lead Management:** Track potential buyers/tenants. Includes strict Indian 10-digit mobile number validation and word-limited note-taking.
+* **Property Portfolio:** Manage property listings (Apartments, Houses, Commercial, Land) with Base64 image uploads and secure PDF Brochure uploads (up to 10MB).
+* **Task & Follow-up Tracking:** Assign tasks to specific leads, track due dates, and manage daily workflows.
+* **Advanced Analytics Dashboard:** Real-time statistics on total leads, pipeline revenue, and conversion rates, dynamically filtered by user hierarchy.
+* **Secure Authentication:** JWT-based login with SendGrid OTP verification integration.
+* **Optimized UI/UX:** Fully responsive, mobile-first design using CSS Modules, featuring SweetAlert2 popups and Toast notifications.
 
-🛠️ Technology Stack
-We used the MERN Stack to build this application:
+---
 
-Frontend: React.js (Vite) with CSS Modules for clean styling.
+## 🔐 Role-Based Architecture (Hierarchy)
 
-Backend: Node.js & Express.js for the API.
+The CRM enforces a strict structural hierarchy to ensure data privacy and operational efficiency:
 
-Database: MongoDB Atlas (Cloud) for secure data storage.
+1.  **👑 Admin:** * Has absolute control over the system.
+    * Can view, edit, and delete ALL leads, properties, and tasks.
+    * Can manage the entire team (create/remove Managers and Agents).
+    * Can view global dashboard statistics.
+2.  **👔 Manager:** * Manages a specific team of Agents.
+    * Can view and assign leads/properties to themselves or their assigned Agents.
+    * Dashboard reflects statistics for their entire team's pipeline.
+3.  **🧑‍💼 Agent:** * The ground-level operator.
+    * Can only view, edit, and manage leads, properties, and tasks specifically assigned to them.
+    * Cannot see data belonging to other agents or managers.
 
-⚙️ How to Run Locally
-Clone the project: git clone https://github.com/ankitkhetariya/crm-real-estate.git
+---
 
-Backend Setup: - Go to the backend folder.
+## 🛠️ Tech Stack
 
-Run npm install.
+**Frontend:**
+* **Framework:** React.js (Vite)
+* **Routing:** React Router DOM
+* **Icons:** Lucide React
+* **Styling:** Custom CSS Modules (Mobile-First, Dark Mode Ready)
+* **Alerts/Notifications:** SweetAlert2, React Hot Toast
+* **Deployment:** Netlify
 
-Create a .env file and add your MONGO_URI and JWT_SECRET.
+**Backend:**
+* **Runtime:** Node.js
+* **Framework:** Express.js
+* **Database:** MongoDB & Mongoose
+* **File Handling:** Multer (For PDF Brochures)
+* **Authentication:** JSON Web Tokens (JWT), Bcrypt.js
+* **Email Services:** SendGrid
+* **Deployment:** Render
 
-Frontend Setup: - Go to the frontend/crm-frontend folder.
+---
 
-Run npm install.
+## 🚀 Local Setup & Installation
 
-Run: Start both servers using npm start or npm run dev.
+To run this project locally on your machine, follow these steps:
 
-🤝 Team Members
-Mohit Khetariya
+### Prerequisites
+* Node.js (v16+)
+* MongoDB (Local or Atlas)
+* SendGrid API Key (for email services)
 
-Harsh Rakholiya
-
-Bhautik Rafaliya
+### 1. Clone the repository
+```bash
+git clone [https://github.com/yourusername/crm-real-estate.git](https://github.com/yourusername/crm-real-estate.git)
