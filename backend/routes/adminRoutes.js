@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 
-// ✅ Import the new functions from adminController
+// Import the new functions from adminController
 const {
   getAdminMasterStats,
   assignTeam,

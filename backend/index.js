@@ -20,11 +20,11 @@ const app = express();
 // Configure CORS for local development and production environments
 app.use(cors({
     origin: [
-        "http://localhost:5173", 
+        "http://localhost:5173",
         "https://crm-mohitrealestate.netlify.app"
     ],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"] 
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 // Body parser middleware with increased limit to prevent 413 Payload Too Large errors

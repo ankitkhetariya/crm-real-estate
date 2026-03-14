@@ -8,7 +8,6 @@ import {
   Edit,
   MapPin,
   X,
-  Save,
   UploadCloud,
   Bed,
   Bath,
@@ -18,20 +17,18 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
+  IndianRupee,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import styles from "./Properties.module.css";
 
-// ✅ 1. Import Global Tools
 import { useAdminView } from "../../hooks/useAdminView";
 import AdminViewFilter from "../../components/AdminViewFilter";
 
 const Properties = () => {
   const navigate = useNavigate();
-
-  // ✅ 2. Use Global Hook
   const { viewTargetId, setTarget } = useAdminView();
 
   const [properties, setProperties] = useState([]);
@@ -39,10 +36,22 @@ const Properties = () => {
   const [loading, setLoading] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
   const [brochureUploading, setBrochureUploading] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+
+  const [searchInput, setSearchInput] = useState("");
+  const [minPriceInput, setMinPriceInput] = useState("");
+  const [maxPriceInput, setMaxPriceInput] = useState("");
+  const [statusInput, setStatusInput] = useState("All");
+
+  const [activeFilters, setActiveFilters] = useState({
+    search: "",
+    minPrice: "",
+    maxPrice: "",
+    status: "All",
+  });
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentProp, setCurrentProp] = useState(null);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -60,26 +69,33 @@ const Properties = () => {
       const params = {
         page,
         limit,
-        search: searchText || undefined,
-        status: statusFilter !== "All" ? statusFilter : undefined,
+        search: activeFilters.search || undefined,
+        status:
+          activeFilters.status !== "All" ? activeFilters.status : undefined,
         assignedTo: viewTargetId || undefined,
+        minPrice: activeFilters.minPrice || undefined,
+        maxPrice: activeFilters.maxPrice || undefined,
       };
+
       const [propRes, leadRes] = await Promise.all([
         API.get("/properties", { params }),
         API.get("/leads"),
       ]);
+
       const paginated = propRes.data;
       setProperties(Array.isArray(paginated.data) ? paginated.data : []);
       setTotal(paginated.total ?? 0);
       setTotalPages(paginated.totalPages ?? 1);
       setPage(paginated.page ?? 1);
-      setLeads(Array.isArray(leadRes.data) ? leadRes.data : leadRes.data?.data ?? []);
+      setLeads(
+        Array.isArray(leadRes.data) ? leadRes.data : (leadRes.data?.data ?? []),
+      );
     } catch (err) {
       toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
-  }, [page, searchText, statusFilter, viewTargetId]);
+  }, [page, activeFilters, viewTargetId]);
 
   useEffect(() => {
     fetchData();
@@ -87,9 +103,44 @@ const Properties = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [searchText, statusFilter, viewTargetId]);
+  }, [viewTargetId]);
 
-  // --- CRUD Functions (UNCHANGED) ---
+  const handleApplyFilters = () => {
+    if (Number(minPriceInput) < 0 || Number(maxPriceInput) < 0) {
+      toast.error("Budget cannot be negative!");
+      return;
+    }
+    if (
+      minPriceInput &&
+      maxPriceInput &&
+      Number(minPriceInput) > Number(maxPriceInput)
+    ) {
+      toast.error("Min budget cannot be greater than Max budget!");
+      return;
+    }
+    setActiveFilters({
+      search: searchInput.trim(),
+      minPrice: minPriceInput,
+      maxPrice: maxPriceInput,
+      status: statusInput,
+    });
+    setPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSearchInput("");
+    setMinPriceInput("");
+    setMaxPriceInput("");
+    setStatusInput("All");
+    setActiveFilters({ search: "", minPrice: "", maxPrice: "", status: "All" });
+    setPage(1);
+  };
+
+  const handleBudgetInput = (e, setter) => {
+    const val = e.target.value;
+    if (val === "" || Number(val) >= 0) setter(val);
+  };
+
   const handleDeleteAll = async () => {
     if (properties.length === 0) return;
     const result = await Swal.fire({
@@ -141,11 +192,11 @@ const Properties = () => {
           <div style="border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px;">
             <h2 style="margin: 0; font-size: 1.5rem; color: #0f172a; font-weight: 800;">${prop.title}</h2>
             <div style="margin-top: 5px; color: #2563eb; font-weight: 700; font-size: 1.2rem;">₹${Number(prop.price).toLocaleString("en-IN")}</div>
-            <div style="font-size: 0.9rem; color: #64748b; margin-top: 4px; display:flex; align-items:center; gap:4px;">📍 ${prop.address}, ${prop.city}</div>
+            <div style="font-size: 0.9rem; color: #64748b; margin-top: 4px; display:flex; align-items:center; gap:4px;">📍 ${prop.address ? prop.address + ", " : ""}${prop.city}</div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
             <div style="background:#f8fafc; padding:10px; border-radius:8px;"><div style="color:#64748b; text-transform:uppercase; font-size:0.7rem; font-weight:700;">Type</div><div style="font-weight:600; color:#0f172a;">${prop.type}</div></div>
-            <div style="background:#f8fafc; padding:10px; border-radius:8px;"><div style="color:#64748b; text-transform:uppercase; font-size:0.7rem; font-weight:700;">Area</div><div style="font-weight:600; color:#0f172a;">${prop.area} sqft</div></div>
+            <div style="background:#f8fafc; padding:10px; border-radius:8px;"><div style="color:#64748b; text-transform:uppercase; font-size:0.7rem; font-weight:700;">Area</div><div style="font-weight:600; color:#0f172a;">${prop.area || 0} sqft</div></div>
             <div style="background:#f8fafc; padding:10px; border-radius:8px;"><div style="color:#64748b; text-transform:uppercase; font-size:0.7rem; font-weight:700;">Status</div><div style="color:${prop.status === "Available" ? "#166534" : "#991b1b"}; font-weight:600;">${prop.status}</div></div>
             <div style="background:#f8fafc; padding:10px; border-radius:8px;"><div style="color:#64748b; text-transform:uppercase; font-size:0.7rem; font-weight:700;">Owner</div><div style="font-weight:600; color:#0f172a;">${ownerName}</div></div>
           </div>
@@ -155,7 +206,7 @@ const Properties = () => {
               <div><strong style="color: #0f172a; display: block; margin-bottom: 10px; font-size: 0.95rem; border-bottom:2px solid #e2e8f0; padding-bottom:4px;">Bathrooms</strong>${bathroomsList}</div>
             </div>
           </div>
-          ${prop.description ? `<div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#64748b; text-transform:uppercase; font-size:0.7rem; font-weight:700; margin-bottom:4px;">Description</div><p style="margin: 0; font-size: 0.9rem; line-height: 1.5; color: #475569;">${prop.description}</p></div>` : ""}
+          ${prop.description ? `<div style="background:#f1f5f9; padding:12px; border-radius:8px;"><div style="color:#64748b; text-transform:uppercase; font-size:0.7rem; font-weight:700; margin-bottom:4px;">Description</div><p style="margin: 0; font-size: 0.9rem; line-height: 1.5; color: #475569; word-wrap: break-word;">${prop.description}</p></div>` : ""}
           ${prop.brochureUrl ? `<p style="margin-top:16px;"><a href="${getBrochureUrl(prop.brochureUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#2563eb;color:white;border-radius:8px;text-decoration:none;font-weight:600;">View Brochure</a></p>` : ""}
         </div>
       `,
@@ -171,12 +222,13 @@ const Properties = () => {
     setCurrentProp({
       ...prop,
       owner: prop.owner?._id || prop.owner || "",
-      bedrooms: prop.bedrooms || [],
-      bathrooms: prop.bathrooms || [],
+      bedrooms: Array.isArray(prop.bedrooms) ? prop.bedrooms : [],
+      bathrooms: Array.isArray(prop.bathrooms) ? prop.bathrooms : [],
       brochureUrl: prop.brochureUrl || "",
     });
     setIsEditModalOpen(true);
   };
+
   const handleEditChange = (e) => {
     const { name, value, type } = e.target;
     if (type === "number" && value < 0) {
@@ -188,23 +240,27 @@ const Properties = () => {
     }
     setCurrentProp({ ...currentProp, [name]: value });
   };
+
   const handleRoomChange = (field, index, value) => {
     const updatedList = [...currentProp[field]];
     updatedList[index].size = value;
     setCurrentProp({ ...currentProp, [field]: updatedList });
   };
+
   const handleAddRoom = (field) => {
     setCurrentProp((prev) => ({
       ...prev,
       [field]: [...prev[field], { size: "" }],
     }));
   };
+
   const handleRemoveRoom = (field, index) => {
     setCurrentProp((prev) => ({
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index),
     }));
   };
+
   const handleEditImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -219,6 +275,7 @@ const Properties = () => {
       reader.readAsDataURL(file);
     }
   };
+
   const handleSaveChanges = async (e) => {
     e.preventDefault();
     setSaveLoading(true);
@@ -237,6 +294,7 @@ const Properties = () => {
       setSaveLoading(false);
     }
   };
+
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -255,6 +313,7 @@ const Properties = () => {
       }
     }
   };
+
   const handleStatusChange = async (id, newStatus) => {
     try {
       await API.put(`/properties/${id}`, { status: newStatus });
@@ -278,13 +337,21 @@ const Properties = () => {
     try {
       const formData = new FormData();
       formData.append("brochure", file);
-      const res = await API.post(`/properties/${currentProp._id}/brochure`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setCurrentProp((prev) => (prev ? { ...prev, brochureUrl: res.data.brochureUrl } : null));
+      const res = await API.post(
+        `/properties/${currentProp._id}/brochure`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
+      setCurrentProp((prev) =>
+        prev ? { ...prev, brochureUrl: res.data.brochureUrl } : null,
+      );
       setProperties(
         properties.map((p) =>
-          p._id === currentProp._id ? { ...p, brochureUrl: res.data.brochureUrl } : p,
+          p._id === currentProp._id
+            ? { ...p, brochureUrl: res.data.brochureUrl }
+            : p,
         ),
       );
       toast.success("Brochure uploaded");
@@ -338,7 +405,6 @@ const Properties = () => {
         </div>
       </div>
 
-      {/* ✅ 4. GLOBAL FILTER (Fixed Outer Wrapper to prevent bleed) */}
       {["admin", "manager"].includes(
         JSON.parse(localStorage.getItem("user") || "{}").role?.toLowerCase(),
       ) && (
@@ -350,28 +416,58 @@ const Properties = () => {
         </div>
       )}
 
-      <div className={styles.filterBar}>
-        <div className={styles.searchWrapper}>
-          <Search size={20} className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search title or city..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className={styles.searchInput}
-          />
+      {/* ADVANCED FILTER BAR */}
+      <div className={styles.filterCard}>
+        <div className={styles.filterGrid}>
+          <div className={styles.inputWrapper}>
+            <Search size={16} className={styles.inputIcon} />
+            <input
+              type="text"
+              placeholder="Search title, city..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </div>
+          <div className={styles.inputWrapper}>
+            <IndianRupee size={16} className={styles.inputIcon} />
+            <input
+              type="number"
+              min="0"
+              placeholder="Min Budget"
+              value={minPriceInput}
+              onChange={(e) => handleBudgetInput(e, setMinPriceInput)}
+            />
+          </div>
+          <div className={styles.inputWrapper}>
+            <IndianRupee size={16} className={styles.inputIcon} />
+            <input
+              type="number"
+              min="0"
+              placeholder="Max Budget"
+              value={maxPriceInput}
+              onChange={(e) => handleBudgetInput(e, setMaxPriceInput)}
+            />
+          </div>
+          <div className={styles.inputWrapper}>
+            <Filter size={16} className={styles.inputIcon} />
+            <select
+              value={statusInput}
+              onChange={(e) => setStatusInput(e.target.value)}
+            >
+              <option value="All">All Status</option>
+              <option value="Available">Available</option>
+              <option value="Sold">Sold</option>
+              <option value="Rented">Rented</option>
+            </select>
+          </div>
         </div>
-        <div className={styles.filterWrapper}>
-          <Filter size={18} />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="All">All Status</option>
-            <option value="Available">Available</option>
-            <option value="Sold">Sold</option>
-            <option value="Rented">Rented</option>
-          </select>
+        <div className={styles.filterActions}>
+          <button className={styles.clearBtn} onClick={handleClearFilters}>
+            Clear
+          </button>
+          <button className={styles.applyBtn} onClick={handleApplyFilters}>
+            Apply Filters
+          </button>
         </div>
       </div>
 
@@ -404,12 +500,13 @@ const Properties = () => {
                 />
                 <span className={styles.typeBadge}>{prop.type}</span>
                 {prop.brochureUrl && (
-                  <span className={styles.pdfBadge} title="PDF brochure attached">
+                  <span
+                    className={styles.pdfBadge}
+                    title="PDF brochure attached"
+                  >
                     <FileText size={12} /> PDF
                   </span>
                 )}
-
-                {/* Agent Badge (Visible to Admins and Managers) */}
                 {["admin", "manager"].includes(
                   JSON.parse(
                     localStorage.getItem("user") || "{}",
@@ -540,6 +637,7 @@ const Properties = () => {
         </div>
       )}
 
+      {/* EDIT MODAL */}
       {isEditModalOpen && currentProp && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -584,7 +682,11 @@ const Properties = () => {
                 </div>
                 <div className={styles.formGroup}>
                   <label>
-                    <User size={16} /> Assign to Lead (Owner)
+                    <User
+                      size={16}
+                      style={{ marginRight: "4px", verticalAlign: "middle" }}
+                    />{" "}
+                    Assign to Lead (Owner)
                   </label>
                   <select
                     name="owner"
@@ -621,11 +723,10 @@ const Properties = () => {
                     onChange={handleEditChange}
                   />
                 </div>
-                <div className={`${styles.formGroup} ${styles.dynamicGroup}`}>
+
+                <div className={styles.formGroup}>
                   <div className={styles.dynamicLabel}>
-                    <label style={{ margin: 0 }}>
-                      Bedrooms ({currentProp.bedrooms.length})
-                    </label>
+                    <label>Bedrooms ({currentProp.bedrooms.length})</label>
                     <button
                       type="button"
                       onClick={() => handleAddRoom("bedrooms")}
@@ -639,7 +740,7 @@ const Properties = () => {
                       <div key={index} className={styles.roomRow}>
                         <input
                           type="text"
-                          placeholder={`Size`}
+                          placeholder="Size"
                           value={room.size}
                           onChange={(e) =>
                             handleRoomChange("bedrooms", index, e.target.value)
@@ -657,11 +758,10 @@ const Properties = () => {
                     ))}
                   </div>
                 </div>
-                <div className={`${styles.formGroup} ${styles.dynamicGroup}`}>
+
+                <div className={styles.formGroup}>
                   <div className={styles.dynamicLabel}>
-                    <label style={{ margin: 0 }}>
-                      Bathrooms ({currentProp.bathrooms.length})
-                    </label>
+                    <label>Bathrooms ({currentProp.bathrooms.length})</label>
                     <button
                       type="button"
                       onClick={() => handleAddRoom("bathrooms")}
@@ -675,7 +775,7 @@ const Properties = () => {
                       <div key={index} className={styles.roomRow}>
                         <input
                           type="text"
-                          placeholder={`Size`}
+                          placeholder="Size"
                           value={room.size}
                           onChange={(e) =>
                             handleRoomChange("bathrooms", index, e.target.value)
@@ -693,6 +793,7 @@ const Properties = () => {
                     ))}
                   </div>
                 </div>
+
                 <div className={styles.formGroup}>
                   <label>Status</label>
                   <select
@@ -705,6 +806,7 @@ const Properties = () => {
                     <option value="Rented">Rented</option>
                   </select>
                 </div>
+
                 <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                   <label>Update Photo</label>
                   <div className={styles.imageUpdateSection}>
@@ -721,19 +823,29 @@ const Properties = () => {
                         </button>
                       </div>
                     )}
-                    <div className={styles.uploadTrigger}>
-                      <UploadCloud size={20} />
-                      <span>Change Image</span>
+                    <label className={styles.imageActionBtn}>
+                      <UploadCloud size={16} />
+                      <span>
+                        {currentProp.image ? "Change Image" : "Upload Image"}
+                      </span>
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleEditImageChange}
+                        style={{ display: "none" }}
                       />
-                    </div>
+                    </label>
                   </div>
                 </div>
+
                 <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                  <label><FileText size={16} /> PDF Brochure</label>
+                  <label>
+                    <FileText
+                      size={16}
+                      style={{ marginRight: "4px", verticalAlign: "middle" }}
+                    />{" "}
+                    PDF Brochure
+                  </label>
                   <div className={styles.brochureSection}>
                     {currentProp.brochureUrl ? (
                       <>
@@ -752,15 +864,21 @@ const Properties = () => {
                           className={styles.removeBrochureBtn}
                           title="Remove brochure"
                         >
-                          <Trash2 size={16} /> Remove
+                          <Trash2 size={14} /> Remove
                         </button>
                       </>
                     ) : (
-                      <span className={styles.brochureNone}>No brochure uploaded</span>
+                      <span className={styles.brochureNone}>
+                        No brochure uploaded
+                      </span>
                     )}
-                    <label className={styles.brochureUploadLabel}>
-                      <UploadCloud size={18} />
-                      {brochureUploading ? "Uploading..." : "Upload or replace PDF"}
+                    <label className={styles.brochureUploadBtn}>
+                      <UploadCloud size={16} />
+                      <span>
+                        {brochureUploading
+                          ? "Uploading..."
+                          : "Upload or replace PDF"}
+                      </span>
                       <input
                         type="file"
                         accept="application/pdf"
@@ -771,13 +889,19 @@ const Properties = () => {
                     </label>
                   </div>
                 </div>
+
                 <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                   <label>Description</label>
                   <textarea
                     name="description"
                     value={currentProp.description || ""}
                     onChange={handleEditChange}
-                    rows="3"
+                    rows="4"
+                    style={{
+                      resize: "vertical",
+                      width: "100%",
+                      boxSizing: "border-box",
+                    }}
                   />
                 </div>
               </div>

@@ -67,7 +67,7 @@
     border: 1px solid var(--input-border);
     border-radius: 8px;
     padding: 0 12px;
-    background: var(--card-bg);
+    background: var(--input-bg);
     transition: all 0.2s ease;
 }
 
@@ -76,9 +76,9 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+/* Inputs & Select */
 .inputWrapper input,
-.inputWrapper select,
-.inputWrapper textarea {
+.inputWrapper select {
     width: 100%;
     border: none;
     padding: 12px;
@@ -89,15 +89,46 @@
     color: var(--text-primary);
 }
 
+/* Fix for Dropdown colors in dark mode */
+.inputWrapper select option {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+}
+
+/* Textarea Strict Bounds */
+.inputWrapper textarea {
+    width: 100%;
+    max-width: 100%;
+    border: none;
+    padding: 12px;
+    font-size: 0.95rem;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    color: var(--text-primary);
+    resize: vertical;
+    box-sizing: border-box;
+    min-height: 80px;
+    max-height: 250px;
+}
+
+.textareaWrapper {
+    align-items: flex-start;
+}
+
+.iconTop {
+    margin-top: 14px;
+}
+
 .inputWrapper input::placeholder,
 .inputWrapper textarea::placeholder {
     color: var(--text-muted);
 }
 
-/* Row Layout for larger screens (Priority & Lead) */
+/* Row Layout for Priority & Lead */
 .row {
     display: flex;
-    flex-direction: column; /* Stack on mobile */
+    flex-direction: column;
     gap: 16px;
     margin-bottom: 16px;
 }
@@ -106,7 +137,7 @@
     flex: 1;
 }
 
-/* Description Section Styles */
+/* Description Section Header with Word Count */
 .labelRow {
     display: flex;
     justify-content: space-between;
@@ -114,54 +145,33 @@
     margin-bottom: 6px;
 }
 
-.viewBtn {
-    background: none;
-    border: none;
-    color: var(--link-color);
+.labelRow label {
+    margin-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     font-size: 0.85rem;
+}
+
+.wordCount {
+    font-size: 0.8rem;
     font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 0;
-}
-
-.viewBtn:hover {
-    text-decoration: underline;
-}
-
-.textareaVisible {
-    display: block;
-    min-height: 80px;
-}
-
-.textareaHidden {
-    /* Instead of display:none, we might just reduce height or obscure it,
-       but for a "View" toggle, fully hiding/showing works best usually.
-       However, keeping it in DOM but visually hidden or collapsed is good for layout stability if desired.
-       Here, let's keep it simple: if hidden, user can't type easily. */
-    /* If the requirement is just to see it, maybe we don't hide the input but toggle expanded mode?
-          Assuming "view" means expanding/collapsing the area. */
-    display: none;
-}
-/* When hidden, the wrapper shouldn't look empty if we want to completely hide it.
-   If we hide the textarea, let's hide the wrapper's padding too or handle via JS conditional rendering.
-   For simplicity in CSS, we'll keep the wrapper visible but maybe change style.
-*/
-
-/* Helper text for preview */
-.previewText {
-    font-size: 0.85rem;
     color: var(--text-muted);
-    margin-top: 4px;
-    font-style: italic;
+    transition: color 0.3s ease;
+}
+
+.wordCountWarning {
+    color: var(--warning-text, #f59e0b);
+}
+
+.wordCountDanger {
+    color: var(--danger-text, #ef4444);
+    font-weight: 600;
 }
 
 /* Submit Button */
 .submitBtn {
     width: 100%;
-    background-color: #2563eb;
+    background-color: var(--link-color, #2563eb);
     color: white;
     padding: 14px;
     border: none;
@@ -174,24 +184,25 @@
     justify-content: center;
     gap: 8px;
     margin-top: 20px;
-    transition: background-color 0.2s;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    transition: opacity 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .submitBtn:hover {
-    background-color: #1d4ed8;
+    opacity: 0.9;
 }
 
 .submitBtn:disabled {
     background-color: var(--text-muted);
     cursor: not-allowed;
     box-shadow: none;
+    opacity: 0.6;
 }
 
 /* Tablet & Desktop Adjustments */
 @media (min-width: 640px) {
     .container {
-        max-width: 700px; /* Restrict width on larger screens */
+        max-width: 700px;
         padding: 30px;
     }
 
@@ -200,7 +211,7 @@
     }
 
     .row {
-        flex-direction: row; /* Side-by-side on larger screens */
+        flex-direction: row;
         gap: 20px;
     }
 }

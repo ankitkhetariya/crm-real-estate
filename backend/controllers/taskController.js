@@ -18,6 +18,15 @@ exports.createTask = async (req, res) => {
       return res.status(401).json({ message: "User not authenticated" });
     }
 
+    // ✅ NEW LOGIC: Select Lead is Required
+    if (!lead) {
+      return res
+        .status(400)
+        .json({
+          message: "Please select a lead. It is required to create a task.",
+        });
+    }
+
     const task = new Task({
       title,
       description,
@@ -25,7 +34,7 @@ exports.createTask = async (req, res) => {
       priority,
       status,
       assignedTo: req.user._id || req.user.userId, // Secure: Logged in user lo
-      relatedLead: lead || null, // Fix: Frontend 'lead' ko Schema ke 'relatedLead' se joda
+      relatedLead: lead, // Fix: Ab lead required hai, toh seedha assign kar diya
       relatedProperty: relatedProperty || null,
     });
 
@@ -42,7 +51,10 @@ exports.getAllTasks = async (req, res) => {
   try {
     const userId = req.user._id || req.user.userId;
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 10));
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(req.query.limit, 10) || 10),
+    );
 
     const query = { assignedTo: userId };
     const total = await Task.countDocuments(query);
@@ -52,7 +64,7 @@ exports.getAllTasks = async (req, res) => {
     const tasks = await Task.find(query)
       .populate("relatedLead", "name email phone")
       .populate("relatedProperty", "title address")
-      .sort({ dueDate: 1 })
+      .sort({ createdAt: -1 }) // ✅ NEW LOGIC: Latest task top pe show hoga
       .skip(skip)
       .limit(limit);
 

@@ -49,22 +49,25 @@ exports.createProperty = async (req, res) => {
   }
 };
 
-// 2. Get All Properties (with pagination and optional search/status filter)
+// 2. Get All Properties (FIXED BUG: query object overwriting)
 exports.getAllProperties = async (req, res) => {
   try {
     const userId = req.user._id || req.user.userId;
     const role = req.user.role;
+
+    // START WITH EMPTY QUERY
     let query = {};
 
-    if (role === "admin") {
-      query = {};
-    } else if (role === "manager") {
+    // 1. SET ROLE-BASED ACCESS (Safely mutating query object)
+    if (role === "manager") {
       const teamAgents = await User.find({ managedBy: userId }).distinct("_id");
-      query = { assignedTo: { $in: [userId, ...teamAgents] } };
-    } else {
-      query = { assignedTo: userId };
+      query.assignedTo = { $in: [userId, ...teamAgents] };
+    } else if (role !== "admin") {
+      // If agent, only show their properties. Admin sees all (leaves query empty)
+      query.assignedTo = userId;
     }
 
+    // 2. EXTRACT FRONTEND FILTERS
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.min(
       100,
@@ -73,13 +76,25 @@ exports.getAllProperties = async (req, res) => {
     const search = (req.query.search || "").trim();
     const statusFilter = req.query.status;
     const assignedToFilter = req.query.assignedTo;
+    const minPrice = req.query.minPrice;
+    const maxPrice = req.query.maxPrice;
 
+    // 3. APPLY BUDGET FILTER SAFELY
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // 4. APPLY SEARCH FILTER
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
         { city: { $regex: search, $options: "i" } },
       ];
     }
+
+    // 5. APPLY STATUS FILTER
     if (
       statusFilter &&
       statusFilter !== "All" &&
@@ -87,10 +102,13 @@ exports.getAllProperties = async (req, res) => {
     ) {
       query.status = statusFilter;
     }
+
+    // 6. APPLY ADMIN/MANAGER SPECIFIC ASSIGNMENT OVERRIDE
     if (assignedToFilter && (role === "admin" || role === "manager")) {
       query.assignedTo = assignedToFilter;
     }
 
+    // EXECUTE DB QUERY
     const total = await Property.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
     const skip = (page - 1) * limit;

@@ -2,6 +2,25 @@ const Lead = require("../models/Lead");
 const User = require("../models/User");
 const Task = require("../models/Task");
 
+/**
+ * SENIOR DEV LOGIC: Robust 10-Digit Mobile Number Validation
+ * - Handles both String and Number types safely
+ * - Trims accidental whitespace
+ * - Enforces exactly 10 digits (0-9)
+ * - Blocks dummy numbers like "0000000000"
+ */
+const isValidMobileNumber = (phone) => {
+  if (!phone) return true; // Let Mongoose schema handle "required" logic
+
+  const phoneStr = String(phone).trim(); // Safely convert to string and remove spaces
+
+  // Regex: Exactly 10 digits
+  const isValidFormat = /^\d{10}$/.test(phoneStr);
+  const isNotAllZeros = phoneStr !== "0000000000";
+
+  return isValidFormat && isNotAllZeros;
+};
+
 // 1. Stats logic (UPDATED FOR MANAGER HIERARCHY & PIPELINE)
 exports.getDashboardStats = async (req, res) => {
   try {
@@ -89,22 +108,24 @@ exports.getDashboardStats = async (req, res) => {
   }
 };
 
-//  2. Get All (with pagination and optional search/status/assignedTo filter)
+//  2. Get All (with pagination, search, status, assignedTo, and budget filter)
 exports.getAllLeads = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const role = req.user.role;
+
+    // 1. BASE QUERY START
     let query = {};
 
-    if (role === "admin") {
-      query = {};
-    } else if (role === "manager") {
+    // 2. ROLE HIERARCHY LOGIC
+    if (role === "manager") {
       const teamAgents = await User.find({ managedBy: userId }).distinct("_id");
-      query = { assignedTo: { $in: [userId, ...teamAgents] } };
-    } else {
-      query = { assignedTo: userId };
+      query.assignedTo = { $in: [userId, ...teamAgents] };
+    } else if (role !== "admin") {
+      query.assignedTo = userId;
     }
 
+    // 3. EXTRACT FILTERS
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.min(
       100,
@@ -113,7 +134,17 @@ exports.getAllLeads = async (req, res) => {
     const search = (req.query.search || "").trim();
     const statusFilter = req.query.status;
     const assignedToFilter = req.query.assignedTo;
+    const minPrice = req.query.minPrice;
+    const maxPrice = req.query.maxPrice;
 
+    // 4. APPLY BUDGET FILTER
+    if (minPrice || maxPrice) {
+      query.budget = {};
+      if (minPrice) query.budget.$gte = Number(minPrice);
+      if (maxPrice) query.budget.$lte = Number(maxPrice);
+    }
+
+    // 5. APPLY SEARCH FILTER
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -121,6 +152,8 @@ exports.getAllLeads = async (req, res) => {
         { company: { $regex: search, $options: "i" } },
       ];
     }
+
+    // 6. APPLY STATUS FILTER
     if (statusFilter && statusFilter !== "All") {
       const valid = [
         "New",
@@ -132,10 +165,13 @@ exports.getAllLeads = async (req, res) => {
       ];
       if (valid.includes(statusFilter)) query.status = statusFilter;
     }
+
+    // 7. APPLY ASSIGNED USER FILTER OVERRIDE
     if (assignedToFilter && (role === "admin" || role === "manager")) {
       query.assignedTo = assignedToFilter;
     }
 
+    // EXECUTE DB QUERY
     const total = await Lead.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
     const skip = (page - 1) * limit;
@@ -153,9 +189,17 @@ exports.getAllLeads = async (req, res) => {
   }
 };
 
-// 3. Create (UPDATED TO FIX ASSIGNMENT BUG)
+// 3. Create
 exports.createLead = async (req, res) => {
   try {
+    // PROPER VALIDATION CHECK
+    if (req.body.phone && !isValidMobileNumber(req.body.phone)) {
+      return res.status(400).json({
+        message:
+          "Invalid phone number. Please enter a valid 10-digit mobile number.",
+      });
+    }
+
     // Logic: Check if user sent an 'assignedTo' ID AND has permission to assign
     let assignee = req.user.id;
 
@@ -168,7 +212,7 @@ exports.createLead = async (req, res) => {
 
     const newLead = new Lead({
       ...req.body,
-      assignedTo: assignee, // Uses selected agent if provided, else self
+      assignedTo: assignee,
     });
 
     await newLead.save();
@@ -192,6 +236,14 @@ exports.getLeadById = async (req, res) => {
 // 5. Update
 exports.updateLead = async (req, res) => {
   try {
+    // PROPER VALIDATION CHECK
+    if (req.body.phone && !isValidMobileNumber(req.body.phone)) {
+      return res.status(400).json({
+        message:
+          "Invalid phone number. Please enter a valid 10-digit mobile number.",
+      });
+    }
+
     const updated = await Lead.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });

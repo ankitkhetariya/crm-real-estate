@@ -1,3 +1,4 @@
+// Leads.jsx
 import { useEffect, useState, useCallback } from "react";
 import API from "../../api/axios";
 import {
@@ -8,63 +9,84 @@ import {
   Phone,
   Mail,
   Edit,
-  X,
-  Save,
-  Briefcase,
-  MapPin,
-  MessageSquare,
   Eye,
   ChevronLeft,
   ChevronRight,
+  Briefcase,
+  X,
+  Save,
+  IndianRupee,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import styles from "./Leads.module.css";
 
-// 1. Import Global Tools
 import { useAdminView } from "../../hooks/useAdminView";
 import AdminViewFilter from "../../components/AdminViewFilter";
 
 const Leads = () => {
   const navigate = useNavigate();
-
-  // 2. Use Global Hook
   const { viewTargetId, setTarget } = useAdminView();
 
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+
+  // UI Input States (Won't trigger fetch until applied)
+  const [searchInput, setSearchInput] = useState("");
+  const [minBudgetInput, setMinBudgetInput] = useState("");
+  const [maxBudgetInput, setMaxBudgetInput] = useState("");
+  const [statusInput, setStatusInput] = useState("All");
+
+  // Active Filter States (These trigger the fetch)
+  const [activeFilters, setActiveFilters] = useState({
+    search: "",
+    minPrice: "",
+    maxPrice: "",
+    status: "All",
+  });
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentLead, setCurrentLead] = useState(null);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
   const limit = 10;
 
   const fetchLeads = useCallback(async () => {
     try {
       setLoading(true);
+
       const params = {
         page,
         limit,
-        search: searchText || undefined,
-        status: statusFilter !== "All" ? statusFilter : undefined,
+        search: activeFilters.search || undefined,
+        status:
+          activeFilters.status !== "All" ? activeFilters.status : undefined,
         assignedTo: viewTargetId || undefined,
+        minPrice: activeFilters.minPrice || undefined,
+        maxPrice: activeFilters.maxPrice || undefined,
       };
+
       const res = await API.get("/leads", { params });
       const payload = res.data;
-      setLeads(Array.isArray(payload.data) ? payload.data : []);
-      setTotal(payload.total ?? 0);
-      setTotalPages(payload.totalPages ?? 1);
-      setPage(payload.page ?? 1);
-    } catch (err) {
+
+      if (payload && Array.isArray(payload.data)) {
+        setLeads(payload.data);
+        setTotalPages(payload.totalPages || 1);
+      } else if (Array.isArray(payload)) {
+        setLeads(payload);
+        setTotalPages(1);
+      } else {
+        setLeads([]);
+        setTotalPages(1);
+      }
+    } catch {
       toast.error("Failed to load leads");
     } finally {
       setLoading(false);
     }
-  }, [page, searchText, statusFilter, viewTargetId]);
+  }, [page, activeFilters, viewTargetId]);
 
   useEffect(() => {
     fetchLeads();
@@ -72,91 +94,154 @@ const Leads = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [searchText, statusFilter, viewTargetId]);
+  }, [activeFilters, viewTargetId]);
 
-  /* PROFESSIONAL VIEW DETAILS POPUP */
+  const handleBudgetInput = (e, setter) => {
+    const val = e.target.value;
+    if (val === "" || Number(val) >= 0) setter(val);
+  };
+
+  const handleApplyFilters = () => {
+    if (Number(minBudgetInput) < 0 || Number(maxBudgetInput) < 0) {
+      toast.error("Budget cannot be negative!");
+      return;
+    }
+    if (
+      minBudgetInput &&
+      maxBudgetInput &&
+      Number(minBudgetInput) > Number(maxBudgetInput)
+    ) {
+      toast.error("Min budget cannot be greater than Max budget!");
+      return;
+    }
+
+    setActiveFilters({
+      search: searchInput.trim(),
+      minPrice: minBudgetInput,
+      maxPrice: maxBudgetInput,
+      status: statusInput,
+    });
+    setPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSearchInput("");
+    setMinBudgetInput("");
+    setMaxBudgetInput("");
+    setStatusInput("All");
+    setActiveFilters({ search: "", minPrice: "", maxPrice: "", status: "All" });
+    setPage(1);
+  };
+
   const handleViewDetails = (lead) => {
     Swal.fire({
-      title: null,
-      html: `
-          <div style="text-align: left; font-family: 'Inter', sans-serif; color: #334155;">
-
-            <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:10px;">
-              <div>
-                  <h2 style="margin: 0; font-size: 1.4rem; color: #0f172a; font-weight: 700;">${lead.name}</h2>
-                  <div style="font-size: 0.9rem; color: #64748b; margin-top: 4px; display:flex; align-items:center; gap:6px;">
-                      <span style="background:#f1f5f9; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:600;">${lead.company || "Individual"}</span>
-                  </div>
-              </div>
-              <div>
-                  <span style="background:${getStatusColor(lead.status)}; color:white; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:600; text-transform:uppercase;">${lead.status}</span>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-
-              <div style="flex: 1 1 200px; background:#f8fafc; padding:10px; border-radius:8px;">
-                  <div style="color:#64748b; font-size:0.7rem; font-weight:700; text-transform:uppercase; margin-bottom:4px;">Email</div>
-                  <div style="font-weight:500; color:#0f172a; font-size:0.9rem; word-break: break-all;">${lead.email}</div>
-              </div>
-
-              <div style="flex: 1 1 200px; background:#f8fafc; padding:10px; border-radius:8px;">
-                  <div style="color:#64748b; font-size:0.7rem; font-weight:700; text-transform:uppercase; margin-bottom:4px;">Phone</div>
-                  <div style="font-weight:500; color:#0f172a; font-size:0.9rem;">${lead.phone}</div>
-              </div>
-
-              <div style="flex: 1 1 200px; background:#f8fafc; padding:10px; border-radius:8px;">
-                  <div style="color:#64748b; font-size:0.7rem; font-weight:700; text-transform:uppercase; margin-bottom:4px;">Budget</div>
-                  <div style="font-weight:600; color:#2563eb; font-size:1rem;">₹${Number(lead.budget).toLocaleString("en-IN")}</div>
-              </div>
-
-              <div style="flex: 1 1 200px; background:#f8fafc; padding:10px; border-radius:8px;">
-                  <div style="color:#64748b; font-size:0.7rem; font-weight:700; text-transform:uppercase; margin-bottom:4px;">Source</div>
-                  <div style="font-weight:500; color:#0f172a; font-size:0.9rem;">${lead.source}</div>
-              </div>
-
-            </div>
-
-            ${
-              lead.address
-                ? `
-            <div style="margin-bottom: 20px;">
-               <div style="color:#64748b; font-size:0.75rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;">📍 Address</div>
-               <div style="color:#334155; font-size:0.9rem;">${lead.address}</div>
-            </div>`
-                : ""
-            }
-
-            <div style="background:#fff7ed; padding:15px; border-radius:8px; border-left:4px solid #f97316;">
-              <div style="color:#9a3412; font-size:0.75rem; font-weight:800; text-transform:uppercase; margin-bottom:6px;">📝 Full Notes</div>
-              <p style="margin: 0; font-size: 0.9rem; line-height: 1.5; color: #334155; white-space: pre-wrap;">${lead.notes || "No notes available."}</p>
-            </div>
-          </div>
-        `,
-      showCloseButton: true,
+      background: "var(--card-bg)",
+      color: "var(--text-primary)",
+      width: "500px",
       showConfirmButton: false,
-      width: "550px", // Limits max width on desktop
-      padding: "20px",
-      customClass: {
-        popup: "swal2-responsive-popup", // Optional hooks for CSS if needed later
-      },
+      showCloseButton: true,
+      html: `
+      <div style="text-align:left; font-family: 'Inter', sans-serif;">
+        <h2 style="margin: 0 0 10px 0; font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">${lead.name}</h2>
+        <div style="margin-bottom: 20px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+          🏢 ${lead.company || "Individual Client"}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+          <div style="background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border);">
+             <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Status</div>
+             <div style="font-size: 1rem; font-weight: 600; color: ${getStatusColorHex(lead.status)};">${lead.status}</div>
+          </div>
+          <div style="background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border);">
+             <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Budget</div>
+             <div style="font-size: 1rem; font-weight: 600; color: #2563eb;">₹${Number(lead.budget).toLocaleString("en-IN")}</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--card-border);">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Email</div>
+          <div style="font-size: 0.95rem; font-weight: 500; color: var(--text-primary); word-break: break-all;">
+             <a href="mailto:${lead.email}" style="color: var(--link-color); text-decoration: none;">${lead.email}</a>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Phone</div>
+          <div style="font-size: 0.95rem; font-weight: 500; color: var(--text-primary);">
+             <a href="tel:${lead.phone}" style="color: var(--text-primary); text-decoration: none;">${lead.phone}</a>
+          </div>
+        </div>
+
+        ${
+          lead.notes
+            ? `
+        <div style="margin-top: 20px; background: #fff7ed; padding: 12px; border-radius: 8px; border-left: 4px solid #f97316;">
+          <div style="font-size: 0.75rem; color: #9a3412; text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Notes</div>
+          <div style="font-size: 0.9rem; color: #431407; white-space: pre-wrap;">${lead.notes}</div>
+        </div>
+        `
+            : ""
+        }
+      </div>
+      `,
     });
   };
-  // Helper for Status Colors in Popup
-  const getStatusColor = (status) => {
+
+  const getStatusColorHex = (status) => {
     switch (status) {
       case "New":
         return "#3b82f6";
       case "Contacted":
         return "#f59e0b";
       case "Qualified":
-        return "#10b981";
+        return "#8b5cf6";
+      case "Proposal Sent":
+        return "#0ea5e9";
       case "Converted":
-        return "#65a30d";
+        return "#16a34a";
       case "Lost":
-        return "#ef4444";
+        return "#dc2626";
       default:
-        return "#64748b";
+        return "var(--text-primary)";
+    }
+  };
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await API.put(`/leads/${id}`, { status: newStatus });
+      setLeads(
+        leads.map((l) => (l._id === id ? { ...l, status: newStatus } : l)),
+      );
+      toast.success(`Status updated to ${newStatus}`);
+    } catch (err) {
+      toast.error("Status Update failed");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: "Delete Lead?",
+      text: "You won't be able to revert this!",
+      background: "var(--card-bg)",
+      color: "var(--text-primary)",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await API.delete(`/leads/${id}`);
+        toast.success("Lead Deleted");
+        if (leads.length === 1 && page > 1) {
+          setPage(page - 1);
+        } else {
+          fetchLeads();
+        }
+      } catch {
+        toast.error("Failed to delete lead");
+      }
     }
   };
 
@@ -175,13 +260,11 @@ const Leads = () => {
     setCurrentLead({ ...currentLead, [name]: value });
   };
 
-  // Helper: Accurate Word Count
   const getWordCount = (str) => {
     if (!str) return 0;
     return str.trim().split(/\s+/).filter(Boolean).length;
   };
 
-  // Strict 15-Word Limit Handler
   const handleNotesChange = (e) => {
     const val = e.target.value;
     const words = val.trim().split(/\s+/).filter(Boolean);
@@ -212,88 +295,16 @@ const Leads = () => {
     }
   };
 
-  const handleStatusChange = async (id, newStatus) => {
-    try {
-      await API.put(`/leads/${id}`, { status: newStatus });
-      setLeads(
-        leads.map((l) => (l._id === id ? { ...l, status: newStatus } : l)),
-      );
-      toast.success(`Status updated to ${newStatus}`);
-    } catch (err) {
-      toast.error("Update failed");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "Delete this Lead?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      confirmButtonText: "Yes, delete it!",
-    });
-    if (result.isConfirmed) {
-      try {
-        await API.delete(`/leads/${id}`);
-        toast.success("Lead removed successfully");
-        fetchLeads();
-      } catch (err) {
-        toast.error("Failed to delete");
-      }
-    }
-  };
-
-  const handleDeleteAll = async () => {
-    const result = await Swal.fire({
-      title: "Are you absolutely sure?",
-      text: "This will delete ALL leads. This action cannot be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#64748b",
-      confirmButtonText: "Yes, delete everything!",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        setLoading(true);
-        await API.delete("/leads/delete-all");
-        toast.success("All Leads have been cleared!");
-        fetchLeads();
-      } catch (err) {
-        toast.error(err.response?.data?.message || "Failed to clear leads");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  if (loading)
-    return <div className={styles.loading}>Loading Dashboard...</div>;
+  if (loading) return <div className={styles.loading}>Loading Leads...</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>Sales Leads</h2>
-        <div className={styles.headerActions}>
-          {["admin", "manager"].includes(
-            JSON.parse(
-              localStorage.getItem("user") || "{}",
-            ).role?.toLowerCase(),
-          ) &&
-            total > 0 && (
-              <button className={styles.deleteAllBtn} onClick={handleDeleteAll}>
-                <Trash2 size={18} /> Delete All
-              </button>
-            )}
-          <button
-            className={styles.addBtn}
-            onClick={() => navigate("/add-lead")}
-          >
-            <Plus size={18} /> New Lead
-          </button>
-        </div>
+
+        <button className={styles.addBtn} onClick={() => navigate("/add-lead")}>
+          <Plus size={18} /> New Lead
+        </button>
       </div>
 
       {["admin", "manager"].includes(
@@ -307,31 +318,65 @@ const Leads = () => {
         </div>
       )}
 
-      <div className={styles.filterBar}>
-        <div className={styles.searchWrapper}>
-          <Search size={20} className={styles.searchIcon} />
-          <input
-            className={styles.searchInput}
-            type="text"
-            placeholder="Search..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+      {/* FILTER CARD */}
+      <div className={styles.filterCard}>
+        <div className={styles.filterGrid}>
+          <div className={styles.inputWrapper}>
+            <Search size={16} className={styles.inputIcon} />
+            <input
+              type="text"
+              placeholder="Search leads..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.inputWrapper}>
+            <IndianRupee size={16} className={styles.inputIcon} />
+            <input
+              type="number"
+              min="0"
+              placeholder="Min Budget"
+              value={minBudgetInput}
+              onChange={(e) => handleBudgetInput(e, setMinBudgetInput)}
+            />
+          </div>
+
+          <div className={styles.inputWrapper}>
+            <IndianRupee size={16} className={styles.inputIcon} />
+            <input
+              type="number"
+              min="0"
+              placeholder="Max Budget"
+              value={maxBudgetInput}
+              onChange={(e) => handleBudgetInput(e, setMaxBudgetInput)}
+            />
+          </div>
+
+          <div className={styles.inputWrapper}>
+            <Filter size={16} className={styles.inputIcon} />
+            <select
+              value={statusInput}
+              onChange={(e) => setStatusInput(e.target.value)}
+            >
+              <option value="All">All Statuses</option>
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Qualified">Qualified</option>
+              <option value="Proposal Sent">Proposal Sent</option>
+              <option value="Converted">Converted</option>
+              <option value="Lost">Lost</option>
+            </select>
+          </div>
         </div>
-        <div className={styles.filterWrapper}>
-          <Filter size={18} className={styles.filterIcon} />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="All">All Status</option>
-            <option value="New">New</option>
-            <option value="Contacted">Contacted</option>
-            <option value="Qualified">Qualified</option>
-            <option value="Proposal Sent">Proposal Sent</option>
-            <option value="Converted">Converted</option>
-            <option value="Lost">Lost</option>
-          </select>
+
+        <div className={styles.filterActions}>
+          <button className={styles.clearBtn} onClick={handleClearFilters}>
+            Clear
+          </button>
+          <button className={styles.applyBtn} onClick={handleApplyFilters}>
+            Apply Filters
+          </button>
         </div>
       </div>
 
@@ -342,26 +387,25 @@ const Leads = () => {
               <th>Lead Info</th>
               <th>Contact</th>
               <th>Status</th>
-              <th>Notes</th>
               <th>Budget</th>
-              <th style={{ textAlign: "center" }}>Actions</th>
+              <th>Action</th>
             </tr>
           </thead>
+
           <tbody>
             {leads.length === 0 ? (
               <tr>
-                <td colSpan="6" className={styles.emptyState}>
-                  {viewTargetId
-                    ? "No leads found for this user context."
-                    : "No leads found matching your search."}
+                <td colSpan="5" className={styles.emptyState}>
+                  No leads found.
                 </td>
               </tr>
             ) : (
               leads.map((lead) => (
                 <tr key={lead._id}>
-                  <td data-label="LEAD INFO">
+                  <td data-label="Lead Info">
                     <div className={styles.leadInfo}>
                       <div className={styles.avatar}>{lead.name.charAt(0)}</div>
+
                       <div>
                         <div className={styles.leadName}>{lead.name}</div>
                         <div className={styles.companyName}>
@@ -370,29 +414,26 @@ const Leads = () => {
                       </div>
                     </div>
                   </td>
-                  <td data-label="CONTACT">
+
+                  <td data-label="Contact">
                     <div className={styles.contactCell}>
-                      <a
-                        href={`mailto:${lead.email}`}
-                        className={styles.contactLink}
-                      >
+                      <a href={`mailto:${lead.email}`}>
                         <Mail size={14} /> {lead.email}
                       </a>
-                      <a
-                        href={`tel:${lead.phone}`}
-                        className={`${styles.contactLink} ${styles.phoneLink}`}
-                      >
+
+                      <a href={`tel:${lead.phone}`}>
                         <Phone size={14} /> {lead.phone}
                       </a>
                     </div>
                   </td>
-                  <td data-label="STATUS">
+
+                  <td data-label="Status">
                     <select
-                      className={styles.statusSelect}
                       value={lead.status}
                       onChange={(e) =>
                         handleStatusChange(lead._id, e.target.value)
                       }
+                      className={styles.statusSelect}
                       data-status={lead.status}
                     >
                       <option value="New">New</option>
@@ -403,40 +444,30 @@ const Leads = () => {
                       <option value="Lost">Lost</option>
                     </select>
                   </td>
-                  <td data-label="NOTES">
-                    <div className={styles.noteCell} title={lead.notes}>
-                      <MessageSquare size={14} className={styles.noteIcon} />
-                      <span className={styles.noteText}>
-                        {lead.notes ? lead.notes : "No notes added"}
-                      </span>
-                    </div>
-                  </td>
-                  <td data-label="BUDGET">
+
+                  <td data-label="Budget">
                     <div className={styles.budgetCell}>
                       ₹{Number(lead.budget).toLocaleString("en-IN")}
                     </div>
-                    <div className={styles.sourceLabel}>{lead.source}</div>
                   </td>
-                  <td data-label="ACTIONS">
+
+                  <td data-label="Action">
                     <div className={styles.actions}>
-                      {/* ✅ VIEW DETAILS BUTTON */}
                       <button
-                        className={styles.viewBtn}
                         onClick={() => handleViewDetails(lead)}
-                        title="View Full Details"
+                        title="View Details"
                       >
                         <Eye size={16} />
                       </button>
 
                       <button
-                        className={styles.editBtn}
                         onClick={() => openEditModal(lead)}
                         title="Edit Lead"
                       >
                         <Edit size={16} />
                       </button>
+
                       <button
-                        className={styles.deleteBtn}
                         onClick={() => handleDelete(lead._id)}
                         title="Delete Lead"
                       >
@@ -454,19 +485,17 @@ const Leads = () => {
       {totalPages > 1 && (
         <div className={styles.pagination}>
           <button
-            type="button"
-            className={styles.paginationBtn}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
           >
-            <ChevronLeft size={18} /> Previous
+            <ChevronLeft size={18} /> Prev
           </button>
-          <span className={styles.paginationInfo}>
-            Page {page} of {totalPages} ({total} total)
+
+          <span>
+            Page {page} of {totalPages}
           </span>
+
           <button
-            type="button"
-            className={styles.paginationBtn}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
           >
@@ -489,7 +518,6 @@ const Leads = () => {
             </div>
             <form onSubmit={handleSaveChanges} className={styles.editForm}>
               <div className={styles.formGrid}>
-                {/* Inputs ... */}
                 <div className={styles.formGroup}>
                   <label>Full Name</label>
                   <input
@@ -552,7 +580,6 @@ const Leads = () => {
                   </select>
                 </div>
 
-                {/* NOTES SECTION WITH COUNTER */}
                 <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                   <div
                     style={{
@@ -570,17 +597,17 @@ const Leads = () => {
                         color:
                           getWordCount(currentLead.notes || "") >= 15
                             ? "#ef4444"
-                            : "#64748b",
+                            : "var(--text-secondary)",
                         background:
                           getWordCount(currentLead.notes || "") >= 15
                             ? "#fef2f2"
-                            : "#f1f5f9",
+                            : "var(--input-bg)",
                         padding: "2px 8px",
                         borderRadius: "12px",
                         border:
                           getWordCount(currentLead.notes || "") >= 15
                             ? "1px solid #fecaca"
-                            : "1px solid #e2e8f0",
+                            : "1px solid var(--input-border)",
                       }}
                     >
                       Word Count: {getWordCount(currentLead.notes || "")}/15
@@ -591,28 +618,16 @@ const Leads = () => {
                     value={currentLead.notes || ""}
                     onChange={handleNotesChange}
                     rows="3"
-                    placeholder="Enter notes (Max 15 words)..."
                     style={{
                       borderColor:
                         getWordCount(currentLead.notes || "") >= 15
                           ? "#ef4444"
-                          : "#cbd5e1",
+                          : "var(--input-border)",
                     }}
                   />
-                  {getWordCount(currentLead.notes || "") >= 15 && (
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        color: "#ef4444",
-                        marginTop: "4px",
-                      }}
-                    >
-                      Maximum word limit reached.
-                    </span>
-                  )}
                 </div>
               </div>
-              <div className={styles.modalFooter}>
+              <div className={styles.modalActions}>
                 <button
                   type="button"
                   className={styles.cancelBtn}

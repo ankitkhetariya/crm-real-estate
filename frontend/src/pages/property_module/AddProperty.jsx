@@ -210,7 +210,11 @@ const AddProperty = () => {
       const newPropertyId = res.data?._id;
 
       let brochureUploaded = false;
-      if (newPropertyId && brochureFile && brochureFile.type === "application/pdf") {
+      if (
+        newPropertyId &&
+        brochureFile &&
+        brochureFile.type === "application/pdf"
+      ) {
         try {
           const formData = new FormData();
           formData.append("brochure", brochureFile);
@@ -219,13 +223,20 @@ const AddProperty = () => {
           });
           brochureUploaded = true;
         } catch (brochureErr) {
-          toast.error(brochureErr.response?.data?.message || "Property saved but brochure upload failed.");
+          toast.error(
+            brochureErr.response?.data?.message ||
+              "Property saved but brochure upload failed.",
+          );
         }
       } else if (brochureFile && brochureFile.type !== "application/pdf") {
-        toast.error("Only PDF files are allowed for brochures. Property was saved without brochure.");
+        toast.error(
+          "Only PDF files are allowed for brochures. Property was saved without brochure.",
+        );
       }
 
-      let successMsg = brochureUploaded ? "Property and brochure saved!" : "Property Added!";
+      let successMsg = brochureUploaded
+        ? "Property and brochure saved!"
+        : "Property Added!";
       if (finalAssignee !== currentUserId) {
         const assigneeName =
           assignableUsers.find((u) => u._id === finalAssignee)?.name || "Agent";
@@ -474,7 +485,7 @@ const AddProperty = () => {
             />
           </div>
 
-          {/*  FILTERED Owner Dropdown */}
+          {/* FILTERED Owner Dropdown */}
           <div className={styles.formGroup}>
             <label>
               <User size={16} /> Assign to Lead (Optional)
@@ -526,7 +537,9 @@ const AddProperty = () => {
           </div>
 
           <div className={styles.formGroup} style={{ gridColumn: "1 / -1" }}>
-            <label><FileText size={16} /> PDF Brochure (optional)</label>
+            <label>
+              <FileText size={16} /> PDF Brochure (optional)
+            </label>
             <div className={styles.brochureRow}>
               <label className={styles.brochureUploadLabel}>
                 <UploadCloud size={18} />
@@ -539,6 +552,13 @@ const AddProperty = () => {
                     if (file) {
                       if (file.type !== "application/pdf") {
                         toast.error("Only PDF files are allowed.");
+                        return;
+                      }
+                      // ✅ 10MB LIMIT CHECK FOR PDF BROCHURE ADDED HERE
+                      if (file.size > 10 * 1024 * 1024) {
+                        toast.error(
+                          "Brochure file is too large. Max 10MB allowed.",
+                        );
                         return;
                       }
                       setBrochureFile(file);
